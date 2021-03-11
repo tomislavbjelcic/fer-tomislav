@@ -1,0 +1,10 @@
+Objekt tipa PlainOldClass zauzima 4 bajta jer sadrži samo 1 int koji zauzima 4 bajta, i nema
+nikakvih virtualnih funkcija, stoga pokazivač na tablicu virtualnih funkcija ne postoji u tom objektu.
+
+Objekt tipa CoolClass zauzima 16 bajtova. Zašto?
+Objekt tipa CoolClass ima virtualne funkcije, što znači da, uz 1 int, objekt sadrži i pokazivač na tablicu 
+virtualnih funkcija. Pokazivač na tablicu virtualnih funkcija zauzima 8 bajtova jer se radi o 64-bitnom računalu.
+Taj pokazivač je prvi član koji zauzima memorijski prostor objekta. Nakon njega slijedi int x_.
+Cijeli objekt mora zauzimati broj bajtova djeljiv sa brojem bajtova memorijski najvećeg člana.
+U ovom slučaju radi se o pokazivaču koji zauzima 8 bajtova. Zbog toga se uz 8+4=12 bajtova dodaje još 4 bajta, što ukupno 
+čini 16 bajtova.
