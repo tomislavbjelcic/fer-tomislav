@@ -11,7 +11,7 @@ struct Square_Vtable {
 static Square_Vtable vtbl = {
 	.dstr = &Unary_Function_destruct_impl,
 	.value_at = &Square_value_at_impl,
-	.negative_value_at = &Unary_Function_negative_value_at
+	.negative_value_at = &Unary_Function_negative_value_at_impl
 };
 
 Square *Square_create(int lb, int ub) {

@@ -44,7 +44,7 @@ class Square : public Unary_Function
 {
 public:
     Square(int lb, int ub) : Unary_Function(lb, ub){};
-    virtual double value_at(double x)
+    virtual double value_at(double x) override
     {
         return x * x;
     };
@@ -58,7 +58,7 @@ private:
 
 public:
     Linear(int lb, int ub, double a_coef, double b_coef) : Unary_Function(lb, ub), a(a_coef), b(b_coef){};
-    virtual double value_at(double x)
+    virtual double value_at(double x) override
     {
         return a * x + b;
     };
