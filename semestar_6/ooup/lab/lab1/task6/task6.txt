@@ -1,0 +1,17 @@
+Prilikom stvaranja objekta tipa Derived poziva se njegov konstruktor. U tom trenutku njegov 
+pokazivač na tablicu virtualnih funkcija nigdje ne pokazuje. Konstruktor razreda Derived 
+pak poziva konstruktor nadređenog razreda Base. U tom trenutku kreće izvođenje konstruktora 
+razreda Base i tada pokazivač tablice virtualnih funkcija pokazuje na tablicu virtualnih funkcija 
+razreda Base. Kreće izvođenje metode razreda Base (Base::metoda()), koja poziva virtualnu metodu istog razreda.
+Kako u tom trenutku pokazivač tablice virtualnih metoda pokazuje na onu iz razreda Base (unatoč tome što se radi 
+o instanci/objektu razreda Derived), bit će pozvana Base::virtualnaMetoda. Prema tome, prva linija ispisa je
+"Metoda kaže: ja sam bazna implementacija!".
+Završava izvođenje konstruktora razreda Base te sada kreće izvođenje konstruktora razreda Derived. Tada 
+pokazivač na tablicu virtualnih funkcija pokazuje na onu iz razreda Derived.
+Opet se izvodi nevirtualna Base::metoda koja poziva virtualnu metodu virtualnaMetoda. No sada, kako se 
+promijenio pokazivač na tablicu virtualnih funkcija, taj polimorfni poziv će izvesti metodu Derived::virtualnaMetoda.
+Prema tome, druga linija ispisa je "Metoda kaže: ja sam izvedena implementacija!".
+
+Konstrukcija (i inicijalizacija) objekta Derived je gotova. Odmah nakon toga se poziva Base::metoda koja opet 
+obavlja polimorfni poziv metode virtualnaMetoda, koja će izvesti onu iz razreda Derived jer se radi o instanci razreda 
+Derived.
