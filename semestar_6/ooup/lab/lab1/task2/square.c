@@ -2,14 +2,16 @@
 #include "unary_function.h"
 #include <stdlib.h>
 
-static double value_at_impl_(Square *self, double x) {
-	return x*x;
-}
+struct Square_Vtable {
+	void (*dstr)(Unary_Function *);
+	double (*value_at)(Square *, double);
+	double (*negative_value_at)(Unary_Function *, double); 	
+};
 
-const Square_Vtable squareVtbl = {
-	.dstr = unaryFunctionVtbl.dstr,
-	.value_at = &value_at_impl_,
-	.negative_value_at = unaryFunctionVtbl.negative_value_at
+static Square_Vtable vtbl = {
+	.dstr = &Unary_Function_destruct_impl,
+	.value_at = &Square_value_at_impl,
+	.negative_value_at = &Unary_Function_negative_value_at
 };
 
 Square *Square_create(int lb, int ub) {
@@ -18,18 +20,16 @@ Square *Square_create(int lb, int ub) {
 	return sq;
 }
 
-
-
 void Square_init(Square *self, int lb, int ub) {
-	Unary_Function_init(self, lb, ub);
-	self->vtbl = &squareVtbl;
+	Unary_Function_init((Unary_Function *)self, lb, ub);
+	self->vtbl = &vtbl;
 }
 
 void Square_destroy(Square *self) {
-	Unary_Function_destruct(self);
+	Unary_Function_destruct((Unary_Function *)self);
 	free(self);
 };
 
-double Square_value_at(Square *self, double x) {
-	return self->vtbl->value_at(self, x);
+double Square_value_at_impl(Square *self, double x) {
+	return x*x;
 };
