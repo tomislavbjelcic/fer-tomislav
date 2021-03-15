@@ -1,289 +1,248 @@
 	.file	"main.cpp"
 	.intel_syntax noprefix
 	.text
-	.section	.text$_ZN4BaseD2Ev,"x"
-	.linkonce discard
+	.section	.text._ZN9CoolClass3setEi,"axG",@progbits,_ZN9CoolClass3setEi,comdat
 	.align 2
-	.globl	_ZN4BaseD2Ev
-	.def	_ZN4BaseD2Ev;	.scl	2;	.type	32;	.endef
-	.seh_proc	_ZN4BaseD2Ev
-_ZN4BaseD2Ev:
-.LFB1:
-	push	rbp
-	.seh_pushreg	rbp
-	mov	rbp, rsp
-	.seh_setframe	rbp, 0
-	.seh_endprologue
-	mov	QWORD PTR 16[rbp], rcx
-	lea	rdx, _ZTV4Base[rip+16]
-	mov	rax, QWORD PTR 16[rbp]
-	mov	QWORD PTR [rax], rdx
-	nop
-	pop	rbp
-	ret
-	.seh_endproc
-	.section	.text$_ZN9CoolClass3setEi,"x"
-	.linkonce discard
-	.align 2
-	.globl	_ZN9CoolClass3setEi
-	.def	_ZN9CoolClass3setEi;	.scl	2;	.type	32;	.endef
-	.seh_proc	_ZN9CoolClass3setEi
+	.weak	_ZN9CoolClass3setEi
+	.type	_ZN9CoolClass3setEi, @function
 _ZN9CoolClass3setEi:
-.LFB4:
+.LFB0:
+	.cfi_startproc
+	endbr64
 	push	rbp
-	.seh_pushreg	rbp
+	.cfi_def_cfa_offset 16
+	.cfi_offset 6, -16
 	mov	rbp, rsp
-	.seh_setframe	rbp, 0
-	.seh_endprologue
-	mov	QWORD PTR 16[rbp], rcx
-	mov	DWORD PTR 24[rbp], edx
-	mov	rax, QWORD PTR 16[rbp]
-	mov	edx, DWORD PTR 24[rbp]
+	.cfi_def_cfa_register 6
+	mov	QWORD PTR -8[rbp], rdi
+	mov	DWORD PTR -12[rbp], esi
+	mov	rax, QWORD PTR -8[rbp]
+	mov	edx, DWORD PTR -12[rbp]
 	mov	DWORD PTR 8[rax], edx
 	nop
 	pop	rbp
+	.cfi_def_cfa 7, 8
 	ret
-	.seh_endproc
-	.section	.text$_ZN9CoolClass3getEv,"x"
-	.linkonce discard
+	.cfi_endproc
+.LFE0:
+	.size	_ZN9CoolClass3setEi, .-_ZN9CoolClass3setEi
+	.section	.text._ZN9CoolClass3getEv,"axG",@progbits,_ZN9CoolClass3getEv,comdat
 	.align 2
-	.globl	_ZN9CoolClass3getEv
-	.def	_ZN9CoolClass3getEv;	.scl	2;	.type	32;	.endef
-	.seh_proc	_ZN9CoolClass3getEv
+	.weak	_ZN9CoolClass3getEv
+	.type	_ZN9CoolClass3getEv, @function
 _ZN9CoolClass3getEv:
-.LFB5:
+.LFB1:
+	.cfi_startproc
+	endbr64
 	push	rbp
-	.seh_pushreg	rbp
+	.cfi_def_cfa_offset 16
+	.cfi_offset 6, -16
 	mov	rbp, rsp
-	.seh_setframe	rbp, 0
-	.seh_endprologue
-	mov	QWORD PTR 16[rbp], rcx
-	mov	rax, QWORD PTR 16[rbp]
+	.cfi_def_cfa_register 6
+	mov	QWORD PTR -8[rbp], rdi
+	mov	rax, QWORD PTR -8[rbp]
 	mov	eax, DWORD PTR 8[rax]
 	pop	rbp
+	.cfi_def_cfa 7, 8
 	ret
-	.seh_endproc
-	.section	.text$_ZN13PlainOldClass3setEi,"x"
-	.linkonce discard
+	.cfi_endproc
+.LFE1:
+	.size	_ZN9CoolClass3getEv, .-_ZN9CoolClass3getEv
+	.section	.text._ZN13PlainOldClass3setEi,"axG",@progbits,_ZN13PlainOldClass3setEi,comdat
 	.align 2
-	.globl	_ZN13PlainOldClass3setEi
-	.def	_ZN13PlainOldClass3setEi;	.scl	2;	.type	32;	.endef
-	.seh_proc	_ZN13PlainOldClass3setEi
+	.weak	_ZN13PlainOldClass3setEi
+	.type	_ZN13PlainOldClass3setEi, @function
 _ZN13PlainOldClass3setEi:
-.LFB6:
+.LFB2:
+	.cfi_startproc
+	endbr64
 	push	rbp
-	.seh_pushreg	rbp
+	.cfi_def_cfa_offset 16
+	.cfi_offset 6, -16
 	mov	rbp, rsp
-	.seh_setframe	rbp, 0
-	.seh_endprologue
-	mov	QWORD PTR 16[rbp], rcx
-	mov	DWORD PTR 24[rbp], edx
-	mov	rax, QWORD PTR 16[rbp]
-	mov	edx, DWORD PTR 24[rbp]
+	.cfi_def_cfa_register 6
+	mov	QWORD PTR -8[rbp], rdi
+	mov	DWORD PTR -12[rbp], esi
+	mov	rax, QWORD PTR -8[rbp]
+	mov	edx, DWORD PTR -12[rbp]
 	mov	DWORD PTR [rax], edx
 	nop
 	pop	rbp
+	.cfi_def_cfa 7, 8
 	ret
-	.seh_endproc
-	.section	.text$_ZN4BaseC2Ev,"x"
-	.linkonce discard
+	.cfi_endproc
+.LFE2:
+	.size	_ZN13PlainOldClass3setEi, .-_ZN13PlainOldClass3setEi
+	.section	.text._ZN4BaseC2Ev,"axG",@progbits,_ZN4BaseC5Ev,comdat
 	.align 2
-	.globl	_ZN4BaseC2Ev
-	.def	_ZN4BaseC2Ev;	.scl	2;	.type	32;	.endef
-	.seh_proc	_ZN4BaseC2Ev
+	.weak	_ZN4BaseC2Ev
+	.type	_ZN4BaseC2Ev, @function
 _ZN4BaseC2Ev:
-.LFB11:
+.LFB7:
+	.cfi_startproc
+	endbr64
 	push	rbp
-	.seh_pushreg	rbp
+	.cfi_def_cfa_offset 16
+	.cfi_offset 6, -16
 	mov	rbp, rsp
-	.seh_setframe	rbp, 0
-	.seh_endprologue
-	mov	QWORD PTR 16[rbp], rcx
+	.cfi_def_cfa_register 6
+	mov	QWORD PTR -8[rbp], rdi
 	lea	rdx, _ZTV4Base[rip+16]
-	mov	rax, QWORD PTR 16[rbp]
+	mov	rax, QWORD PTR -8[rbp]
 	mov	QWORD PTR [rax], rdx
 	nop
 	pop	rbp
+	.cfi_def_cfa 7, 8
 	ret
-	.seh_endproc
-	.section	.text$_ZN9CoolClassC1Ev,"x"
-	.linkonce discard
+	.cfi_endproc
+.LFE7:
+	.size	_ZN4BaseC2Ev, .-_ZN4BaseC2Ev
+	.weak	_ZN4BaseC1Ev
+	.set	_ZN4BaseC1Ev,_ZN4BaseC2Ev
+	.section	.text._ZN9CoolClassC2Ev,"axG",@progbits,_ZN9CoolClassC5Ev,comdat
 	.align 2
-	.globl	_ZN9CoolClassC1Ev
-	.def	_ZN9CoolClassC1Ev;	.scl	2;	.type	32;	.endef
-	.seh_proc	_ZN9CoolClassC1Ev
-_ZN9CoolClassC1Ev:
-.LFB14:
+	.weak	_ZN9CoolClassC2Ev
+	.type	_ZN9CoolClassC2Ev, @function
+_ZN9CoolClassC2Ev:
+.LFB9:
+	.cfi_startproc
+	endbr64
 	push	rbp
-	.seh_pushreg	rbp
+	.cfi_def_cfa_offset 16
+	.cfi_offset 6, -16
 	mov	rbp, rsp
-	.seh_setframe	rbp, 0
-	sub	rsp, 32
-	.seh_stackalloc	32
-	.seh_endprologue
-	mov	QWORD PTR 16[rbp], rcx
-	mov	rax, QWORD PTR 16[rbp]
-	mov	rcx, rax
+	.cfi_def_cfa_register 6
+	sub	rsp, 16
+	mov	QWORD PTR -8[rbp], rdi
+	mov	rax, QWORD PTR -8[rbp]
+	mov	rdi, rax
 	call	_ZN4BaseC2Ev
 	lea	rdx, _ZTV9CoolClass[rip+16]
-	mov	rax, QWORD PTR 16[rbp]
+	mov	rax, QWORD PTR -8[rbp]
 	mov	QWORD PTR [rax], rdx
 	nop
-	add	rsp, 32
-	pop	rbp
+	leave
+	.cfi_def_cfa 7, 8
 	ret
-	.seh_endproc
-	.def	__main;	.scl	2;	.type	32;	.endef
+	.cfi_endproc
+.LFE9:
+	.size	_ZN9CoolClassC2Ev, .-_ZN9CoolClassC2Ev
+	.weak	_ZN9CoolClassC1Ev
+	.set	_ZN9CoolClassC1Ev,_ZN9CoolClassC2Ev
 	.text
 	.globl	main
-	.def	main;	.scl	2;	.type	32;	.endef
-	.seh_proc	main
+	.type	main, @function
 main:
-.LFB8:
+.LFB4:
+	.cfi_startproc
+	endbr64
 	push	rbp
-	.seh_pushreg	rbp
+	.cfi_def_cfa_offset 16
+	.cfi_offset 6, -16
+	mov	rbp, rsp
+	.cfi_def_cfa_register 6
 	push	rbx
-	.seh_pushreg	rbx
-	sub	rsp, 56
-	.seh_stackalloc	56
-	lea	rbp, 128[rsp]
-	.seh_setframe	rbp, 128
-	.seh_endprologue
-	call	__main
-	mov	ecx, 16
-	call	_Znwy
+	sub	rsp, 40
+	.cfi_offset 3, -24
+	mov	rax, QWORD PTR fs:40
+	mov	QWORD PTR -24[rbp], rax
+	xor	eax, eax
+	mov	edi, 16
+	call	_Znwm@PLT
 	mov	rbx, rax
-	mov	rcx, rbx
+	mov	rdi, rbx
 	call	_ZN9CoolClassC1Ev
-	mov	QWORD PTR -88[rbp], rbx
-	lea	rax, -92[rbp]
-	mov	edx, 42
-	mov	rcx, rax
+	mov	QWORD PTR -32[rbp], rbx
+	lea	rax, -36[rbp]
+	mov	esi, 42
+	mov	rdi, rax
 	call	_ZN13PlainOldClass3setEi
-	mov	rax, QWORD PTR -88[rbp]
+	mov	rax, QWORD PTR -32[rbp]
 	mov	rax, QWORD PTR [rax]
-	mov	rax, QWORD PTR [rax]
-	mov	rcx, QWORD PTR -88[rbp]
-	mov	edx, 42
-	call	rax
-	cmp	QWORD PTR -88[rbp], 0
-	je	.L9
-	mov	rax, QWORD PTR -88[rbp]
-	mov	rax, QWORD PTR [rax]
-	add	rax, 24
-	mov	rax, QWORD PTR [rax]
-	mov	rdx, QWORD PTR -88[rbp]
-	mov	rcx, rdx
-	call	rax
-.L9:
+	mov	rdx, QWORD PTR [rax]
+	mov	rax, QWORD PTR -32[rbp]
+	mov	esi, 42
+	mov	rdi, rax
+	call	rdx
 	mov	eax, 0
-	add	rsp, 56
+	mov	rcx, QWORD PTR -24[rbp]
+	xor	rcx, QWORD PTR fs:40
+	je	.L9
+	call	__stack_chk_fail@PLT
+.L9:
+	add	rsp, 40
 	pop	rbx
 	pop	rbp
+	.cfi_def_cfa 7, 8
 	ret
-	.seh_endproc
-	.globl	_ZTV9CoolClass
-	.section	.rdata$_ZTV9CoolClass,"dr"
-	.linkonce same_size
+	.cfi_endproc
+.LFE4:
+	.size	main, .-main
+	.weak	_ZTV9CoolClass
+	.section	.data.rel.ro.local._ZTV9CoolClass,"awG",@progbits,_ZTV9CoolClass,comdat
 	.align 8
+	.type	_ZTV9CoolClass, @object
+	.size	_ZTV9CoolClass, 32
 _ZTV9CoolClass:
 	.quad	0
 	.quad	_ZTI9CoolClass
 	.quad	_ZN9CoolClass3setEi
 	.quad	_ZN9CoolClass3getEv
-	.quad	_ZN9CoolClassD1Ev
-	.quad	_ZN9CoolClassD0Ev
-	.section	.text$_ZN9CoolClassD1Ev,"x"
-	.linkonce discard
-	.align 2
-	.globl	_ZN9CoolClassD1Ev
-	.def	_ZN9CoolClassD1Ev;	.scl	2;	.type	32;	.endef
-	.seh_proc	_ZN9CoolClassD1Ev
-_ZN9CoolClassD1Ev:
-.LFB17:
-	push	rbp
-	.seh_pushreg	rbp
-	mov	rbp, rsp
-	.seh_setframe	rbp, 0
-	sub	rsp, 32
-	.seh_stackalloc	32
-	.seh_endprologue
-	mov	QWORD PTR 16[rbp], rcx
-	lea	rdx, _ZTV9CoolClass[rip+16]
-	mov	rax, QWORD PTR 16[rbp]
-	mov	QWORD PTR [rax], rdx
-	mov	rax, QWORD PTR 16[rbp]
-	mov	rcx, rax
-	call	_ZN4BaseD2Ev
-	nop
-	add	rsp, 32
-	pop	rbp
-	ret
-	.seh_endproc
-	.section	.text$_ZN9CoolClassD0Ev,"x"
-	.linkonce discard
-	.align 2
-	.globl	_ZN9CoolClassD0Ev
-	.def	_ZN9CoolClassD0Ev;	.scl	2;	.type	32;	.endef
-	.seh_proc	_ZN9CoolClassD0Ev
-_ZN9CoolClassD0Ev:
-.LFB18:
-	push	rbp
-	.seh_pushreg	rbp
-	mov	rbp, rsp
-	.seh_setframe	rbp, 0
-	sub	rsp, 32
-	.seh_stackalloc	32
-	.seh_endprologue
-	mov	QWORD PTR 16[rbp], rcx
-	mov	rcx, QWORD PTR 16[rbp]
-	call	_ZN9CoolClassD1Ev
-	mov	edx, 16
-	mov	rcx, QWORD PTR 16[rbp]
-	call	_ZdlPvy
-	nop
-	add	rsp, 32
-	pop	rbp
-	ret
-	.seh_endproc
-	.globl	_ZTV4Base
-	.section	.rdata$_ZTV4Base,"dr"
-	.linkonce same_size
+	.weak	_ZTV4Base
+	.section	.data.rel.ro._ZTV4Base,"awG",@progbits,_ZTV4Base,comdat
 	.align 8
+	.type	_ZTV4Base, @object
+	.size	_ZTV4Base, 32
 _ZTV4Base:
 	.quad	0
 	.quad	_ZTI4Base
 	.quad	__cxa_pure_virtual
 	.quad	__cxa_pure_virtual
-	.quad	0
-	.quad	0
-	.globl	_ZTI9CoolClass
-	.section	.rdata$_ZTI9CoolClass,"dr"
-	.linkonce same_size
+	.weak	_ZTI9CoolClass
+	.section	.data.rel.ro._ZTI9CoolClass,"awG",@progbits,_ZTI9CoolClass,comdat
 	.align 8
+	.type	_ZTI9CoolClass, @object
+	.size	_ZTI9CoolClass, 24
 _ZTI9CoolClass:
 	.quad	_ZTVN10__cxxabiv120__si_class_type_infoE+16
 	.quad	_ZTS9CoolClass
 	.quad	_ZTI4Base
-	.globl	_ZTS9CoolClass
-	.section	.rdata$_ZTS9CoolClass,"dr"
-	.linkonce same_size
+	.weak	_ZTS9CoolClass
+	.section	.rodata._ZTS9CoolClass,"aG",@progbits,_ZTS9CoolClass,comdat
 	.align 8
+	.type	_ZTS9CoolClass, @object
+	.size	_ZTS9CoolClass, 11
 _ZTS9CoolClass:
-	.ascii "9CoolClass\0"
-	.globl	_ZTI4Base
-	.section	.rdata$_ZTI4Base,"dr"
-	.linkonce same_size
+	.string	"9CoolClass"
+	.weak	_ZTI4Base
+	.section	.data.rel.ro._ZTI4Base,"awG",@progbits,_ZTI4Base,comdat
 	.align 8
+	.type	_ZTI4Base, @object
+	.size	_ZTI4Base, 16
 _ZTI4Base:
 	.quad	_ZTVN10__cxxabiv117__class_type_infoE+16
 	.quad	_ZTS4Base
-	.globl	_ZTS4Base
-	.section	.rdata$_ZTS4Base,"dr"
-	.linkonce same_size
+	.weak	_ZTS4Base
+	.section	.rodata._ZTS4Base,"aG",@progbits,_ZTS4Base,comdat
+	.type	_ZTS4Base, @object
+	.size	_ZTS4Base, 6
 _ZTS4Base:
-	.ascii "4Base\0"
-	.ident	"GCC: (x86_64-win32-seh-rev0, Built by MinGW-W64 project) 8.1.0"
-	.def	_Znwy;	.scl	2;	.type	32;	.endef
-	.def	_ZdlPvy;	.scl	2;	.type	32;	.endef
-	.def	__cxa_pure_virtual;	.scl	2;	.type	32;	.endef
+	.string	"4Base"
+	.ident	"GCC: (Ubuntu 9.3.0-17ubuntu1~20.04) 9.3.0"
+	.section	.note.GNU-stack,"",@progbits
+	.section	.note.gnu.property,"a"
+	.align 8
+	.long	 1f - 0f
+	.long	 4f - 1f
+	.long	 5
+0:
+	.string	 "GNU"
+1:
+	.align 8
+	.long	 0xc0000002
+	.long	 3f - 2f
+2:
+	.long	 0x3
+3:
+	.align 8
+4:

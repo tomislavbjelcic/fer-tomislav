@@ -7,6 +7,8 @@ public:
     {
         metoda();
     }
+    
+    virtual ~Base() {}
 
     virtual void virtualnaMetoda()
     {
@@ -37,4 +39,6 @@ int main()
 {
     Derived *pd = new Derived();
     pd->metoda();
+    delete pd;
+    return 0;
 }

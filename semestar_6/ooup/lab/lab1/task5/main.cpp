@@ -40,14 +40,24 @@ void solution(B *pb, int x) {
 
     int p = funPrva(pb);
     int d = funDruga(pb, x);
-    cout << p << endl << d << endl;
+    
+    cout << "Poziv prva(): " << p << '\n';
+    cout << "Poziv druga(" << x << "): " << d << endl;
     
     return;
 }
 
-int main(void) {
+#define XDEF 7
+
+int main(int argc, char *argv[]) {
+	int x = XDEF;
+	if (argc >= 2)
+		x = stoi(argv[1]);	
+	cout << "x = " << x << '\n';
+	
     D d;
-    int x = 7;
-    solution(&d, x); // za x=7 ispisuje 42 49
+    B *pb = &d;
+    
+    solution(pb, x);
     return 0;
 }
