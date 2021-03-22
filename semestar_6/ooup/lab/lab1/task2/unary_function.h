@@ -18,11 +18,11 @@ Koja god funkcija uz nju ima i funkciju sa dodatkom _impl, to mi označava da se
 */
 
 void Unary_Function_init(Unary_Function *self, int lb, int ub);	// konstruktor
-void Unary_Function_destruct(Unary_Function *self);	// destruktor, kojeg sam dodatno učinio virtualnim
+void Unary_Function_destruct(Unary_Function *self);	// destruktor, kojeg sam dodatno učinio virtualnim da kompajler ne javlja warninge
 void Unary_Function_destruct_impl(Unary_Function *self);
 
 double Unary_Function_value_at(Unary_Function *self, double x);
-//double Unary_Function_value_at_impl(Unary_Function *self, double x);
+//double Unary_Function_value_at_impl(Unary_Function *self, double x); implementacija čiste virtualne metode ne postoji
 double Unary_Function_negative_value_at(Unary_Function *self, double x);
 double Unary_Function_negative_value_at_impl(Unary_Function *self, double x);
 void Unary_Function_tabulate(Unary_Function *self);
