@@ -5,15 +5,15 @@ using namespace std;
 class B
 {
 public:
-    virtual int prva() = 0;
-    virtual int druga(int) = 0;
+    virtual int __cdecl prva() = 0;
+    virtual int __cdecl druga(int) = 0;
 };
 
 class D : public B
 {
 public:
-    virtual int prva() { return 42; }
-    virtual int druga(int x) { return prva() + x; }
+    virtual int __cdecl prva() { return 42; }
+    virtual int __cdecl druga(int x) { return prva() + x; }
 };
 
 void solution(B *pb, int x) {
