@@ -1,10 +1,9 @@
-package srs.lab1.crypto;
+package srs.lab1;
 
 public class Main {
 	
 	public static void main(String[] args) {
-		
-		System.out.println("Bruh");
+		System.out.println("Hello world!");
 	}
 	
 }
