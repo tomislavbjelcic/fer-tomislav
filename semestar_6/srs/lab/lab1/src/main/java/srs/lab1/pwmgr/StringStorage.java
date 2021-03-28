@@ -1,11 +1,11 @@
 package srs.lab1.pwmgr;
 
-import java.nio.ByteBuffer;
 import java.nio.charset.StandardCharsets;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Random;
+import java.util.function.Consumer;
+import java.util.function.Function;
 
 public class StringStorage implements PasswordStorage {
 	
@@ -14,6 +14,7 @@ public class StringStorage implements PasswordStorage {
 	private static final String ESCAPE_REGEX = "\\" + ESCAPE + ".";
 	private static final int PREFIX_BYTE_SIZE = 16;
 	private static final Random NORMAL_RNG = new Random();
+	private static final Function<String, String[]> SPLITTER = StringStorage::splitUserPasswordPair;
 	
 	private StringBuilder storage;
 	private Map<String, String> pwMap = new HashMap<>();
@@ -25,7 +26,7 @@ public class StringStorage implements PasswordStorage {
 	public StringStorage(String data) {
 		storage = new StringBuilder(data);
 		data.lines().map(StringStorage::splitUserPasswordPair)
-					.forEach(a -> pwMap.put(a[0], a[1]));
+					.forEach(a -> pwMap.put(removeEscapes(a[0]), removeEscapes(a[1])));
 		
 	}
 	
