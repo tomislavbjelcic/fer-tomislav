@@ -6,5 +6,4 @@ public interface PasswordStorage {
 	String put(String site, String password);
 	byte[] convertToBytes();
 	
-	
 }

@@ -4,7 +4,6 @@ import java.util.Random;
 
 public class Util {
 	
-	private static final Random RNG = new Random();
 	
 	private Util() {}
 	
@@ -22,9 +21,9 @@ public class Util {
 		return result;
 	}
 	
-	public static byte[] getRandomBytes(int size) {
+	public static byte[] getRandomBytes(int size, Random rng) {
 		byte[] out = new byte[size];
-		RNG.nextBytes(out);
+		rng.nextBytes(out);
 		return out;
 	}
 }

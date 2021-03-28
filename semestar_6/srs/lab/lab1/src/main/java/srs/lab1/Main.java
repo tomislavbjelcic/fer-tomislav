@@ -4,14 +4,16 @@ import java.util.Arrays;
 import java.util.Map;
 
 import srs.lab1.pwmgr.PasswordManagerCommand;
+import srs.lab1.pwmgr.commands.PasswordManagerGetCommand;
 import srs.lab1.pwmgr.commands.PasswordManagerInitCommand;
+import srs.lab1.pwmgr.commands.PasswordManagerPutCommand;
 
 public class Main {
 	
 	private static final Map<String, PasswordManagerCommand> SUPPORTED_COMMANDS = Map.of(
 			"init", new PasswordManagerInitCommand(),
-			"put", new PasswordManagerInitCommand(),
-			"get", new PasswordManagerInitCommand()
+			"put", new PasswordManagerPutCommand(),
+			"get", new PasswordManagerGetCommand()
 	);
 	
 	private static void printSupportedCommands() {
@@ -29,7 +31,7 @@ public class Main {
 		String command = args[0];
 		PasswordManagerCommand cmd = SUPPORTED_COMMANDS.get(command);
 		if (cmd == null) {
-			System.out.println("Unsupported command \"init\". Supported: ");
+			System.out.println("Unsupported command \"" + command + "\". Supported: ");
 			printSupportedCommands();
 			return;
 		}

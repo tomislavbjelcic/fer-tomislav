@@ -2,6 +2,7 @@ package srs.lab1.pwmgr;
 
 import java.nio.ByteBuffer;
 import java.nio.charset.StandardCharsets;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Random;
@@ -12,10 +13,14 @@ public class StringStorage implements PasswordStorage {
 	private static final char ESCAPE = '\\';
 	private static final String ESCAPE_REGEX = "\\" + ESCAPE + ".";
 	private static final int PREFIX_BYTE_SIZE = 16;
+	private static final Random NORMAL_RNG = new Random();
 	
 	private StringBuilder storage;
 	private Map<String, String> pwMap = new HashMap<>();
 	
+	public StringStorage() {
+		this("");
+	}
 	
 	public StringStorage(String data) {
 		storage = new StringBuilder(data);
@@ -25,6 +30,8 @@ public class StringStorage implements PasswordStorage {
 	}
 	
 	public static StringStorage fromBytes(byte[] bytes) {
+		if (bytes.length < PREFIX_BYTE_SIZE)
+			throw new InvalidByteArrayException("Too few bytes!");
 		int off = PREFIX_BYTE_SIZE;
 		int len = bytes.length - PREFIX_BYTE_SIZE;
 		String data = new String(bytes, off, len, StandardCharsets.UTF_8);
@@ -46,7 +53,7 @@ public class StringStorage implements PasswordStorage {
 
 	@Override
 	public byte[] convertToBytes() {
-		byte[] prefix = Util.getRandomBytes(PREFIX_BYTE_SIZE);
+		byte[] prefix = Util.getRandomBytes(PREFIX_BYTE_SIZE, NORMAL_RNG);
 		byte[] data = storage.toString().getBytes(StandardCharsets.UTF_8);
 		return Util.concatByteArrays(prefix, data);
 	}
@@ -101,6 +108,11 @@ public class StringStorage implements PasswordStorage {
 				line.substring(sepIdx+1)
 		};
 		return splitted;
+	}
+	
+	@Override
+	public String toString() {
+		return storage.toString();
 	}
 	
 }

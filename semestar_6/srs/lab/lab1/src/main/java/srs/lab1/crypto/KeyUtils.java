@@ -24,11 +24,11 @@ public class KeyUtils {
 	/**
 	 * Key derivation function algorithm.
 	 */
-	public static final String KEY_DERIVATION_ALGORITHM = "PBKDF2WithHmacSHA" + AES_KEY_LENGTH;
+	public static final String KEY_DERIVATION_ALGORITHM = "PBKDF2WithHmacSHA256";
 	/**
 	 * Broj iteracija primjenjivanja funkcije.
 	 */
-	public static final int ITERATIONS = 4096;
+	public static final int ITERATIONS = 10;
 	
 	private KeyUtils() {}
 	
