@@ -20,20 +20,20 @@ public class KeyUtils {
 	/**
 	 * Broj bitova AES kriptografskog ključa.
 	 */
-	public static final int AES_KEY_LENGTH = 128;
+	public static final int AES_KEY_LENGTH = 256;
 	/**
-	 * Key derivation function algorithm.
+	 * Algoritam za derivaciju ključa.
 	 */
 	public static final String KEY_DERIVATION_ALGORITHM = "PBKDF2WithHmacSHA256";
 	/**
-	 * Broj iteracija primjenjivanja funkcije.
+	 * Broj iteracija primjenjivanja funkcije sažetka.
 	 */
 	public static final int ITERATIONS = 10;
 	
 	private KeyUtils() {}
 	
 	/**
-	 * Stvara objekt AES ključa koristeći šifru {@code password} i salt {@code salt}.
+	 * Stvara objekt AES256 ključa koristeći lozinku {@code password} i salt {@code salt}.
 	 * 
 	 * @param password
 	 * @param salt
@@ -53,6 +53,7 @@ public class KeyUtils {
 		// stvori specifikaciju ključa koristeći potrebne podatke: password i salt
         KeySpec spec = new PBEKeySpec(password, salt, ITERATIONS, AES_KEY_LENGTH);
         
+        
         // generiraj bajtove ključa iz specifikacije
         byte[] keyBytes = null;
         try {
@@ -64,6 +65,7 @@ public class KeyUtils {
         
         // iz bajtova ključa stvori AES ključ
         SecretKey aesKey = new SecretKeySpec(keyBytes, "AES");
+        
 		
 		return aesKey;
 	}

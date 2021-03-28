@@ -8,18 +8,37 @@ import srs.lab1.pwmgr.commands.PasswordManagerGetCommand;
 import srs.lab1.pwmgr.commands.PasswordManagerInitCommand;
 import srs.lab1.pwmgr.commands.PasswordManagerPutCommand;
 
+/**
+ * Razred koji sadrži main metodu i definira sve podržane naredbe password managera.
+ * 
+ * @author tomislav
+ *
+ */
 public class Main {
 	
+	/**
+	 * Podržane naredbe password managera kao mapa (preslikavanje) iz imena 
+	 * u objekt {@link PasswordManagerCommand}.
+	 */
 	private static final Map<String, PasswordManagerCommand> SUPPORTED_COMMANDS = Map.of(
 			"init", new PasswordManagerInitCommand(),
 			"put", new PasswordManagerPutCommand(),
 			"get", new PasswordManagerGetCommand()
 	);
 	
+	/**
+	 * Ispisuje sve podržane naredbe.
+	 */
 	private static void printSupportedCommands() {
 		SUPPORTED_COMMANDS.keySet().forEach(System.out::println);
 	}
 	
+	/**
+	 * Glavni program koji koristi argumente iz komandne linije {@code args} preko kojih 
+	 * se zadaju naredba password managera i zatim argumenti tih naredbi.
+	 * 
+	 * @param args
+	 */
 	public static void main(String[] args) {
 		
 		if (args.length == 0) {
