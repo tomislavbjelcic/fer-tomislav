@@ -4,8 +4,6 @@ import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Random;
-import java.util.function.Consumer;
-import java.util.function.Function;
 
 /**
  * Implementacija sučelja {@link PasswordStorage} koja primarno koristi velike Stringove 
