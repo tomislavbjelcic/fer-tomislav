@@ -16,9 +16,10 @@ Stanje u pohrani (String) bi izgledao ovako:
 "www.fer.unizg.hr,F3Rs1fR4\n
 www.facebook.com,si\,fra#123\n
 ferko.fer.hr,SRSL4B\n"
+gdje je "\n" oznaka novog retka.
 
-Kako taj zapisi pohraniti na disk?
-Potrebno je onaj String pretvoriti u binarnu reprezentaciju.
+Kako taj String zapis pohraniti na disk?
+Potrebno ga je pretvoriti u binarnu reprezentaciju.
 Najprije, kako sadržaj pohrane ne bi bio nikad prazan, kao prefiks (dakle na početak) se umeće slučajnih 16 bajtova.
 Nakon toga onaj veliki String, koristeći UTF-8 kodnu stranicu, se kodira u niz bajtova.
 I onda taj niz bajtova prefiks + niz UTF-8 bajtova čini "jasan tekst".
@@ -30,7 +31,7 @@ On se generira koristeći algoritam PBKDF2 sa HMAC-SHA256. Dakle potrebna nam je
 slučajno generirani (koristeći kriptografski generator slučajnih brojeva, dok to nije bio slučaj kod prefiksa jer tamo nije 
 bilo bitno) tzv. salt da bismo mogli generirati 256 bitni ključ za AES enkripciju.
 Uz pripremljen ključ, potrebno je, na isti način kao i salt, slučajno generirati inicijalizacijski vektor (IV) koji se koristi 
-za enkripciju kod algoritma AES.
+za enkripciju kod blok šifre AES.
 I sada kada je pripremljen tajni simetrični ključ i IV, možemo dobiti kriptat iz niza bajtova "jasnog teksta".
 Ali, kako bi legitiman korisnik mogao ponovno pristupiti spremniku, mora uz master lozinku, znati i salt i IV kako bi uspješno 
 dekriptirao kriptat. Iz tog razloga se salt i IV stavljaju prije kriptata u originalnom obliku. Njihova javnost ne narušava 
@@ -44,9 +45,16 @@ Uz master lozinku koju mora unijeti korisnik, IV i salt se može pročitati dire
 te iz salta i master lozinke rekonstruirati tajni ključ pa koristeći IV obaviti dekripciju.
 Uz dekripciju obavlja se i verifikacija oznake, pa ako je
 1. unesena kriva master lozinka
-2. datoteka u međuvremenu mijenjana
+2. datoteka u međuvremenu mijenjana na bilo kojem mjestu
 Dekripcija neće uspjeti. I to je ono što želimo, povjerljivost i integritet.
-Naravno jednom kada dobijemo bajtove "čistog teksta", odbacimo onaj 16 bajtni prefiks, parsiramo veliki String te dohvatimo zapise.
+Naravno jednom kada dobijemo bajtove "čistog teksta", odbacimo onaj 16 bajtni prefiks, preostale bajtove koristeći UTF-8 kodnu
+stranicu pretvorimo nazad u veliki String, parsiramo veliki String po retcima, odvojimo jedini zarez koji nije escapean 
+(jer tada on označava separator između stranice i lozinke), izbacimo escape znakove i tako u cjelosti imamo sve zapise.
 
-Čak i da korisnik za novu lozinku postojećeg zapisa unese istu kao i staru šifru (dakle konceptualno u pohrani neće biti 
-nikakvih promjena), to će promijeniti binarnu datoteku jer se ključevi uvijek generiraju drukčije zbog slučajnog salta.
+Sigurnosni zahtjevi su zadovoljeni jer prilikom svake enkripcije koristimo drugi tajni ključ (zato što on ovisi o bajtovima salta, 
+koji su slučajni prilikom svake enkripcije) i uz to koristimo sigurnu autentificiranu šifru. 
+Napadač ne može nikakve informacije o stranicama i šiframa doznati, čak ni ako je nova lozinka jedna staroj, jer će se generirati 
+drukčiji ključ što će rezultirati drugim nizom bajtova. Jedino što napadač može doznati jest okvirna duljina cjelokupne String pohrane 
+na temelju veličine kriptirane datoteke. Napadač ne može narušiti ni integritet, jer se radi o autentificiranoj šifri. Bilokakva promjena
+binarne datoteke od strane napadača će biti prepoznata činjenicom da AES-GCM neće uspjeti potvrditi oznaku, jedino ako bi napadač 
+uspio nekako falsificirati oznaku, no to je praktički nemoguće.
