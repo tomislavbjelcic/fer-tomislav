@@ -10,5 +10,5 @@ Oba dva zahtjeva se lako mogu provjeriti unosom u konzoli "java --version".
 Nakon toga alat se može pokrenuti iz izvršne datoteke pwmgr.
 Primjerice, u konzoli unijeti "./pwmgr init ..."
 
-Konceptualno, izvršna datoteka zapravo obavlja poziv "java -jar lab1-1.0.jar [argumenti]", pa ako kojim slučajem 
-izvršna datoteka pwmgr neće funkcionirati, poziv primjerice "./pwmgr init sifra" se može zamijeniti sa "java -jar lab1-1.0.jar init sifra".
+Konceptualno, izvršna datoteka zapravo obavlja poziv "java -jar lab1.jar [argumenti]", pa ako kojim slučajem 
+izvršna datoteka pwmgr neće funkcionirati, poziv primjerice "./pwmgr init sifra" se može zamijeniti sa "java -jar lab1.jar init sifra".
