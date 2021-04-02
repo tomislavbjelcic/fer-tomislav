@@ -1,7 +1,7 @@
 package ui.algorithms;
 
-import java.util.Collection;
-import java.util.LinkedList;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Set;
 
 import ui.State;
@@ -21,8 +21,8 @@ class SearchNode<S extends State> extends StateCostPair<S> {
 		return parent;
 	}
 	
-	static <T extends State> Collection<SearchNode<T>> expand(SearchNode<T> parent, SuccessorFunction<T> succ) {
-		Collection<SearchNode<T>> expanded = new LinkedList<>();
+	static <T extends State> List<SearchNode<T>> expand(SearchNode<T> parent, SuccessorFunction<T> succ) {
+		List<SearchNode<T>> expanded = new ArrayList<>(); // da se brže sortira kod BFS-a
 		T ps = parent.getState();
 		Set<StateCostPair<T>> successors = succ.apply(ps);
 		for (var s : successors) {

@@ -14,10 +14,11 @@ public class Main {
 		Path p = Paths.get(fstr);
 		var prob = StringStateSearchProblemLoader.loadProblemFromFile(p);
 		System.out.println("Done Loading problem.");
-		System.out.println("Applying BFS...");
+		System.out.println("Applying algo...");
 		SearchProblemAlgorithm<StringState> alg = new BreadthFirstSearch<>();
 		SearchProblemResult res = alg.executeAlgorithm(prob, null);
-		System.out.println("Algo done");
+		System.out.println("Algo done: " + alg.getAlgorithmName());
+		System.out.println(res);
 		
 		
 		
