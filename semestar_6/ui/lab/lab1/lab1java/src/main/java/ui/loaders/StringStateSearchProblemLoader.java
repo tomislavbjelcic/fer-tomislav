@@ -72,14 +72,18 @@ public class StringStateSearchProblemLoader {
 		StringState parent = new StringState(parentStr);
 		
 		String rest = line.substring(colonIdx+1).strip();
-		String[] stateCostPairsStr = rest.split(SPACE_REGEX);
+		boolean isEmpty = rest.isEmpty();
 		Set<StateCostPair<StringState>> stateCostPairs = new HashSet<>();
-		for (var p : stateCostPairsStr) {
-			String[] spl = p.split(COMMA_STR);
-			String stateStr = spl[0];
-			double cost = Double.parseDouble(spl[1]);
-			StateCostPair<StringState> pair = new StateCostPair<>(new StringState(stateStr), cost);
-			stateCostPairs.add(pair);
+		
+		if (!isEmpty) {
+			String[] stateCostPairsStr = rest.split(SPACE_REGEX);
+			for (var p : stateCostPairsStr) {
+				String[] spl = p.split(COMMA_STR);
+				String stateStr = spl[0];
+				double cost = Double.parseDouble(spl[1]);
+				StateCostPair<StringState> pair = new StateCostPair<>(new StringState(stateStr), cost);
+				stateCostPairs.add(pair);
+			}
 		}
 		succ.defineSuccessors(parent, stateCostPairs);
 	}

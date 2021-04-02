@@ -3,14 +3,30 @@ package ui;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 
+import ui.algorithms.BreadthFirstSearch;
 import ui.loaders.StringStateSearchProblemLoader;
 
 public class Main {
 	
 	public static void main(String[] args) {
-		Path p = Paths.get("./maps/istra.txt");
+		
+		String fstr = "./maps/istra.txt";
+		Path p = Paths.get(fstr);
 		var prob = StringStateSearchProblemLoader.loadProblemFromFile(p);
-		System.out.println("Done");
+		System.out.println("Done Loading problem.");
+		System.out.println("Applying BFS...");
+		SearchProblemAlgorithm<StringState> alg = new BreadthFirstSearch<>();
+		SearchProblemResult res = alg.executeAlgorithm(prob, null);
+		System.out.println("Algo done");
+		
+		
+		
+		/*
+		String str = "sm";
+		String regex = "\\s+";
+		String[] spl = str.split(regex);
+		System.out.println("" + spl.length + '\n' + Arrays.toString(spl));
+		*/
 	}
 	
 }

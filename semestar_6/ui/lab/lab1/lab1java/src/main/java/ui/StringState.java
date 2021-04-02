@@ -1,5 +1,7 @@
 package ui;
 
+import java.util.Objects;
+
 public class StringState implements State {
 	
 	private String str;
@@ -17,6 +19,11 @@ public class StringState implements State {
 		
 		StringState other = (StringState) obj;
 		return str.equals(other.str);
+	}
+	
+	@Override
+	public int hashCode() {
+		return Objects.hashCode(str);
 	}
 	
 	@Override
