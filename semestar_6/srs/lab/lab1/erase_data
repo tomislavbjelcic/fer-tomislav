@@ -1,0 +1,6 @@
+dir="encryptedData"
+
+if [ -d $dir ]; then
+   rm -r $dir
+   echo "Directory $dir deleted."
+fi

@@ -1,0 +1,17 @@
+
+
+#izbrisi prethodne podatke
+./erase_data
+
+mpw="master_p4ssword"
+#inicijaliziraj
+echo "Running command: \"./pwmgr init $mpw\""
+./pwmgr init $mpw
+
+#spremi neki zapis
+echo "Running command: \"./pwmgr put $mpw www.fer.hr fer_sifr4\""
+./pwmgr put $mpw www.fer.hr fer_sifr4
+
+#dohvati ga
+echo "Running command: \"./pwmgr get $mpw www.fer.hr\""
+./pwmgr get $mpw www.fer.hr

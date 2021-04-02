@@ -1,0 +1,4 @@
+# compile project using javac
+
+echo "Compiling project using javac..."
+javac -source 11 -target 11 -d lab1project/target/classes -sourcepath lab1project/src/main/java lab1project/src/main/java/srs/lab1/Main.java
