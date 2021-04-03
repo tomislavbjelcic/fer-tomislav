@@ -45,7 +45,7 @@ public class Main {
 		System.out.println(res);
 		*/
 		
-		HeuristicFunctionChecker.checkAndReportOptimistic(prob, h);
+		HeuristicFunctionChecker.checkAndReportConsistent(prob, h);
 		
 		
 		
