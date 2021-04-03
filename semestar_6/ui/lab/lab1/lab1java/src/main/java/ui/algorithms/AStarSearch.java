@@ -1,11 +1,11 @@
 package ui.algorithms;
 
 import java.util.Comparator;
-import java.util.HashSet;
+import java.util.HashMap;
 import java.util.LinkedList;
-import java.util.PriorityQueue;
-import java.util.Queue;
-import java.util.Set;
+import java.util.Map;
+import java.util.SortedMap;
+import java.util.TreeMap;
 import java.util.function.Function;
 
 import ui.HeuristicFunction;
@@ -14,11 +14,10 @@ import ui.SearchProblemAlgorithm;
 import ui.SearchProblemResult;
 import ui.State;
 
-public class UniformCostSearch<S extends State> implements SearchProblemAlgorithm<S> {
+public class AStarSearch<S extends State> implements SearchProblemAlgorithm<S> {
 
 	@Override
 	public SearchProblemResult executeAlgorithm(SearchProblem<S> problem, HeuristicFunction<? super S> h) {
-		// heuristic function not used in UCS
 		S initialState = problem.getInitialState();
 		var succ = problem.getSuccessorFunction();
 		var goal = problem.getGoalPredicate();
@@ -27,18 +26,19 @@ public class UniformCostSearch<S extends State> implements SearchProblemAlgorith
 			return SearchProblemResult.FAIL;
 		
 		Function<SearchNode<S>, String> strKeyExtractor = n -> n.getState().toString();
-		Comparator<SearchNode<S>> compCosts = Comparator.comparingDouble(SearchNode::getCost);
+		Comparator<SearchNode<S>> compCostHeuristic = Comparator.comparingDouble(SearchNode::getCostWithHeuristic);
 		Comparator<SearchNode<S>> compStates = Comparator.comparing(strKeyExtractor);
-		Comparator<SearchNode<S>> comp = compCosts.thenComparing(compStates);
+		Comparator<SearchNode<S>> comp = compCostHeuristic.thenComparing(compStates);
 		
-		Queue<SearchNode<S>> open = new PriorityQueue<>(comp);
+		SortedMap<SearchNode<S>, SearchNode<S>> open = new TreeMap<>(comp);
 		SearchNode<S> initialNode = new SearchNode<>(initialState, 0, null);
-		open.add(initialNode);
+		open.put(initialNode, initialNode);
 
-		Set<S> visited = new HashSet<>();
-
+		Map<SearchNode<S>, SearchNode<S>> visited = new HashMap<>();
+		
 		while(!open.isEmpty()) {
-			var n = open.remove();
+			var n = open.firstKey();
+			open.remove(n);
 			S sn = n.getState();
 			if (goal.test(sn)) {
 				// pronađeno ciljno stanje
@@ -58,12 +58,30 @@ public class UniformCostSearch<S extends State> implements SearchProblemAlgorith
 				return result;
 			}
 
-			visited.add(sn);
-			var expand = SearchNode.expand(n, succ);
+			visited.put(n, n);
+			
+			var expand = SearchNode.expand(n, succ, h);
 			for (var m : expand) {
-				S sm = m.getState();
-				if (!visited.contains(sm))
-					open.add(m);
+				
+				// provjeri visited
+				Map<SearchNode<S>, SearchNode<S>> checking = visited;
+				SearchNode<S> m_ = checking.get(m);
+				if (m_ == null) {
+					// ako nema u visitedu, provjeri open
+					checking = open;
+					m_ = checking.get(m);
+				}
+				
+				if (m_ != null) {
+					if (m_.getCost() < m.getCost())
+						continue;
+					checking.remove(m_);
+				}
+				
+				open.put(m, m);
+				
+				
+
 			}
 		}
 		return SearchProblemResult.FAIL;
@@ -71,7 +89,7 @@ public class UniformCostSearch<S extends State> implements SearchProblemAlgorith
 
 	@Override
 	public String getAlgorithmName() {
-		return "UCS";
+		return "A-STAR";
 	}
 
 }

@@ -46,7 +46,7 @@ public class BreadthFirstSearch<S extends State> implements SearchProblemAlgorit
 				
 				LinkedList<State> solutionPath = new LinkedList<>();
 				
-				for (var itnode=n; itnode != null; itnode=itnode.parent) {
+				for (var itnode=n; itnode != null; itnode=itnode.getParent()) {
 					solutionPath.addFirst(itnode.getState());
 				}
 				

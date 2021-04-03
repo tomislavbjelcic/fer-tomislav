@@ -4,6 +4,8 @@ import java.util.function.ToDoubleFunction;
 
 public interface HeuristicFunction<S extends State> extends ToDoubleFunction<S>{
 	
-	HeuristicFunction<? extends State> DEFAULT = s -> 0.0;
+	static <T extends State> HeuristicFunction<T> getDefault() {
+		return s -> 0.0;
+	}
 	
 }
