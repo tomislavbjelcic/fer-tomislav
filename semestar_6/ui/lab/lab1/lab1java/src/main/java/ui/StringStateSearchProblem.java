@@ -41,4 +41,9 @@ public class StringStateSearchProblem implements SearchProblem<StringState> {
 		return goalStates::contains;
 	}
 
+	@Override
+	public void setInitialState(StringState state) {
+		initialState = state;
+	}
+
 }

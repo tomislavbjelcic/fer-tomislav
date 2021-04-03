@@ -5,13 +5,13 @@ import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.HashSet;
-import java.util.Set;
 
 import ui.StateCostPair;
 import ui.StringState;
 import ui.StringStateSearchProblem;
 import ui.StringStateSuccessorFunction;
+import ui.collections.MyHashSet;
+import ui.collections.MySet;
 
 public class StringStateSearchProblemLoader {
 	
@@ -73,7 +73,7 @@ public class StringStateSearchProblemLoader {
 		
 		String rest = line.substring(colonIdx+1).strip();
 		boolean isEmpty = rest.isEmpty();
-		Set<StateCostPair<StringState>> stateCostPairs = new HashSet<>();
+		MySet<StateCostPair<StringState>> stateCostPairs = new MyHashSet<>();
 		
 		if (!isEmpty) {
 			String[] stateCostPairsStr = rest.split(SPACE_REGEX);

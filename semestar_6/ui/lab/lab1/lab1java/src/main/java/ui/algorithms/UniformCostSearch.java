@@ -13,18 +13,19 @@ import ui.SearchProblem;
 import ui.SearchProblemAlgorithm;
 import ui.SearchProblemResult;
 import ui.State;
+import ui.StateCostPair;
 
 public class UniformCostSearch<S extends State> implements SearchProblemAlgorithm<S> {
 
 	@Override
-	public SearchProblemResult executeAlgorithm(SearchProblem<S> problem, HeuristicFunction<? super S> h) {
+	public SearchProblemResult<S> executeAlgorithm(SearchProblem<S> problem, HeuristicFunction<? super S> h) {
 		// heuristic function not used in UCS
 		S initialState = problem.getInitialState();
 		var succ = problem.getSuccessorFunction();
 		var goal = problem.getGoalPredicate();
 
 		if (initialState == null)
-			return SearchProblemResult.FAIL;
+			return SearchProblemResult.fail();
 		
 		Function<SearchNode<S>, String> strKeyExtractor = n -> n.getState().toString();
 		Comparator<SearchNode<S>> compCosts = Comparator.comparingDouble(SearchNode::getCost);
@@ -42,15 +43,15 @@ public class UniformCostSearch<S extends State> implements SearchProblemAlgorith
 			S sn = n.getState();
 			if (goal.test(sn)) {
 				// pronađeno ciljno stanje
-				SearchProblemResult result = new SearchProblemResult();
+				SearchProblemResult<S> result = new SearchProblemResult<>();
 				result.solutionFound = true;
 				result.totalCost = n.getCost();
 				result.statesVisited = visited.size() + 1;
 
-				LinkedList<State> solutionPath = new LinkedList<>();
+				LinkedList<StateCostPair<S>> solutionPath = new LinkedList<>();
 
 				for (var itnode=n; itnode != null; itnode=itnode.getParent()) {
-					solutionPath.addFirst(itnode.getState());
+					solutionPath.addFirst(itnode);
 				}
 
 				result.solutionPath = solutionPath;
@@ -66,7 +67,7 @@ public class UniformCostSearch<S extends State> implements SearchProblemAlgorith
 					open.add(m);
 			}
 		}
-		return SearchProblemResult.FAIL;
+		return SearchProblemResult.fail();
 	}
 
 	@Override

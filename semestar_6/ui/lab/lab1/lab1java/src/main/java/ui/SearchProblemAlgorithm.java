@@ -2,7 +2,7 @@ package ui;
 
 public interface SearchProblemAlgorithm<S extends State> {
 	
-	SearchProblemResult executeAlgorithm
+	SearchProblemResult<S> executeAlgorithm
 			(SearchProblem<S> problem, HeuristicFunction<? super S> h);
 	String getAlgorithmName();
 	

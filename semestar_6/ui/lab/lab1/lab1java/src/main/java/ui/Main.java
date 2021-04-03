@@ -20,21 +20,32 @@ public class Main {
 		algs.add(new UniformCostSearch<>());
 		algs.add(new AStarSearch<>());
 		
-		String fstr = "./maps/3x3_puzzle.txt";
+		String fstr = "./maps/istra.txt";
 		Path pf = Paths.get(fstr);
 		
-		String hpstr = "./maps/3x3_misplaced_heuristic.txt";
+		String hpstr = "./maps/istra_pessimistic_heuristic.txt";
 		Path ph = Paths.get(hpstr);
 		
 		
 		var h = StringStateHeuristicFunctionLoader.loadHeuristicFromFile(ph);
 		var prob = StringStateSearchProblemLoader.loadProblemFromFile(pf);
+		
+		//prob.setInitialState(new StringState("Barban"));
+		/*
+		String f = "Lupoglav";
+		String t = "Labin";
+		System.out.println(prob.getSuccessorFunction().getCost(new StringState(f),new StringState(t)));
+		*/
+		/*
 		System.out.println("Done Loading problem & heuristic.");
 		System.out.println("Applying algo...");
-		SearchProblemAlgorithm<StringState> alg = algs.get(2);
+		SearchProblemAlgorithm<StringState> alg = algs.get(1);
 		SearchProblemResult res = alg.executeAlgorithm(prob, h);
 		System.out.println("Algo done: " + alg.getAlgorithmName());
 		System.out.println(res);
+		*/
+		
+		HeuristicFunctionChecker.checkAndReportOptimistic(prob, h);
 		
 		
 		
