@@ -9,15 +9,15 @@
           "value": "yes"
         },
         "PATH": {
-          "match": "exact",
+          "match": "ignored",
           "value": "enroll_artificial_intelligence => fail_lab => fail_course"
         },
         "PATH_LENGTH": {
-          "match": "exact",
+          "match": "ignored",
           "value": "3"
         },
         "STATES_VISITED": {
-          "match": "exact",
+          "match": "ignored",
           "value": "6"
         },
         "TOTAL_COST": {
@@ -36,15 +36,15 @@
           "value": "yes"
         },
         "PATH": {
-          "match": "exact",
+          "match": "ignored",
           "value": "enroll_artificial_intelligence => complete_lab => pass_continuous => pass_course"
         },
         "PATH_LENGTH": {
-          "match": "exact",
+          "match": "ignored",
           "value": "4"
         },
         "STATES_VISITED": {
-          "match": "exact",
+          "match": "ignored",
           "value": "4"
         },
         "TOTAL_COST": {
@@ -204,15 +204,15 @@
           "value": "yes"
         },
         "PATH": {
-          "match": "exact",
+          "match": "ignored",
           "value": "enroll_artificial_intelligence => complete_lab => pass_continuous => pass_course"
         },
         "PATH_LENGTH": {
-          "match": "exact",
+          "match": "ignored",
           "value": "4"
         },
         "STATES_VISITED": {
-          "match": "exact",
+          "match": "ignored",
           "value": "7"
         },
         "TOTAL_COST": {

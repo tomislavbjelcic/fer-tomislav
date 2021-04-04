@@ -60,3 +60,8 @@ conda activate autograder_env
 ```
 
 Then you can run the above given command for obtaining autograder's output.
+
+-------------------
+
+For C++ solutions on Windows: autograder assumes that you are using `mingw32-make` as a compiler and that it is defined in the PATH variable. 
+If you are using some other compiler, make sure that you replace `mingw32-make` with the name of your compiler in the line 66 of `autograder.py` (and that your compiler is defined in the PATH variable).

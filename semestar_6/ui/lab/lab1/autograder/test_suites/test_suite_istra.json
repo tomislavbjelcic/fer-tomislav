@@ -9,15 +9,15 @@
           "value": "yes"
         },
         "PATH": {
-          "match": "exact",
+          "match": "ignored",
           "value": "Pula => Barban => Labin => Lupoglav => Buzet"
         },
         "PATH_LENGTH": {
-          "match": "exact",
+          "match": "ignored",
           "value": "5"
         },
         "STATES_VISITED": {
-          "match": "exact",
+          "match": "ignored",
           "value": "14"
         },
         "TOTAL_COST": {
@@ -36,15 +36,15 @@
           "value": "yes"
         },
         "PATH": {
-          "match": "exact",
+          "match": "ignored",
           "value": "Pula => Vodnjan => Kanfanar => \u017dminj => Pazin => Motovun => Buzet"
         },
         "PATH_LENGTH": {
-          "match": "exact",
+          "match": "ignored",
           "value": "7"
         },
         "STATES_VISITED": {
-          "match": "exact",
+          "match": "ignored",
           "value": "13"
         },
         "TOTAL_COST": {
@@ -288,15 +288,15 @@
           "value": "yes"
         },
         "PATH": {
-          "match": "exact",
+          "match": "ignored",
           "value": "Pula => Barban => Labin => Lupoglav => Buzet"
         },
         "PATH_LENGTH": {
-          "match": "exact",
+          "match": "ignored",
           "value": "5"
         },
         "STATES_VISITED": {
-          "match": "exact",
+          "match": "ignored",
           "value": "17"
         },
         "TOTAL_COST": {

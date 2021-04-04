@@ -51,7 +51,10 @@ def compile(path_to_solution, language):
       os.chdir(path_to_solution)
       # Compilation is done via maven
       cmd = 'mvn -q clean compile'.split()
-      subprocess.Popen(cmd, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL).wait()
+      if os.name != 'nt':
+        subprocess.Popen(cmd, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL).wait()
+      else:
+        subprocess.Popen(cmd, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL, shell=True).wait()
       # Restore directory
       os.chdir(cwd)
       return True, ""
@@ -63,11 +66,11 @@ def compile(path_to_solution, language):
       if not os.path.exists('Makefile'):
         shutil.copy(os.path.join(cwd, 'Makefile'), path_to_solution)
 
-      cmd = ['make']
+      cmd = ['make' if os.name != 'nt' else 'mingw32-make']
       output = subprocess.Popen(cmd).wait()
       print("After compile: ", os.listdir('.'))
       # Check if the solution executable exists after compilation
-      if not os.path.exists('solution'):
+      if not os.path.exists('solution') and not os.path.exists('solution.exe'):
         return False, "No entry point"
       os.chdir(cwd)
       return True, ""
@@ -106,7 +109,7 @@ def iterate_student_solutions(evaluation_log_file=None, solutions_dir=None,
   
   student_reports = {}
 
-  with open(evaluation_log_file, 'wt') as log_file:
+  with open(evaluation_log_file, 'wt', encoding='utf-8') as log_file:
 
     # [Assumption:] the name of the folder for each student is the JMBAG
     # of the student. It can also be a name, ID or any _unique_ identifier
@@ -214,7 +217,7 @@ def iterate_student_solutions(evaluation_log_file=None, solutions_dir=None,
       # Check that folder exits, if not create
       if not os.path.exists(student_log_dir):
         os.makedirs(student_log_dir)
-      with open(os.path.join(student_log_dir, f"{report['id']}.log"), 'wt') as student_log:
+      with open(os.path.join(student_log_dir, f"{report['id']}.log"), 'wt', encoding='utf-8') as student_log:
         log_results(student_log, report, verbose=True)
 
   return student_reports
@@ -306,10 +309,14 @@ def run_evaluation(path_to_solution, language,
         'output': None,
         'expected_output': '',
         'correct_fields': 0,
-        'field_results': {field: False for field in test_instance['expected_output_fields']},
-        'total_fields': len(test_instance['expected_output_fields']),
+        'field_results': None,
+        'total_fields': None,
         'test_passed': False
       }
+
+      evaluation_fields = [field for field in test_instance['expected_output_fields'] if test_instance['expected_output_fields'][field]['match'] != 'ignored']
+      report['total_fields'] = len(evaluation_fields)
+      report['field_results'] = {field: False for field in evaluation_fields}
 
       execution_args = test_instance['execution_args']
       result_code, result, command = execute(path_to_solution, language, execution_args)
@@ -365,7 +372,8 @@ def execute(path_to_solution, language, arguments):
     command = ex_cmd + ' ' + arguments
 
   elif language == 'java':
-    ex_cmd = 'java -cp target/classes ui.Solution'
+    ex_cmd = 'java -cp target/classes ui.Solution' if os.name != 'nt' \
+      else 'java -cp target/classes -Dfile.encoding=UTF-8 ui.Solution'
     command = ex_cmd + ' ' + arguments
 
   elif language == 'cpp':
@@ -375,7 +383,7 @@ def execute(path_to_solution, language, arguments):
   print(f"Running: {command}")
 
   try:
-    result = subprocess.check_output(command.split(), stderr=subprocess.STDOUT, timeout=max_time)
+    result = subprocess.check_output(command.split(), stderr=subprocess.STDOUT, timeout=max_time, env={**os.environ.copy(), 'PYTHONUTF8': '1'})
   except CalledProcessError as e:
     os.chdir(curdir)
     error_message = e.output.decode("utf-8")

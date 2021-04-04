@@ -2,6 +2,8 @@ def grade_solution(student_output, solution):
     grades = {}
 
     for field in solution:
+        if solution[field]['match'] == 'ignored':
+            continue
         grades[field] = {'match': False, 'expected': '', 'obtained': ''}
         
         if solution[field]['match'] == 'exact':
@@ -70,7 +72,10 @@ def parse_output(output, correct_output=False):
                 field = line.strip().split()[0][1:-2]
                 subtask_output[field] = {'value': []}
                 if correct_output:
-                    subtask_output[field]['match'] = 'exact'
+                    if field in ['PATH', 'PATH_LENGTH', 'STATES_VISITED'] and subtask in ['UCS', 'A-STAR']:
+                        subtask_output[field]['match'] = 'ignored'
+                    else:
+                        subtask_output[field]['match'] = 'exact'
                 subtask_output[field]['value'] = ' '.join(line.strip().split()[1:])
         else:
             break
