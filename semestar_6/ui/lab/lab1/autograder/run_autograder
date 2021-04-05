@@ -1,0 +1,1 @@
+python3 autograder.py --solutions solutions --test_suites test_suites --evaluation_log full.log --student_log_dir student_logs
