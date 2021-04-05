@@ -2,13 +2,15 @@ package ui;
 
 import java.util.Comparator;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
+import java.util.PriorityQueue;
+import java.util.Queue;
 import java.util.Set;
-import java.util.TreeMap;
+import java.util.function.BiFunction;
 import java.util.function.Function;
 
-import ui.algorithms.UniformCostSearch;
-import ui.collections.MySet;
+import ui.algorithms.SearchNode;
 
 public class HeuristicFunctionChecker {
 	
@@ -30,10 +32,7 @@ public class HeuristicFunctionChecker {
 	public static <S extends State> void checkAndReportOptimistic
 				(SearchProblem<S> problem, HeuristicFunction<? super S> h) {
 		
-		var rcmap = findAllTrueCosts(problem);
-		Comparator<S> statecomp = Comparator.comparing(Object::toString);
-		Map<S, Double> realCosts = new TreeMap<>(statecomp);
-		realCosts.putAll(rcmap);
+		Map<S, Double> realCosts = findAllTrueCostsV2(problem);
 		boolean optimistic = true;
 		StringBuilder sb = new StringBuilder();
 		
@@ -76,7 +75,7 @@ public class HeuristicFunctionChecker {
 		StringBuilder sb = new StringBuilder();
 		
 		for (S state : stateSet) {
-			MySet<StateCostPair<S>> successorSet = succ.apply(state);
+			Set<StateCostPair<S>> successorSet = succ.apply(state);
 			// isto kao i prethodno
 			for (var scpair : successorSet) {
 				S to = scpair.getState();
@@ -115,6 +114,7 @@ public class HeuristicFunctionChecker {
 		
 	}
 	
+	/*
 	public static <S extends State> Map<S, Double> findAllTrueCosts
 				(SearchProblem<S> problem) {
 		S initialState = problem.getInitialState();
@@ -150,65 +150,101 @@ public class HeuristicFunctionChecker {
 	private static <S extends State> SearchProblemAlgorithm<S> getTrueCostAlgo() {
 		return new UniformCostSearch<>();
 	}
-	
-	/*
-	 * 
-	 * Drugi pokušaj u kojem se prvo izvršava UCS za stanja sa najvećom heuristikom
-	public static <S extends State> Map<S, Double> findAllTrueCostsV2
-	(SearchProblem<S> problem, HeuristicFunction<S> h) {
-		S initialState = problem.getInitialState();
-		SearchProblemAlgorithm<S> alg = getTrueCostAlgo();
-		Map<S, Double> trueCosts = new HashMap<>();
-		Set<S> stateSet = problem.getStateSet();
-
-
-		Map<S, Double> stateHeuristicMap = h.getAsMap();
-		Function<Entry<S, Double>, S> keyExtractor = Entry::getKey;
-		Comparator<S> stateComparator = Comparator.comparing(Object::toString);
-		Function<Entry<S, Double>, Double> valExtractor = Entry::getValue;
-		Comparator<Entry<S, Double>> compVal = Comparator.comparing(valExtractor);
-		Comparator<Entry<S, Double>> compKey = Comparator.comparing(keyExtractor, stateComparator);
-		Comparator<Entry<S, Double>> comp = compVal.thenComparing(compKey).reversed();
-
-		Set<Entry<S, Double>> stateHeuristicEntries = new TreeSet<>(comp);
-		stateHeuristicEntries.addAll(stateHeuristicMap.entrySet());
-
-		System.out.println("State count: " + stateHeuristicEntries.size());
-
-		int count = 0;
-		int algexeccount = 0;
-		for (var entry : stateHeuristicEntries) {
-			S state = entry.getKey();
-			count++;
-			System.out.println("Processed " + count + ". Executed UCS " + algexeccount + " times.");
-
-			if (trueCosts.containsKey(state))
-				continue;
-			problem.setInitialState(state);
-			var results = alg.executeAlgorithm(problem, null);
-			algexeccount++;
-			//System.out.println("algexec");
-			if (!results.solutionFound) {
-				trueCosts.put(state, Double.POSITIVE_INFINITY);
-				continue;
-			}
-
-			var path = results.solutionPath;
-			for (var pair : path) {
-				S s = pair.getState();
-				if (trueCosts.containsKey(s))
-					break;
-				double c =  results.totalCost - pair.getCost();
-				trueCosts.put(s, c);
-			}
-
-
-		}
-
-		problem.setInitialState(initialState);
-		return trueCosts;
-	}
 	*/
+	
+	public static <S extends State> Map<S, Double> findAllTrueCostsV2
+								(SearchProblem<S> problem) {
+		
+		Set<S> states = problem.getStateSet();
+		var succ = problem.getSuccessorFunction();
+		
+		// modeliraj obrnutu successor funkciju
+		Map<S, Set<StateCostPair<S>>> reversedSucc = new HashMap<>();
+		for (S state : states) {
+			Set<StateCostPair<S>> set = new HashSet<>();
+			reversedSucc.put(state, set);
+		}
+		for (S state : states) {
+			var s = succ.apply(state);
+			for (var p : s) {
+				S from = state;
+				S to = p.getState();
+				double cost = p.getCost();
+				StateCostPair<S> npair = new StateCostPair<>(from, cost);
+				
+				BiFunction<S, Set<StateCostPair<S>>, Set<StateCostPair<S>>> bf
+						= (st, set) -> {
+							set.add(npair);
+							return set;
+						};
+				reversedSucc.compute(to, bf);
+			}
+		}
+		
+		SuccessorFunction<S> rsucc = new SuccessorFunction<S>() {
+
+			@Override
+			public Set<StateCostPair<S>> apply(S t) {
+				return reversedSucc.get(t);
+			}
+
+			@Override
+			public Set<S> getStateSet() {
+				return null; //nece se koristiti
+			}
+			
+		};
+		
+		
+		// primijeni modificirani UCS za sva ciljna stanja
+		Set<S> goalStates = problem.getGoalStates();
+		Map<S, Double> realCosts = new HashMap<>();
+		for (S state : states) {
+			realCosts.put(state, Double.POSITIVE_INFINITY);
+		}
+		
+		
+		Function<SearchNode<S>, String> strKeyExtractor = n -> n.getState().toString();
+		Comparator<SearchNode<S>> compCosts = Comparator.comparingDouble(SearchNode::getCost);
+		Comparator<SearchNode<S>> compStates = Comparator.comparing(strKeyExtractor);
+		Comparator<SearchNode<S>> comp = compCosts.thenComparing(compStates);
+		
+		Queue<SearchNode<S>> open = new PriorityQueue<>(comp);
+		Set<S> visited = new HashSet<>();
+		
+		for (S gs : goalStates) {
+			
+			SearchNode<S> initialNode = new SearchNode<>(gs, 0, null);
+			open.add(initialNode);
+
+			
+			
+			while(!open.isEmpty()) {
+				var n = open.remove();
+				var sn = n.getState();
+				visited.add(sn);
+				
+				double c1 = realCosts.get(sn).doubleValue();
+				double c2 = n.getCost();
+				if (Double.compare(c1, c2) > 0) {
+					realCosts.remove(sn);
+					realCosts.put(sn, c2);
+				}
+				
+				var expand = SearchNode.expand(n, rsucc);
+				for (var m : expand) {
+					S sm = m.getState();
+					if (!visited.contains(sm))
+						open.add(m);
+				}
+			}
+			
+			open.clear();
+			visited.clear();
+		}
+		
+		return realCosts;
+	}
 	
 	
 	

@@ -2,7 +2,6 @@ package ui;
 
 import java.util.HashSet;
 import java.util.Set;
-import java.util.function.Predicate;
 
 public class StringStateSearchProblem implements SearchProblem<StringState> {
 	
@@ -36,14 +35,15 @@ public class StringStateSearchProblem implements SearchProblem<StringState> {
 		return succ;
 	}
 
-	@Override
-	public Predicate<StringState> getGoalPredicate() {
-		return goalStates::contains;
-	}
 
 	@Override
 	public void setInitialState(StringState state) {
 		initialState = state;
+	}
+
+	@Override
+	public Set<StringState> getGoalStates() {
+		return goalStates;
 	}
 
 }
