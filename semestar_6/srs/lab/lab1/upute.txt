@@ -6,6 +6,7 @@ Za uspješno pokretanje alata potrebno je:
 	
 
 Oba dva zahtjeva se lako mogu provjeriti unosom u konzoli "java --version".
+KONFLIKT.
 
 Nakon toga alat se može pokrenuti iz izvršne datoteke pwmgr.
 Primjerice, u konzoli unijeti "./pwmgr init ..."
