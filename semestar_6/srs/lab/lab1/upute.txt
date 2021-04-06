@@ -1,15 +1,21 @@
-Za uspješno pokretanje alata potrebno je:
+Za uspješno prevođenje i pokretanje alata potrebno je:
 
 1.	imati instaliran Javin virtualni stroj (verzije barem 11)
 2.	imati podešenu varijablu okruženja PATH da uključuje "bin" poddirektorij 
-	instalacije Javinog virtualnog stroja, kako bi se on mogao pokrenuti direktno iz konzole naredbom "java".
+	instalacije Javinog virtualnog stroja, kako bi se on mogao pokrenuti direktno iz konzole naredbom "java", 
+	te kako bi se Javin kompajler "javac" također mogao pokrenuti direktno iz konzole.
+3.	OPCIONALNO: imati instaliran alat Maven te podešenu varijablu PATH da uključuje "bin" poddirektorij instalacije
+	Mavena.
 	
 
-Oba dva zahtjeva se lako mogu provjeriti unosom u konzoli "java --version".
-KONFLIKT.
+Dva obavezna zahtjeva se lako mogu provjeriti unosom u konzoli "java --version" i "javac -version", 
+a provjera za Maven glasi "mvn -v".
+
+Alat se može prevesti ili koristeći javac ili koristeći alat Maven. Prevođenje je izdvojeno u zasebne skripte
+"compile_javac" i "compile_maven".
 
 Nakon toga alat se može pokrenuti iz izvršne datoteke pwmgr.
 Primjerice, u konzoli unijeti "./pwmgr init ..."
 
-Konceptualno, izvršna datoteka zapravo obavlja poziv "java -jar lab1.jar [argumenti]", pa ako kojim slučajem 
-izvršna datoteka pwmgr neće funkcionirati, poziv primjerice "./pwmgr init sifra" se može zamijeniti sa "java -jar lab1.jar init sifra".
+Umjesto toga, u svrhu kratke demonstracije pripremljena je skripta "run_demo" koja obavlja inicijalizaciju, sprema i dohvaća
+jedan zapis: "./run_demo".
