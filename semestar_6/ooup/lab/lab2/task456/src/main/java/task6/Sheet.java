@@ -1,8 +1,8 @@
 package task6;
 
+import java.util.Deque;
+import java.util.LinkedList;
 import java.util.Objects;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 public class Sheet {
 	
@@ -10,22 +10,15 @@ public class Sheet {
 	private static final int MAX_ROWS = 8;
 	private static final int MAX_COLS = 8;
 	private static final String REG = "[A-H][1-8]";
-	private static final Pattern PATTERN = Pattern.compile(REG);
 	
 	private int rows;
 	private int cols;
 	private Cell[][] cells;
-	private ExpressionEvaluator evaluator;
 	
-	public Sheet(int rows, int cols, ExpressionEvaluator evaluator) {
+	public Sheet(int rows, int cols) {
 		setRows(rows);
 		setCols(cols);
 		cells = new Cell[rows][cols];
-		this.evaluator = Objects.requireNonNull(evaluator);
-	}
-	
-	public Sheet(int rows, int cols) {
-		this(rows, cols, new DefaultExpressionEvaluator());
 	}
 	
 	
@@ -66,49 +59,59 @@ public class Sheet {
 		return cells[coords.first-1][coords.second-1];
 	}
 	
-	public double evaluate(String expr) {
-		// zamijeni koordinate sa konstantama
-		Objects.requireNonNull(expr);
-		Matcher matcher = PATTERN.matcher(expr);
-		int len = expr.length();
-		StringBuilder sb = new StringBuilder(len);
-		int lastidx = 0;
-		while (matcher.find()) {
-			int start = matcher.start();
-			int end = matcher.end();
-			
-			sb.append(expr, lastidx, start);
-			lastidx = end;
-			
-			String substr = expr.substring(start, end);
-			Cell cell = cell(substr);
-			double cellval = cell.getValue();
-			
-			sb.append(cellval);
-		}
-		sb.append(expr, lastidx, len);
-		String evalexpr = sb.toString();
-		
-		double result = evaluator.evaluate(evalexpr);
-		return result;
+	public double evaluate(Cell cell) {
+		return cell.evaluate();
 	}
 	
-	private void checkCycles() {}
+	private static void checkCircular(Cell c) {
+		
+		Deque<Cell> stack = new LinkedList<>();
+		
+		for (Cell r : c.getReferencedCells())
+			stack.push(r);
+		
+		while(!stack.isEmpty()) {
+			Cell top = stack.pop();
+			if (top.equals(c))
+				throw new RuntimeException("Circular dependency.");
+			
+			var refd = top.getReferencedCells();
+			for (Cell r : refd)
+				stack.push(r);
+			
+		}
+	}
 	
 	public void set(String text, String expr) {
 		IntPair coords = getCoordinatesFromText(text);
 		checkIndex(coords.first, 1, MAX_ROWS, "Row number");
 		checkIndex(coords.second, 1, MAX_COLS, "Column number");
-		boolean present = cells[coords.first-1][coords.second-1] == null;
-		//Cell cell = present ? cells[coords.first-1][coords.second-1] : new Cell(this, expr);
+		boolean present = cells[coords.first-1][coords.second-1] != null;
+		Cell cell = present ? cells[coords.first-1][coords.second-1] : new Cell(this, expr, REG);
 		
+		cell.setExpr(expr);
+		
+		checkCircular(cell);
+		
+		
+		if (!present)
+			cells[coords.first-1][coords.second-1] = cell;
+		cell.evaluate();
 		
 	}
 	
-	public static void main(String[] args) {
-		StringBuilder sb = new StringBuilder("lmao");
-		sb.append("lololaxd", 8, 8);
-		System.out.println(sb.toString());
+	@Override
+	public String toString() {
+		StringBuilder sb = new StringBuilder();
+		for (int i=0; i<rows; i++) {
+			for (int j=0; j<cols; j++) {
+				Cell c = cells[i][j];
+				sb.append((c==null) ? "[EMPTY]" : c);
+				sb.append(' ');
+			}
+			sb.append('\n');
+		}
+		return sb.toString();
 	}
 	
 }
