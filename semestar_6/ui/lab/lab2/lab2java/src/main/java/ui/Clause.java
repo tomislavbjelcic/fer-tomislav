@@ -24,7 +24,7 @@ public class Clause {
 	private Map<Literal, Literal> literals = new HashMap<>();
 	private boolean isTautology = false;
 	
-	public static Clause fromLiterals(Literal[] literals) {
+	public static Clause fromLiterals(Literal... literals) {
 		Objects.requireNonNull(literals);
 		
 		Clause clause = new Clause();
@@ -118,6 +118,53 @@ public class Clause {
 				return null;
 		}
 		return smaller;
+	}
+	
+	public Clause resolve(Clause other) {
+		Objects.requireNonNull(other);
+		
+		Literal common = null;
+		if (this.isTautology || other.isTautology)
+			return null;
+		
+		int lc1 = this.literalCount();
+		int lc2 = other.literalCount();
+		Clause smaller = lc1<lc2 ? this : other;
+		Clause larger = smaller==this ? other : this;
+		
+		for (var entry : smaller.literals.entrySet()) {
+			Literal positive = entry.getKey();
+			
+			Literal otherliteral = larger.literals.get(positive);
+			if (otherliteral == null)
+				continue;
+			
+			Literal lit = entry.getValue();
+			if (otherliteral.isNegated() != lit.isNegated()) {
+				if (common != null)
+					return TAUT;
+				else
+					common = positive;
+			}
+		}
+		
+		if (common == null)
+			return null;
+		
+		Clause resolvent = new Clause();
+		for (var e : this.literals.entrySet()) {
+			Literal pos = e.getKey();
+			Literal lit = e.getValue();
+			if (!pos.equals(common))
+				resolvent.addLiteral(lit);
+		}
+		for (var e : other.literals.entrySet()) {
+			Literal pos = e.getKey();
+			Literal lit = e.getValue();
+			if (!pos.equals(common))
+				resolvent.addLiteral(lit);
+		}
+		return resolvent;
 	}
 	
 	@Override

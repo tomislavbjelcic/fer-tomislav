@@ -9,6 +9,7 @@ import ui.loaders.ClauseLoader;
 public class Solution {
 
 	public static void main(String ... args) {
+		
 		String constant = "lab2_files/resolution_examples/";
 		String pathstr = constant + args[0];
 		Path p = Paths.get(pathstr);
@@ -32,6 +33,11 @@ public class Solution {
 		System.out.println("Premises:");
 		for (Clause c : cs)
 			System.out.println(c);
+		
+		System.out.println();
+		System.out.println(cs);
+		
+		
 	}
 
 }

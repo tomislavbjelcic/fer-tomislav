@@ -1,18 +1,21 @@
 package ui;
 
-import java.util.List;
+import java.util.HashMap;
+import java.util.Map;
 
 public class Main {
 	
 	public static void main(String[] args) {
-		List<Integer> l = List.of(4, 5, -2, 0, 4);
+		Map<Integer, Integer> m = new HashMap<>();
+		m.put(1, 7);
+		m.put(-2, 5);
+		m.put(3, 7);
 		
-		var lit = l.listIterator();
-		while(lit.hasNext()) {
-			int idx = lit.nextIndex();
-			int next = lit.next();
-			System.out.println("Element at index " + idx + ": " + next);
-		}
+		var s = m.keySet();
+		s.add(9);
+		
+		System.out.println("Map: " + m);
+		System.out.println("Set view: " + s);
 		
 	}
 	

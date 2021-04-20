@@ -8,7 +8,15 @@ import java.util.Set;
 public class ClauseSet implements Iterable<Clause> {
 	
 	
-	private Set<Clause> clauses = new HashSet<>();
+	private Set<Clause> clauses;
+	
+	public ClauseSet() {
+		this(null);
+	}
+	
+	private ClauseSet(Set<Clause> cls) {
+		clauses = cls == null ? new HashSet<>() : new HashSet<>(cls);
+	}
 	
 	public boolean addClause(Clause c) {
 		Objects.requireNonNull(c);
@@ -33,6 +41,10 @@ public class ClauseSet implements Iterable<Clause> {
 		
 		return true;
 		
+	}
+	
+	public ClauseSet copy() {
+		return new ClauseSet(clauses);
 	}
 	
 	@Override
