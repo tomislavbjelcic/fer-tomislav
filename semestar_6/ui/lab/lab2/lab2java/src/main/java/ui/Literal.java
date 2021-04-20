@@ -48,6 +48,10 @@ public class Literal {
 		return new Literal(atom, false);
 	}
 	
+	public Literal negate() {
+		return new Literal(atom, !negated);
+	}
+	
 	@Override
 	public int hashCode() {
 		return Objects.hash(atom, negated);
