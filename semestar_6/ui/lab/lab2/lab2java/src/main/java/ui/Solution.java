@@ -5,6 +5,8 @@ import java.nio.file.Paths;
 import java.util.List;
 
 import ui.loaders.ClauseLoader;
+import ui.resolution.ProofResult;
+import ui.resolution.Reasoning;
 
 public class Solution {
 
@@ -29,14 +31,8 @@ public class Solution {
 				cs.addClause(c);
 		}
 		
-		System.out.println("Goal clause: " + last);
-		System.out.println("Premises:");
-		for (Clause c : cs)
-			System.out.println(c);
-		
-		System.out.println();
-		System.out.println(cs);
-		
+		ProofResult res = Reasoning.prove(cs, last);
+		System.out.println(res);
 		
 	}
 
