@@ -29,13 +29,17 @@ public class Reasoning {
 		ClauseSet knowledge = premises.copy();
 		Set<Literal> negGoal = goal.negate();
 		Set<Clause> negGoalClauses = new HashSet<>();
-		for (Literal l : negGoal) {
-			Clause cl = Clause.fromLiterals(l);
-			negGoalClauses.add(cl);
-		}
 		
 		Map<Clause, UnorderedPair<Clause>> proofMap = new HashMap<>();
 		UnorderedPair<Clause> noparents = new UnorderedPair<>(null, null);
+		
+		for (Literal l : negGoal) {
+			Clause cl = Clause.fromLiterals(l);
+			negGoalClauses.add(cl);
+			proofMap.put(cl, noparents);
+		}
+		
+		
 		for (Clause c : knowledge)
 			proofMap.put(c, noparents);
 		
@@ -56,13 +60,14 @@ public class Reasoning {
 					// rekonstruirati rjesenje
 					ProofResult result = new ProofResult();
 					Map<Clause, Integer> used = new HashMap<>();
-					Integer dummy = Integer.valueOf(0);
+					
 					Deque<Clause> q = new LinkedList<>();
 					q.add(resolveTry);
 					
+					int order=1;
 					while(!q.isEmpty()) {
 						Clause top = q.remove();
-						used.put(top, dummy);
+						used.put(top, order++);
 						
 						var pair = proofMap.get(top);
 						Clause p1 = pair.getFirst();
@@ -75,23 +80,22 @@ public class Reasoning {
 							q.add(p2);
 					}
 					
-					Function<UnorderedPair<Clause>, Clause> extractor = UnorderedPair::getFirst;
-					Comparator<Clause> clausecomp = (c1, c2) -> {
-						if (c1==null & c2==null)
-							return 0;
-						if (c1==null)
-							return -1;
-						return 1;
-					};
-					Comparator<UnorderedPair<Clause>> cpcomp = Comparator.comparing(extractor, clausecomp);
-					Comparator<Clause> comp = (c1, c2) -> {
-						var pair1 = proofMap.get(c1);
-						var pair2 = proofMap.get(c2);
-						return cpcomp.compare(pair1, pair2);
-					};
+					Comparator<Clause> alwaysEq = (c1, c2) -> 0;
+					Comparator<Clause> nullFirst = Comparator.nullsFirst(alwaysEq);
+					
+					Function<Clause, UnorderedPair<Clause>> parentExtractor = proofMap::get;
+					Function<UnorderedPair<Clause>, Clause> firstParentExtractor = UnorderedPair::getFirst;
+					Function<Clause, Clause> pExtr = parentExtractor.andThen(firstParentExtractor);
+					Comparator<Clause> nullParentsFirst = Comparator.comparing(pExtr, nullFirst);
+					
+					Function<Clause, Integer> orderExtractor = used::get;
+					Comparator<Integer> ci = Comparator.reverseOrder();
+					Comparator<Clause> orderComparator = Comparator.comparing(orderExtractor, ci);
+					
 					Function<Clause, Boolean> isNegGoal = negGoalClauses::contains;
 					Comparator<Clause> compCheckGoal = Comparator.comparing(isNegGoal);
-					Comparator<Clause> finalComp = comp.thenComparing(compCheckGoal);
+					
+					Comparator<Clause> finalComp = nullParentsFirst.thenComparing(compCheckGoal).thenComparing(orderComparator);
 					
 					List<Clause> list = new ArrayList<>(used.keySet());
 					list.sort(finalComp);
@@ -101,7 +105,7 @@ public class Reasoning {
 					}
 					
 					Map<Clause, UnorderedPair<Integer>> resultMap = new LinkedHashMap<>();
-					for (Clause cls : used.keySet()) {
+					for (Clause cls : list) {
 						UnorderedPair<Clause> clpair = proofMap.get(cls);
 						Integer i1 = used.get(clpair.getFirst());
 						Integer i2 = used.get(clpair.getSecond());
@@ -123,7 +127,7 @@ public class Reasoning {
 			knowledge.addClause(clause);
 		}
 		
-		return ProofResult.FAIL;
+		return ProofResult.fail(goal);
 	}
 	
 	
