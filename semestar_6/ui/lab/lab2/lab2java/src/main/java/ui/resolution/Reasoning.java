@@ -44,10 +44,18 @@ public class Reasoning {
 			proofMap.put(c, noparents);
 		
 		Deque<Clause> queue = new LinkedList<>(negGoalClauses);
+		Set<Clause> visited = new HashSet<>();
 		
 		
 		while(!queue.isEmpty()) {
 			Clause clause = queue.remove();
+			
+			if (visited.contains(clause))
+				continue;
+			
+			visited.add(clause);
+			
+			//System.out.println("Trying " + clause + ". Knowledge size: " + knowledge.clauseCount());
 			for (Clause knowledgeClause : knowledge) {
 				Clause resolveTry = clause.resolve(knowledgeClause);
 				if (resolveTry == null || resolveTry.isTautology())
@@ -118,7 +126,6 @@ public class Reasoning {
 					result.goal = goal;
 					return result;
 				}
-				
 				
 				queue.add(resolveTry);
 				

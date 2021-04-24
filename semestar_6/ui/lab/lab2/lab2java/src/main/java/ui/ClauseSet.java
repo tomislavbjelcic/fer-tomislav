@@ -23,12 +23,26 @@ public class ClauseSet implements Iterable<Clause> {
 		return clauses.remove(c);
 	}
 	
+	private Clause findRedundant(Clause c) {
+		for (var current : this) {
+			Clause keep = Clause.redundancyCheck(current, c);
+			if (keep == null)
+				continue;
+			if (keep == current)
+				break;
+			
+			return current;
+		}
+		return null;
+	}
+	
 	public boolean addClause(Clause c) {
 		Objects.requireNonNull(c);
 		
 		if (c.isTautology() || c.isNIL())
 			return false;
 		
+		/*
 		var it = clauses.iterator();
 		while (it.hasNext()) {
 			Clause current = it.next();
@@ -40,7 +54,15 @@ public class ClauseSet implements Iterable<Clause> {
 			
 			it.remove();
 			break;
+		}*/
+		
+		Clause redundant = findRedundant(c);
+		if (redundant != null) {
+			if (redundant.equals(c))
+				return false;
+			clauses.remove(redundant);
 		}
+			
 		
 		clauses.add(c);
 		
