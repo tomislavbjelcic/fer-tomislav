@@ -18,6 +18,11 @@ public class ClauseSet implements Iterable<Clause> {
 		clauses = cls == null ? new HashSet<>() : new HashSet<>(cls);
 	}
 	
+	public boolean removeClause(Clause c) {
+		Objects.requireNonNull(c);
+		return clauses.remove(c);
+	}
+	
 	public boolean addClause(Clause c) {
 		Objects.requireNonNull(c);
 		
