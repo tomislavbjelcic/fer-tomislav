@@ -55,7 +55,6 @@ public class Reasoning {
 			
 			visited.add(clause);
 			
-			//System.out.println("Trying " + clause + ". Knowledge size: " + knowledge.clauseCount());
 			for (Clause knowledgeClause : knowledge) {
 				Clause resolveTry = clause.resolve(knowledgeClause);
 				if (resolveTry == null || resolveTry.isTautology())
