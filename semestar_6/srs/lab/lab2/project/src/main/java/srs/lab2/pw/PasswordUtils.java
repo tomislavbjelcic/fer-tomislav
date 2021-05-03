@@ -10,7 +10,7 @@ public class PasswordUtils {
 	
 	private static final SecureRandom SECURE_RNG = new SecureRandom();
 	private static final int SALT_LENGTH_BYTES = 32;
-	private static final int ITERATIONS = 100_000;
+	private static final int ITERATIONS = 1 << 16;
 	
 	private PasswordUtils() {}
 	
@@ -37,10 +37,11 @@ public class PasswordUtils {
 		return same;
 	}
 	
-	public char[] getPasswordFromConsole(String prompt) {
+	public static char[] getPasswordFromConsole(String prompt) {
 		Console console = Objects.requireNonNull(System.console(), "System.console() returned null");
 		char[] pw = console.readPassword(prompt);
 		return pw;
 	}
+	
 	
 }

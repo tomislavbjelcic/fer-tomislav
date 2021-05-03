@@ -9,11 +9,22 @@ import srs.lab2.pw.PasswordUtils;
 
 public class Vault {
 	
-	private Map<String, UserInfo> vaultMap = new HashMap<>();
+	private static final String USERNAME_REGEX = "\\w+";
+	
+	private Map<String, UserInfo> vaultMap;
 	private PasswordHasher hasher;
 	
 	public Vault(PasswordHasher hasher) {
+		this(hasher, null);
+	}
+	
+	Vault(PasswordHasher hasher, Map<String, UserInfo> vaultMap) {
+		this.vaultMap = vaultMap == null ? new HashMap<>() : vaultMap;
 		this.hasher = Objects.requireNonNull(hasher);
+	}
+	
+	Map<String, UserInfo> getVaultMap() {
+		return vaultMap;
 	}
 	
 	public UserInfo getUserInfo(String userName) {
@@ -28,9 +39,11 @@ public class Vault {
 	}
 	
 	public void putUser(String userName, char[] password) {
+		checkUsername(userName);
+		
 		UserInfo uinfo = getUserInfo(userName);
-		boolean exists = uinfo == null;
-		UserInfo ui = exists ? new UserInfo() : uinfo;
+		boolean exists = uinfo != null;
+		UserInfo ui = exists ? uinfo : new UserInfo();
 		
 		byte[] salt = PasswordUtils.generateSalt();
 		byte[] pwHash = PasswordUtils.generatePasswordHash(password, hasher, salt);
@@ -54,6 +67,14 @@ public class Vault {
 		
 		boolean match = PasswordUtils.checkPasswordMatch(enteredPassword, uinfo.pwHash, hasher, uinfo.salt);
 		return match;
+	}
+	
+	private static void checkUsername(String userName) {
+		Objects.requireNonNull(userName);
+		
+		boolean match = userName.matches(USERNAME_REGEX);
+		if (!match)
+			throw new IllegalArgumentException("Username can only consist of letters, numbers and underscores!");
 	}
 	
 	
