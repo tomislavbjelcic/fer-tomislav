@@ -8,13 +8,32 @@ import javax.crypto.SecretKey;
 import javax.crypto.SecretKeyFactory;
 import javax.crypto.spec.PBEKeySpec;
 
+/**
+ * Predstavlja implementaciju {@link PasswordHasher} sučelja koja koristi algoritam {@code PBKDF2WithHmacSHA256} kako bi 
+ * računala sažetke lozinki.<br>
+ * 
+ * @author tomislav
+ *
+ */
 public class PBKDF2 implements PasswordHasher {
 	
+	/**
+	 * Duljina sažetka u bitovima.
+	 */
 	public static final int HASH_LENGTH_BITS = 256;
+	/**
+	 * Korišteni algoritam.
+	 */
 	public static final String ALGORITHM = "PBKDF2WithHmacSHA256";
 	
+	/**
+	 * Objekt tvornice ključeva inicijalizirana da koristi prikladan algoritam.
+	 */
 	private static final SecretKeyFactory FACTORY = initFactory();
 	
+	/**
+	 * Dohvaća objekt tvornice ključeva.
+	 */
 	private static SecretKeyFactory initFactory() {
 		SecretKeyFactory factory = null;
 		try {

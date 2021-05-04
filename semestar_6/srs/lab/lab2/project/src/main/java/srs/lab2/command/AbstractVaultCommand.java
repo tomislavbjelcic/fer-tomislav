@@ -28,8 +28,4 @@ public abstract class AbstractVaultCommand implements VaultCommand {
 	
 	protected abstract VaultCommandResult execute(Vault vault, String username);
 	
-	protected VaultCommandResult nonexistentUser(String username) {
-		return VaultCommandResult.fail("User \"" + username + "\" does not exist.");
-	}
-	
 }

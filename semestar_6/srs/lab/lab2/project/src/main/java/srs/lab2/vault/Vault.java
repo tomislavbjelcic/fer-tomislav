@@ -7,11 +7,26 @@ import java.util.Objects;
 import srs.lab2.pw.PasswordHasher;
 import srs.lab2.pw.PasswordUtils;
 
+/**
+ * Predstavlja spremnik podataka korisnika.
+ * 
+ * @author tomislav
+ *
+ */
 public class Vault {
 	
+	/**
+	 * Regularni izraz koji odgovara ispravnom korisničkom imenu.
+	 */
 	private static final String USERNAME_REGEX = "\\w+";
 	
+	/**
+	 * Mapiranje username -> podaci o korisniku
+	 */
 	private Map<String, UserInfo> vaultMap;
+	/**
+	 * Funkcija sažetka koju koristi ovaj spremnik.
+	 */
 	private PasswordHasher hasher;
 	
 	public Vault(PasswordHasher hasher) {
