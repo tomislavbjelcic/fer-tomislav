@@ -15,6 +15,10 @@ public class LoginMain {
 	
 	public static void main(String[] args) {
 		Vault vault = LOADER.load(VAULT_PATH, HASHER);
+		if (vault == null) {
+			System.out.println("Vault at path " + VAULT_PATH + " not yet initialized.");
+			return;
+		}
 		
 		VaultCommandResult result = CMD.execute(vault, args);
 		if (result.vaultChanged) {

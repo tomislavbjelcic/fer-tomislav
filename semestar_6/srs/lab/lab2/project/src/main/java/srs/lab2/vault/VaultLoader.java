@@ -18,7 +18,13 @@ public class VaultLoader {
 	private static final String SEP = "=";
 	private static final String LINE_SEP = System.lineSeparator();
 	
+	private static boolean checkVault(Path file) {
+		return Files.exists(file) && Files.isRegularFile(file);
+	}
+	
 	public Vault load(Path file, PasswordHasher hasher) {
+		if (!checkVault(file))
+			return null;
 		
 		Map<String, UserInfo> vaultMap = new HashMap<>();
 		try (BufferedReader br = Files.newBufferedReader(file, CS)) {
