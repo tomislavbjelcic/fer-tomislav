@@ -11,18 +11,25 @@ public class UserAddCommand extends AbstractVaultCommand {
 
 	@Override
 	protected VaultCommandResult execute(Vault vault, String username) {
+		var uinfo = vault.getUserInfo(username);
+		if (uinfo != null) {
+			return fail("User \"" + username + "\" already exists.");
+		}
+		
+		String userErr = PasswordUtils.checkUsername(username);
+		if (userErr != null)
+			return fail(userErr);
 		
 		char[] pw = PasswordUtils.getPasswordFromConsole("Password: ");
 		char[] repeat = PasswordUtils.getPasswordFromConsole("Repeat Password: ");
 		boolean eq = Arrays.equals(pw, repeat);
 		if (!eq)
 			return fail("User add failed. Password mismatch.");
+		String err = PasswordUtils.checkPassword(pw);
+		if (err != null)
+			return fail(err);
 		
-		try {
-			vault.putUser(username, pw);
-		} catch (IllegalArgumentException ex) {
-			return fail("User add failed. " + ex.getMessage());
-		}
+		vault.putUser(username, pw);
 		
 		return success("User add successfully added.", true);
 	}

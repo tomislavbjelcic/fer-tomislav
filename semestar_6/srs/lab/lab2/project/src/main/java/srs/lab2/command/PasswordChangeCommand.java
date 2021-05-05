@@ -19,9 +19,19 @@ public class PasswordChangeCommand extends AbstractVaultCommand {
 		
 		char[] pw = PasswordUtils.getPasswordFromConsole("Password: ");
 		char[] repeat = PasswordUtils.getPasswordFromConsole("Repeat Password: ");
+		
 		boolean eq = Arrays.equals(pw, repeat);
 		if (!eq)
 			return fail("Password change failed. Password mismatch.");
+		
+		boolean samePw = vault.auth(username, pw);
+		if (samePw)
+			return fail("Cannot have the same password from before!");
+		
+		String err = PasswordUtils.checkPassword(pw);
+		if (err != null)
+			return fail(err);
+		
 		
 		vault.putUser(username, pw);
 		return success("Password change successful.", true);

@@ -2,7 +2,7 @@ package srs.lab2;
 
 import java.nio.file.Path;
 
-import srs.lab2.pw.PBKDF2;
+import srs.lab2.pw.Argon2;
 import srs.lab2.pw.PasswordHasher;
 import srs.lab2.vault.VaultLoader;
 
@@ -25,6 +25,6 @@ class Common {
 	/**
 	 * Korištena implementacija funkcije sažetka za lozinke.
 	 */
-	static final PasswordHasher HASHER = new PBKDF2();
+	static final PasswordHasher HASHER = new Argon2();
 	
 }

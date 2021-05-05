@@ -16,11 +16,6 @@ import srs.lab2.pw.PasswordUtils;
 public class Vault {
 	
 	/**
-	 * Regularni izraz koji odgovara ispravnom korisničkom imenu.
-	 */
-	private static final String USERNAME_REGEX = "\\w+";
-	
-	/**
 	 * Mapiranje username -> podaci o korisniku
 	 */
 	private Map<String, UserInfo> vaultMap;
@@ -54,7 +49,6 @@ public class Vault {
 	}
 	
 	public void putUser(String userName, char[] password) {
-		checkUsername(userName);
 		
 		UserInfo uinfo = getUserInfo(userName);
 		boolean exists = uinfo != null;
@@ -83,15 +77,5 @@ public class Vault {
 		boolean match = PasswordUtils.checkPasswordMatch(enteredPassword, uinfo.pwHash, hasher, uinfo.salt);
 		return match;
 	}
-	
-	private static void checkUsername(String userName) {
-		Objects.requireNonNull(userName);
-		
-		boolean match = userName.matches(USERNAME_REGEX);
-		if (!match)
-			throw new IllegalArgumentException("Username can only consist of letters, numbers and underscores!");
-	}
-	
-	
 	
 }

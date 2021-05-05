@@ -29,6 +29,14 @@ public class LoginCommand extends AbstractVaultCommand {
 			if (!eq)
 				return fail("Login failed. Password mismatch.");
 			
+			boolean samePw = vault.auth(username, newPw);
+			if (samePw)
+				return fail("Cannot have the same password from before!");
+			
+			String err = PasswordUtils.checkPassword(newPw);
+			if (err != null)
+				return fail(err);
+			
 			vault.putUser(username, newPw);
 			vaultChanged = true;
 		}

@@ -25,7 +25,15 @@ public class PasswordUtils {
 	/**
 	 * Korišten broj iteracija za računanje hasheva lozinki.
 	 */
-	private static final int ITERATIONS = 1 << 16;
+	private static final int ITERATIONS = 50;
+	/**
+	 * Regularni izraz koji odgovara ispravnom korisničkom imenu.
+	 */
+	private static final String USERNAME_REGEX = "\\w+";
+	/**
+	 * Minimalna duljina znakova lozinke.
+	 */
+	private static final int PASSWORD_MIN_LENGTH = 8;
 	
 	private PasswordUtils() {}
 	
@@ -94,6 +102,51 @@ public class PasswordUtils {
 		Console console = Objects.requireNonNull(System.console(), "System.console() returned null");
 		char[] pw = console.readPassword(prompt);
 		return pw;
+	}
+	
+	/**
+	 * Provjerava ispravnost usernamea (korisničkog imena) i vraća poruku pogreške ako postoji, inače {@code null}.<br>
+	 * Username je ispravan ako se sastoji samo od slova, dekadskih znamenaka i podvlaka.
+	 * 
+	 * @param username
+	 * @return
+	 */
+	public static String checkUsername(String username) {
+		boolean match = username.matches(USERNAME_REGEX);
+		if (!match)
+			return "Username can only consist of letters, numbers and underscores!";
+		return null;
+	}
+	
+	/**
+	 * Provjerava kompleksnost lozinke i vraća poruku pogreške ako postoji, inače {@code null}.<br>
+	 * Lozinka će proći provjeru ako se sastoji od barem jednog malog slova, barem jednog velikog slova 
+	 * i barem jedne dekadske znamenke.
+	 * 
+	 * @param password
+	 * @return
+	 */
+	public static String checkPassword(char[] password) {
+		int len = password.length;
+		if (len < PASSWORD_MIN_LENGTH)
+			return "Password has to have length " + PASSWORD_MIN_LENGTH + " or more.";
+		
+		boolean uppercases = false;
+		boolean lowercases = false;
+		boolean digits = false;
+		for (char c : password) {
+			uppercases = uppercases || Character.isUpperCase(c);
+			lowercases = lowercases || Character.isLowerCase(c);
+			digits = digits || Character.isDigit(c);
+			if (uppercases && lowercases && digits)
+				break;
+		}
+		
+		if (!(uppercases && lowercases && digits))
+			return "Password must consist of at least 1 upper case letter, "
+						+ "1 lower case letter and 1 number.";
+		
+		return null;
 	}
 	
 	
