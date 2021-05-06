@@ -15,6 +15,9 @@ import srs.lab2.pw.PasswordUtils;
  */
 public class Vault {
 	
+	private static final byte[] DUMMY_SALT = new byte[] {-1};
+	private static final char[] DUMMY_PW = new char[] {'d', 'u', 'm', 'm', 'y', 'p', 'w'};
+	
 	/**
 	 * Mapiranje username -> podaci o korisniku
 	 */
@@ -71,8 +74,14 @@ public class Vault {
 	
 	public boolean auth(String userName, char[] enteredPassword) {
 		UserInfo uinfo = getUserInfo(userName);
-		if (uinfo == null)
+		if (uinfo == null) {
+			/* autentifikacija nece uspjeti, ali svejedno cemo potrositi malo vremena
+			jer ako autentifikacija brzo kaze da nije uspjela, napadac bi mogao
+			zakljuciti da username ne postoji */
+			
+			PasswordUtils.generatePasswordHash(DUMMY_PW, hasher, DUMMY_SALT);
 			return false;
+		}
 		
 		boolean match = PasswordUtils.checkPasswordMatch(enteredPassword, uinfo.pwHash, hasher, uinfo.salt);
 		return match;
