@@ -1,0 +1,4 @@
+# compile project using javac
+
+echo "Compiling project using javac..."
+javac -source 11 -target 11 -d $targetDir -cp $jarPath -sourcepath $sourcePath $mainClassSrcPath

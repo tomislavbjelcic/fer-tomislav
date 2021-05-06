@@ -1,0 +1,3 @@
+source constants.sh
+
+java -cp $classPath $initMainClass

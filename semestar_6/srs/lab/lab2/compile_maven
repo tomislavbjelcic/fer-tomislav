@@ -1,0 +1,4 @@
+source constants.sh
+
+echo "Compiling project using Maven..."
+mvn -f $projdir clean compile

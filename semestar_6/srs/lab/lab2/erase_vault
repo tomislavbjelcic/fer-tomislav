@@ -1,0 +1,7 @@
+source constants.sh
+
+
+if [ -d $vaultDir ]; then
+   rm -r $vaultDir
+   echo "Directory \"$vaultDir\" deleted."
+fi
