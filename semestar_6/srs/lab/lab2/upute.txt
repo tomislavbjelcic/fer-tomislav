@@ -19,3 +19,15 @@ To se radi pokretanjem izvršne datoteke/skripte init_vault: "./init_vault"
 
 Nakon toga alati se mogu pokrenuti iz izvršnih datoteka login i usermgmt.
 Primjerice, u konzoli unijeti "./usermgmt add ..." ili "./login ..."
+
+
+
+Implementacija koristi vanjsku biblioteku koja je uključena u direktoriju "project/libs", a radi se 
+o kriptografskom API-ju "Bouncy Castle". Biblioteka, za razliku od standardne Javine, sadrži implementaciju algoritma Argon2, 
+zbog čega je korištena za ovu vježbu.
+
+Biblioteka i izvorni kod se mogu dohvatiti ili iz centralnog Mavenovog repozitorija navođenjem dependencyja u pom.xml datoteci:
+https://mvnrepository.com/artifact/org.bouncycastle/bcprov-jdk15on/1.68
+
+ili JAR-ove direktno dohvatiti sa stranice organizacije autora biblioteke:
+https://www.bouncycastle.org/latest_releases.html
