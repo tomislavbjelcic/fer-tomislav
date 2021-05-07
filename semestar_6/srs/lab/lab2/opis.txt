@@ -8,7 +8,7 @@ Zatim se unesena lozinka, zajedno sa generiranim saltom, provlači kroz kriptogr
 No korištena kriptografska funkcija sažetka nije bilo kakva.
 Ona mora biti takva da, kao i standardne kriptografske funkcije sažetka, napadaču onemogući lako rekonstruiranje istog sažetka bez da zna originalnu lozinku.
 Uz to, možda najbitnije svojstvo, jest da bude namjerno sporija za računati od klasičnih kriptografskih funkcija sažetaka. Zašto?
-Jer želimo otežati napad grubom silom gdje napadač može pokušati pogoditi jako puno lozinki u malo vremena, što bi bilo moguće da se radi npr. o 
+Jer želimo otežati napad grubom silom gdje napadač može isprobati jako puno lozinki u malo vremena, što bi bilo moguće da se radi npr. o 
 običnom SHA-256. Sa dobrih hardverom napadač može strahovito puno takvih hasheva računati u sekundi, dakle puno lozinki isprobati.
 Zato se koriste hashevi koji rade tzv. "key stretching". One iz relativno slabe, čiste lozinke, povećanem resursa potrebnih da se izračuna hash osiguravaju 
 obranu protiv opisanih napada grubom silom.
@@ -43,3 +43,9 @@ Sustav forsira korištenje lozinke koje su najmanje 8 znakova dugačke, sastoje 
 Time je bar u nekoj mjeri riješena ranjivost lozinki niske razine kompleksnosti i slučajnosti. Administrator, ako posumnja da je korisnikova lozinka u opasnosti, 
 može i forsirati promjenu lozinke nakon sljedećeg uspješnog logina (zastavica true/false koja se pohranjuje u zapisima).
 Prilikom svake promjene lozinke, ponovno se generira novi salt te novi hash za novu lozinku i taj zapis se prepisuje preko postojećeg.
+
+Čuvanjem hasha umjesto čiste lozinke, u slučaju krađe tekstualne datoteke sa zapisima, osigurava se tajnost lozinki. Napadač nikako iz danog hasha i poznatog salta neće 
+moći zaključiti o kojoj se lozinki radi, može samo pogađati. Uloga slučajnog salta jest sprječavanje "Rainbow table" napada, gdje napadač ima prethodno izračunato i pohranjeno 
+puno hasheva za puno lozinki, pa kada ne bismo imali salt, postoji mogućnost da napadač za našu lozinku ima hash pohranjen kod sebe i tako automatski zna 
+o kojoj se lozinki radi kada vidi taj isti hash u tekstualnoj datoteci. Uz to, salt nam osigurava da dva korisnika koja imaju jednake lozinke imaju različite hasheve, 
+što želimo jer kada dva zapisa imaju iste hasheve (u slučaju bez korištenja salta), napadač može zaključiti da dva korisnika imaju iste lozinke.
