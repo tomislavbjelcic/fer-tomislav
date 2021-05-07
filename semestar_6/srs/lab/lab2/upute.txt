@@ -16,6 +16,7 @@ Alat se može prevesti ili koristeći javac ili koristeći alat Maven. Prevođen
 
 Nakon toga je potrebno inicijalizirati, odnosno stvoriti, datoteku koja će služiti kao spremnik podataka.
 To se radi pokretanjem izvršne datoteke/skripte init_vault: "./init_vault"
+Datoteka i direktorij u kojem se nalazi se može i izbrisati: "./erase_vault"
 
 Nakon toga alati se mogu pokrenuti iz izvršnih datoteka login i usermgmt.
 Primjerice, u konzoli unijeti "./usermgmt add ..." ili "./login ..."
