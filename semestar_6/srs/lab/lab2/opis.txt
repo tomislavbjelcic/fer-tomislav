@@ -1,0 +1,51 @@
+Sustav za prijavu, da bi autentificirao registrirane korisnike, mora na neki način pohraniti zapise.
+Oni se pohranjuju na disku, ali lozinke se ne pohranjuju u čistom obliku, u nastavku je objašnjeno kako i u kojem formatu se pohranjuju zapisi.
+
+Za svakog korisnika kojeg administrator registrira, unosi se njegovo korisničko ime (username) i lozinka. 
+Sustav zatim generira, koristeći kriptografski generator slučajnih brojeva, slučajan niz od 32 bajta zvan salt.
+Zatim se unesena lozinka, zajedno sa generiranim saltom, provlači kroz kriptografsku funkciju sažetka koja će nam na izlazu dati 32 bajtni sažetak (hash).
+
+No korištena kriptografska funkcija sažetka nije bilo kakva.
+Ona mora biti takva da, kao i standardne kriptografske funkcije sažetka, napadaču onemogući lako rekonstruiranje istog sažetka bez da zna originalnu lozinku.
+Uz to, možda najbitnije svojstvo, jest da bude namjerno sporija za računati od klasičnih kriptografskih funkcija sažetaka. Zašto?
+Jer želimo otežati napad grubom silom gdje napadač može isprobati jako puno lozinki u malo vremena, što bi bilo moguće da se radi npr. o 
+običnom SHA-256. Sa dobrih hardverom napadač može strahovito puno takvih hasheva računati u sekundi, dakle puno lozinki isprobati.
+Zato se koriste hashevi koji rade tzv. "key stretching". One iz relativno slabe, čiste lozinke, povećanem resursa potrebnih da se izračuna hash osiguravaju 
+obranu protiv opisanih napada grubom silom.
+Kako se "povećaju resursi" potrebnih da se računa hash?
+To ovisi o pojedinim hash funkcijama.
+U Javi, standardna biblioteka nudi PBKDF2, koji se, osim svrhe deriviranja tajnog ključa koristi i u svrhama password hashinga. Tu se može konfigurirati u koliko iteracija će 
+se računati neka standardna hash funkcija (npr. kod PBKDF2WithHmacSHA256 koristi se SHA-256), pa se na taj način usporava računanje cjelokupnog hasha.
+No odlučio sam koristiti Argon2 koja ima više podesivih parametara i bolja je u odnosu na PBKDF2 jer je otporna na napad specijaliziranim hardverom.
+Argon2, uz broj iteracija, može podesiti i koliko je memorijsko zauzeće računanja, koliko dretvi će biti stvoreno, itd.
+Sustav koristi 50 iteracija, jer više od toga uzima vrijeme zbog kojeg bi legitiman korisnik mogao postati nestrpljiv, ali opet dovoljno da napadač ne može puno različitih hasheva
+računati.
+
+I kako onda sustav sprema zapise?
+Sve što je potrebno spremiti u sklopu zapisa korisnika jest:
+1. Korisničko ime (username)
+2. Slučajno generirani 32 bajtni salt
+3. Hash kojeg nam je iz lozinke i salta generirao algoritam Argon2
+4. Zastavica true/false koja označava da korisnik mora promijeniti lozinku nakon sljedećeg logina.
+
+Oni se spremaju u obliku:
+username=zastavica,salt,hash
+Salt i hash je niz od 32 bajta, pa kako bismo ih mogli na lijep način prikazati u tekstualnoj datoteci odlučio sam se za hex zapis koji svaki bajt zapisuje kao 2 hex znamenke.
+Primjerice, izvođenjem naredbe "./usermgmt add tomislav" uz lozinku "TajNaL0z1nKa" u tekstualnoj datoteci "./data/vault.txt" će se dodati novi zapis u novoj liniji:
+tomislav=false,5234821194ddae48998d35e5d6b317e978f5cb2cbb45da1b05b3b0ce22136609,f08e824c9eebc3fdb9f4f944d1cf3c4193968810f338bda34e8bd366b8ddf5cc
+
+Kako onda sustav autentificira korisnika? Pa vrlo jednostavno, od korisnika zatraži unos lozinke, zatim sa zapisanim saltom i unesenom lozinkom 
+sustav algoritmom Argon2 računa hash i provjerava poklapa li se sa spremljenim hashom. Ako se poklapa, korisnik se uspješno ulogirava.
+Ako korisnik ne unese točnu lozinku, generirati će se drugačiji hash i autentifikacija neće proći.
+
+Unos lozinke je skriven, odnosno znakovi se ne ispisuju u konzoli tijekom unosa.
+Sustav forsira korištenje lozinke koje su najmanje 8 znakova dugačke, sastoje se barem od 1 malog, barem 1 velikog slova i barem jedne dekadske znamenke.
+Time je bar u nekoj mjeri riješena ranjivost lozinki niske razine kompleksnosti i slučajnosti. Administrator, ako posumnja da je korisnikova lozinka u opasnosti, 
+može i forsirati promjenu lozinke nakon sljedećeg uspješnog logina (zastavica true/false koja se pohranjuje u zapisima).
+Prilikom svake promjene lozinke, ponovno se generira novi salt te novi hash za novu lozinku i taj zapis se prepisuje preko postojećeg.
+
+Čuvanjem hasha umjesto čiste lozinke, u slučaju krađe tekstualne datoteke sa zapisima, osigurava se tajnost lozinki. Napadač nikako iz danog hasha i poznatog salta neće 
+moći zaključiti o kojoj se lozinki radi, može samo pogađati. Uloga slučajnog salta jest sprječavanje "Rainbow table" napada, gdje napadač ima prethodno izračunato i pohranjeno 
+puno hasheva za puno lozinki, pa kada ne bismo imali salt, postoji mogućnost da napadač za našu lozinku ima hash pohranjen kod sebe i tako automatski zna 
+o kojoj se lozinki radi kada vidi taj isti hash u tekstualnoj datoteci. Uz to, salt nam osigurava da dva korisnika koja imaju jednake lozinke imaju različite hasheve, 
+što želimo jer kada dva zapisa imaju iste hasheve (u slučaju bez korištenja salta), napadač može zaključiti da dva korisnika imaju iste lozinke.
