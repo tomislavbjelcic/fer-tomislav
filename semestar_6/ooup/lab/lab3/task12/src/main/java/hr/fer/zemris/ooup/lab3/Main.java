@@ -6,7 +6,7 @@ public class Main {
 	
 	public static void main(String[] args) {
 		
-		String[] kinds = new String[] {"Dog", "Parrot", "Cat"};
+		String[] kinds = new String[] {"Dog", "Parrot", "Cat", "Tiger", "Dog", "Parrot", "Tiger"};
 		String name = "Mirko";
 		
 		for (String kind : kinds) {
