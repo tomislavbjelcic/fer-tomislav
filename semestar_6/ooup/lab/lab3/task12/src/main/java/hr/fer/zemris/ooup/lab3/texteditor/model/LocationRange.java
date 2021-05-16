@@ -10,6 +10,9 @@ public class LocationRange {
 		this.mark = mark;
 	}
 	
-	
+	@Override
+	public String toString() {
+		return String.format("Dot(%d, %d) Mark(%d, %d)", dot.rowIndex, dot.colIndex, mark.rowIndex, mark.colIndex);
+	}
 	
 }

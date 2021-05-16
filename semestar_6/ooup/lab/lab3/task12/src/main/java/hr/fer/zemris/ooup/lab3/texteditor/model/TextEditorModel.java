@@ -8,7 +8,8 @@ import java.util.List;
 import java.util.ListIterator;
 import java.util.NoSuchElementException;
 import java.util.Objects;
-import java.util.function.Consumer;
+import java.util.Scanner;
+import java.util.stream.Collectors;
 
 public class TextEditorModel {
 	
@@ -17,13 +18,15 @@ public class TextEditorModel {
 	private Location cursorLocation;
 	
 	private List<CursorObserver> cursorObservers = new LinkedList<>();
-	private Consumer<CursorObserver> notifier = obs -> obs.updateCursorLocation(cursorLocation);
 	
 	
 	public TextEditorModel(String initialText) {
 		Objects.requireNonNull(initialText);
 		
 		initialText.lines().forEach(lines::add);
+		int len = initialText.length();
+		if (len != 0 && initialText.charAt(len-1) == '\n')
+			lines.add("");
 		int size = lines.size();
 		
 		boolean empty = size == 0;
@@ -45,12 +48,28 @@ public class TextEditorModel {
 	public Location getCursorLocation() {
 		return cursorLocation;
 	}
-
+	
+	private boolean validLoc(Location cursorLocation) {
+		if (cursorLocation == null)
+			return false;
+		int lineCount = lines.size();
+		if (lineCount == 0)
+			return cursorLocation.rowIndex == 0 && cursorLocation.colIndex == 0;
+		boolean validRow = cursorLocation.rowIndex < lineCount;
+		if (!validRow)
+			return false;
+		String s = lines.get(cursorLocation.rowIndex);
+		boolean validCol = cursorLocation.colIndex <= s.length();
+		return validCol;
+	}
+	
 	public void setCursorLocation(Location cursorLocation) {
-		boolean changed = !this.cursorLocation.equals(cursorLocation);
+		if (!validLoc(cursorLocation))
+			return;
+		boolean changed = !cursorLocation.equals(this.cursorLocation);
 		if (changed) {
 			this.cursorLocation = cursorLocation;
-			notifyCursorObservers();
+			notifyCursorObservers(cursorLocation);
 		}
 	}
 	
@@ -101,24 +120,129 @@ public class TextEditorModel {
 		cursorObservers.remove(Objects.requireNonNull(co));
 	}
 	
-	private void notifyCursorObservers() {
-		cursorObservers.forEach(notifier);
+	private void notifyCursorObservers(Location newLoc) {
+		cursorObservers.forEach(obs -> obs.updateCursorLocation(newLoc));
 	}
 	
-	public void moveCursorLeft() {}
-	public void moveCursorRight() {}
-	public void moveCursorUp() {}
-	public void moveCursorDown() {}
+	public void moveCursorLeft() {
+		int row = cursorLocation.rowIndex;
+		int col = cursorLocation.colIndex;
+		if (row == 0 && col == 0)
+			return;
+		
+		if (col == 0) {
+			int prevRow = row-1;
+			String line = lines.get(prevRow);
+			int len = line.length();
+			Location loc = new Location(prevRow, len);
+			this.setCursorLocation(loc);
+			return;
+		}
+		
+		Location loc = new Location(row, col-1);
+		this.setCursorLocation(loc);
+	}
+	
+	public void moveCursorRight() {
+		int row = cursorLocation.rowIndex;
+		int col = cursorLocation.colIndex;
+		
+		int size = lines.size();
+		if (size == 0)
+			return;
+		
+		String currentLine = lines.get(row);
+		if (col == currentLine.length()) {
+			int nextRow = row+1;
+			if (nextRow == size)
+				return;
+			
+			Location loc = new Location(nextRow, 0);
+			this.setCursorLocation(loc);
+			return;
+		}
+		
+		Location loc = new Location(row, col+1);
+		this.setCursorLocation(loc);
+	}
+	
+	public void moveCursorUp() {
+		int row = cursorLocation.rowIndex;
+		int col = cursorLocation.colIndex;
+		
+		if (row == 0)
+			return;
+		int prevRow = row-1;
+		int prevLen = lines.get(prevRow).length();
+		
+		int newCol = prevLen >= col ? col : prevLen;
+		Location loc = new Location(prevRow, newCol);
+		this.setCursorLocation(loc);
+		
+	}
+	
+	public void moveCursorDown() {
+		int row = cursorLocation.rowIndex;
+		int col = cursorLocation.colIndex;
+		
+		int size = lines.size();
+		if (row == size-1)
+			return;
+		
+		int nextRow = row+1;
+		int nextLen = lines.get(nextRow).length();
+		
+		int newCol = nextLen >= col ? col : nextLen;
+		Location loc = new Location(nextRow, newCol);
+		this.setCursorLocation(loc);
+	}
+	
+	
+	@Override
+	public String toString() {
+		String lin = lines.stream().collect(Collectors.joining("\n"));
+		return lin + '\n' + "Cursor: " + cursorLocation + '\n' + "Sel range: " + selectionRange;
+	}
+	
+	private void test() {
+		@SuppressWarnings("resource")
+		Scanner sc = new Scanner(System.in);
+		boolean cont = true;
+		while(cont) {
+			System.out.print("Key: ");
+			String line = sc.nextLine();
+			String strip = line.strip();
+			if (strip.isEmpty())
+				break;
+			
+			char first = strip.charAt(0);
+			switch(first) {
+			case 'w' -> moveCursorUp();
+			case 's' -> moveCursorDown();
+			case 'a' -> moveCursorLeft();
+			case 'd' -> moveCursorRight();
+			default -> cont=false;
+			}
+		}
+		System.out.println("Test end.");
+	}
 	
 	public static void main(String[] args) {
-		String text = "ola\nzuizy\r\nlr";
+		String text = """
+				GHUHH
+				ui
+				v
+				ittu
+				""";
 		TextEditorModel m = new TextEditorModel(text);
+		System.out.println(m.lines);
+		System.out.println(m.lines.size());
 		
-		var it = m.linesRange(0, 2);
-		while(it.hasNext()) {
-			String n = it.next();
-			System.out.println(n);
-		}
+		
+		m.addCursorObserver(loc -> System.out.println("New location: " + loc));
+		System.out.println(m);
+		m.test();
+		
 	}
 	
 }

@@ -28,4 +28,9 @@ public class Location {
 		return eq;
 	}
 	
+	@Override
+	public String toString() {
+		return String.format("[row=%d, col=%d]", rowIndex, colIndex);
+	}
+	
 }
