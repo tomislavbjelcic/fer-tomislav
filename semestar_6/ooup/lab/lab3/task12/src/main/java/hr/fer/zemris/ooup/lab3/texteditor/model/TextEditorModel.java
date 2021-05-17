@@ -2,36 +2,47 @@ package hr.fer.zemris.ooup.lab3.texteditor.model;
 
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.ListIterator;
+import java.util.Map;
 import java.util.NoSuchElementException;
 import java.util.Objects;
 import java.util.Scanner;
+import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
 public class TextEditorModel {
+	
+	private static final String LINE_SEPARATOR = System.lineSeparator();
 	
 	private List<String> lines = new ArrayList<>();
 	private LocationRange selectionRange;
 	private Location cursorLocation;
 	
 	private List<CursorObserver> cursorObservers = new LinkedList<>();
+	private List<TextObserver> textObservers = new LinkedList<>();
 	
 	
 	public TextEditorModel(String initialText) {
 		Objects.requireNonNull(initialText);
 		
-		initialText.lines().forEach(lines::add);
 		int len = initialText.length();
-		if (len != 0 && initialText.charAt(len-1) == '\n')
+		
+		if (len == 0)
 			lines.add("");
+		else
+			initialText.lines().forEach(lines::add);
+		
+		if (initialText.endsWith(LINE_SEPARATOR))
+			lines.add("");
+		
 		int size = lines.size();
 		
-		boolean empty = size == 0;
-		int rowIndex = empty ? 0 : size-1;
-		int colIndex = empty ? 0 : lines.get(size-1).length();
+		int rowIndex = size-1;
+		int colIndex = lines.get(rowIndex).length();
 		
 		this.setCursorLocation(new Location(rowIndex, colIndex));
 		this.setSelectionRange(new LocationRange(new Location(), new Location()));
@@ -117,11 +128,23 @@ public class TextEditorModel {
 	}
 	
 	public void removeCursorObserver(CursorObserver co) {
-		cursorObservers.remove(Objects.requireNonNull(co));
+		cursorObservers.remove(co);
 	}
 	
 	private void notifyCursorObservers(Location newLoc) {
 		cursorObservers.forEach(obs -> obs.updateCursorLocation(newLoc));
+	}
+	
+	public void addTextObserver(TextObserver to) {
+		textObservers.add(Objects.requireNonNull(to));
+	}
+	
+	public void removeTextObserver(TextObserver to) {
+		textObservers.remove(to);
+	}
+	
+	private void notifyTextObservers() {
+		textObservers.forEach(TextObserver::updateText);
 	}
 	
 	public void moveCursorLeft() {
@@ -146,10 +169,7 @@ public class TextEditorModel {
 	public void moveCursorRight() {
 		int row = cursorLocation.rowIndex;
 		int col = cursorLocation.colIndex;
-		
 		int size = lines.size();
-		if (size == 0)
-			return;
 		
 		String currentLine = lines.get(row);
 		if (col == currentLine.length()) {
@@ -197,6 +217,110 @@ public class TextEditorModel {
 		this.setCursorLocation(loc);
 	}
 	
+	public void insert(char c) {
+		insert(String.valueOf(c));
+	}
+	
+	public void insert(String text) {
+		List<String> textLines = text.lines().collect(Collectors.toCollection(LinkedList::new));
+		if (text.endsWith(LINE_SEPARATOR))
+			textLines.add("");
+		
+		int size = textLines.size();
+		if (size == 0)
+			return;
+		
+		int row = cursorLocation.rowIndex;
+		int col = cursorLocation.colIndex;
+		
+		Location newCursorLoc = null;
+		String currentLine = lines.get(row);
+		if (size == 1) {
+			StringBuilder mutable = new StringBuilder(currentLine);
+			String ins = textLines.get(0);
+			mutable.insert(col, ins);
+			
+			lines.set(row, mutable.toString());
+			newCursorLoc = new Location(row, col+ins.length());
+		} else {
+			String leftSide = currentLine.substring(0, col);
+			String rightSide = currentLine.substring(col);
+			
+			String first = textLines.get(0);
+			String last = textLines.get(size-1);
+			textLines.set(0, leftSide.concat(first));
+			textLines.set(size-1, last.concat(rightSide));
+			
+			lines.remove(row);
+			lines.addAll(row, textLines);
+			
+			int newRow = row-1+size;
+			int newCol = last.length();
+			newCursorLoc = new Location(newRow, newCol);
+		}
+		
+		this.notifyTextObservers();
+		this.setCursorLocation(newCursorLoc);
+	}
+	
+	public void deleteAfter() {
+		int row = cursorLocation.rowIndex;
+		int col = cursorLocation.colIndex;
+		int size = lines.size();
+		
+		String currStr = lines.get(row);
+		int strLen = currStr.length();
+		if (col == strLen) {
+			if (row == size-1)
+				return;
+			
+			// u ovom slucaju treba spojiti dva retka jer se brise prijelaz u novu liniju
+			String nextLine = lines.get(row+1);
+			String merged = currStr.concat(nextLine);
+			
+			lines.set(row, merged);
+			lines.remove(row+1);
+			
+		} else {
+			StringBuilder mutable = new StringBuilder(currStr);
+			mutable.deleteCharAt(col);
+			String removed = mutable.toString();
+			lines.set(row, removed);
+		}
+		
+		this.notifyTextObservers();
+	}
+	
+	public void deleteBefore() {
+		int row = cursorLocation.rowIndex;
+		int col = cursorLocation.colIndex;
+		
+		if (row == 0 && col == 0)
+			return;
+		
+		String currStr = lines.get(row);
+		Location newCursorLoc = null;
+		if (col == 0) {
+			// opet spojiti dva retka
+			
+			String prevLine = lines.get(row-1);
+			String merged = prevLine.concat(currStr);
+			
+			lines.set(row-1, merged);
+			lines.remove(row);
+			newCursorLoc = new Location(row-1, prevLine.length());
+		} else {
+			StringBuilder mutable = new StringBuilder(currStr);
+			mutable.deleteCharAt(col-1);
+			String removed = mutable.toString();
+			lines.set(row, removed);
+			newCursorLoc = new Location(row, col-1);
+		}
+		
+		this.notifyTextObservers();
+		this.setCursorLocation(newCursorLoc);
+	}
+	
 	
 	@Override
 	public String toString() {
@@ -204,44 +328,61 @@ public class TextEditorModel {
 		return lin + '\n' + "Cursor: " + cursorLocation + '\n' + "Sel range: " + selectionRange;
 	}
 	
-	private void test() {
+	private void test(Map<String, Consumer<TextEditorModel>> controls) {
 		@SuppressWarnings("resource")
 		Scanner sc = new Scanner(System.in);
-		boolean cont = true;
-		while(cont) {
+		
+		while(true) {
 			System.out.print("Key: ");
 			String line = sc.nextLine();
 			String strip = line.strip();
 			if (strip.isEmpty())
 				break;
 			
-			char first = strip.charAt(0);
-			switch(first) {
-			case 'w' -> moveCursorUp();
-			case 's' -> moveCursorDown();
-			case 'a' -> moveCursorLeft();
-			case 'd' -> moveCursorRight();
-			default -> cont=false;
-			}
+			var cons = controls.get(strip);
+			if (cons == null)
+				break;
+			
+			cons.accept(this);
 		}
 		System.out.println("Test end.");
 	}
 	
 	public static void main(String[] args) {
 		String text = """
-				GHUHH
-				ui
-				v
-				ittu
+				Orale
+				Et
+				Laborale
+				
 				""";
 		TextEditorModel m = new TextEditorModel(text);
 		System.out.println(m.lines);
 		System.out.println(m.lines.size());
 		
+		Map<String, Consumer<TextEditorModel>> map = new HashMap<>();
+		
+		map.put("j", TextEditorModel::deleteBefore);
+		map.put("l", TextEditorModel::deleteAfter);
+		map.put("a", TextEditorModel::moveCursorLeft);
+		map.put("s", TextEditorModel::moveCursorDown);
+		map.put("d", TextEditorModel::moveCursorRight);
+		map.put("w", TextEditorModel::moveCursorUp);
 		
 		m.addCursorObserver(loc -> System.out.println("New location: " + loc));
+		m.addTextObserver(() -> System.out.println("Lines " + m.lines.size() + ": " + m.lines));
 		System.out.println(m);
-		m.test();
+		
+		//m.test(map);
+		m.setCursorLocation(new Location(0, 3));
+		String ins = """
+				AAAA
+				BBBB
+				CCCC
+				
+				DDDDDD
+				""";
+		m.insert('K');
+		
 		
 	}
 	

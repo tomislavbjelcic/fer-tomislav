@@ -1,6 +1,6 @@
 package hr.fer.zemris.ooup.lab3.texteditor.model;
 
-public class Location {
+public class Location implements Comparable<Location> {
 	
 	public int rowIndex;
 	public int colIndex;
@@ -31,6 +31,16 @@ public class Location {
 	@Override
 	public String toString() {
 		return String.format("[row=%d, col=%d]", rowIndex, colIndex);
+	}
+	@Override
+	public int compareTo(Location o) {
+		if (o==null)
+			return 1;
+		int rowDiff = this.rowIndex - o.rowIndex;
+		if (rowDiff != 0)
+			return rowDiff;
+		
+		return this.colIndex - o.colIndex;
 	}
 	
 }

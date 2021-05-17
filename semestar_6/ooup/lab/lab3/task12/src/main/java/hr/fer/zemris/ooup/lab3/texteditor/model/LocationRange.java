@@ -1,5 +1,7 @@
 package hr.fer.zemris.ooup.lab3.texteditor.model;
 
+import java.util.Objects;
+
 public class LocationRange {
 	
 	public Location dot;
@@ -8,6 +10,11 @@ public class LocationRange {
 	public LocationRange(Location dot, Location mark) {
 		this.dot = dot;
 		this.mark = mark;
+	}
+	
+	public boolean hasSelected() {
+		
+		return !Objects.equals(dot, mark);
 	}
 	
 	@Override
