@@ -2,21 +2,17 @@ package hr.fer.zemris.ooup.lab3.texteditor.model;
 
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.ListIterator;
-import java.util.Map;
 import java.util.NoSuchElementException;
 import java.util.Objects;
-import java.util.Scanner;
-import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
 public class TextEditorModel {
 	
-	private static final String LINE_SEPARATOR = System.lineSeparator();
+	private final String LINE_SEPARATOR = System.lineSeparator();
 	
 	private List<String> lines = new ArrayList<>();
 	private LocationRange selectionRange;
@@ -25,6 +21,9 @@ public class TextEditorModel {
 	private List<CursorObserver> cursorObservers = new LinkedList<>();
 	private List<TextObserver> textObservers = new LinkedList<>();
 	
+	public TextEditorModel() {
+		this("");
+	}
 	
 	public TextEditorModel(String initialText) {
 		Objects.requireNonNull(initialText);
@@ -58,6 +57,10 @@ public class TextEditorModel {
 
 	public Location getCursorLocation() {
 		return cursorLocation;
+	}
+	
+	public String getLineSeparator() {
+		return LINE_SEPARATOR;
 	}
 	
 	private boolean validLoc(Location cursorLocation) {
@@ -326,64 +329,6 @@ public class TextEditorModel {
 	public String toString() {
 		String lin = lines.stream().collect(Collectors.joining("\n"));
 		return lin + '\n' + "Cursor: " + cursorLocation + '\n' + "Sel range: " + selectionRange;
-	}
-	
-	private void test(Map<String, Consumer<TextEditorModel>> controls) {
-		@SuppressWarnings("resource")
-		Scanner sc = new Scanner(System.in);
-		
-		while(true) {
-			System.out.print("Key: ");
-			String line = sc.nextLine();
-			String strip = line.strip();
-			if (strip.isEmpty())
-				break;
-			
-			var cons = controls.get(strip);
-			if (cons == null)
-				break;
-			
-			cons.accept(this);
-		}
-		System.out.println("Test end.");
-	}
-	
-	public static void main(String[] args) {
-		String text = """
-				Orale
-				Et
-				Laborale
-				
-				""";
-		TextEditorModel m = new TextEditorModel(text);
-		System.out.println(m.lines);
-		System.out.println(m.lines.size());
-		
-		Map<String, Consumer<TextEditorModel>> map = new HashMap<>();
-		
-		map.put("j", TextEditorModel::deleteBefore);
-		map.put("l", TextEditorModel::deleteAfter);
-		map.put("a", TextEditorModel::moveCursorLeft);
-		map.put("s", TextEditorModel::moveCursorDown);
-		map.put("d", TextEditorModel::moveCursorRight);
-		map.put("w", TextEditorModel::moveCursorUp);
-		
-		m.addCursorObserver(loc -> System.out.println("New location: " + loc));
-		m.addTextObserver(() -> System.out.println("Lines " + m.lines.size() + ": " + m.lines));
-		System.out.println(m);
-		
-		//m.test(map);
-		m.setCursorLocation(new Location(0, 3));
-		String ins = """
-				AAAA
-				BBBB
-				CCCC
-				
-				DDDDDD
-				""";
-		m.insert('K');
-		
-		
 	}
 	
 }
