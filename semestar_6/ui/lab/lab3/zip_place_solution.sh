@@ -1,7 +1,7 @@
 
 jmbag="0036513877"
-projdir="lab2java"
-autograderdir="autograder_lab2"
+projdir="lab3java"
+autograderdir="autograder_lab3"
 
 # compile if not compiled
 mvn -f $projdir compile
