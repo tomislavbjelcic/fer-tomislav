@@ -22,13 +22,11 @@ public class Main {
 		
 		var fl = data.features.getFeatureList();
 		System.out.println("Feature list: " + fl);
-		for (String feat : fl) {
-			System.out.println(feat);
-		}
+		
 		var out = data.features.getOutputType();
 		var outVals = data.features.getOutputValues();
 		System.out.println("Out: " + out);
-		System.out.println(outVals);
+		System.out.println("Out vals: " + outVals);
 		
 		data.dataUnits.forEach(System.out::println);
 		
