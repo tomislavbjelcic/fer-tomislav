@@ -14,7 +14,7 @@ public interface Features {
 		Objects.checkIndex(index, featList.size());
 		String feat = featList.get(index);
 		return feat;
-	};
+	}
 	
 	void addValue(String feature, String value);
 	String getOutputType();

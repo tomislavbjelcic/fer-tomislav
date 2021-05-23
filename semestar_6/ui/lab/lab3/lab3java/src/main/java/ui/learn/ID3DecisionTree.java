@@ -95,7 +95,7 @@ public class ID3DecisionTree {
 				DBL_CMP, ArrayList::new, adder);
 		igCalcProcessIndex++;
 		
-		//Collections.sort(x.args); //????
+		Collections.sort(x.args); //????
 		String maxIgFeat = x.args.get(0);
 		var vals = gvf.apply(maxIgFeat);
 		Node n = new Node(maxIgFeat, new HashMap<>(), freqEntry.getKey());
