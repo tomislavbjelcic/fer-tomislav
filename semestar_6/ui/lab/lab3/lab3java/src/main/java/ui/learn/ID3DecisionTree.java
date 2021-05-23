@@ -6,6 +6,8 @@ import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Objects;
@@ -64,7 +66,7 @@ public class ID3DecisionTree {
 		this.depth = depth;
 	}
 	
-	private Node id3(Set<Map<String, String>> selectedSet, Set<Map<String, String>> parentSet, 
+	private Node id3(List<Map<String, String>> selectedSet, List<Map<String, String>> parentSet, 
 			Set<String> feats, String outClass, Features features, int currentDepth) {
 		
 		Util.MapValueExtractor<String, String> extrac = new Util.MapValueExtractor<>();
@@ -106,7 +108,7 @@ public class ID3DecisionTree {
 		eqp.key = maxIgFeat;
 		for (String v : vals) {
 			eqp.obj = v;
-			Set<Map<String, String>> subset = Util.subset(selectedSet, HashSet::new, eqp);
+			List<Map<String, String>> subset = Util.subset(selectedSet, LinkedList::new, eqp);
 			Node branch = id3(subset, selectedSet, featRemoved, outClass, features, currentDepth-1);
 			n.children.put(v, branch);
 		}
@@ -118,7 +120,7 @@ public class ID3DecisionTree {
 		return igCalcProcess;
 	}
 	
-	public void fit(Set<Map<String, String>> data, Features features) {
+	public void fit(List<Map<String, String>> data, Features features) {
 		if (root != null)
 			return;
 		Set<String> feats = new HashSet<>(features.getFeatureList());

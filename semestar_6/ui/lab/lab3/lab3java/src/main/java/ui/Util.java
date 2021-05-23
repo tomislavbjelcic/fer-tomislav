@@ -3,7 +3,7 @@ package ui;
 import java.util.Collection;
 import java.util.Comparator;
 import java.util.HashMap;
-import java.util.HashSet;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -83,8 +83,8 @@ public class Util {
 		}
 	}
 	
-	public static <T> Set<T> subset(Set<T> original, Supplier<Set<T>> setCreator, Predicate<? super T> pred) {
-		Set<T> created = setCreator.get();
+	public static <T> List<T> subset(List<T> original, Supplier<List<T>> setCreator, Predicate<? super T> pred) {
+		List<T> created = setCreator.get();
 		for (T elem : original) {
 			if (pred.test(elem))
 				created.add(elem);
@@ -158,7 +158,7 @@ public class Util {
 		return count(it, Function.identity(), mapCreator);
 	}
 	
-	public static <K, V> double informationGain(Set<Map<K, V>> data, K key, K out, Function<K, Set<? extends V>> valuesFunc) {
+	public static <K, V> double informationGain(List<Map<K, V>> data, K key, K out, Function<K, Set<? extends V>> valuesFunc) {
 		if (data.size() == 0)
 			return 0.0;
 		MapValueExtractor<K, V> mve = new MapValueExtractor<>();
@@ -175,7 +175,7 @@ public class Util {
 		for (V v : values) {
 			eqp.obj = v;
 			
-			var subset = subset(data, HashSet::new, eqp);
+			var subset = subset(data, LinkedList::new, eqp);
 			int listSize = subset.size();
 			Map<V, Integer> cm = count(subset, mve, HashMap::new);
 			double e = entropy(cm);
