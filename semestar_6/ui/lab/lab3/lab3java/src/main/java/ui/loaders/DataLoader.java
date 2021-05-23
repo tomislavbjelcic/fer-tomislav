@@ -7,7 +7,7 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.HashMap;
-import java.util.HashSet;
+import java.util.LinkedHashSet;
 import java.util.Map;
 import java.util.Objects;
 import java.util.function.Supplier;
@@ -57,7 +57,7 @@ public class DataLoader {
 			int featCount = feat.getFeatureList().size();
 			data = new LoadedData();
 			data.features = feat;
-			data.dataUnits = new HashSet<>();
+			data.dataUnits = new LinkedHashSet<>();
 			
 			while(true) {
 				String lineRead = br.readLine();
