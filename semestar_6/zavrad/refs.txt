@@ -1,0 +1,3 @@
+https://blogs.sap.com/2018/02/18/sap-hana-text-mining-functions-part1/
+https://en.wikipedia.org/wiki/Metric_(mathematics)
+https://en.wikipedia.org/wiki/Norm_(mathematics)

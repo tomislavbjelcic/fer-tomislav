@@ -1,0 +1,129 @@
+\documentclass[times, utf8, zavrsni]{fer}
+\usepackage{booktabs}
+\usepackage{float}
+\begin{document}
+
+% TODO: Navedite broj rada.
+\thesisnumber{000}
+
+% TODO: Navedite naslov rada.
+\title{Usporedba metoda grupiranja primjenom programskog jezika Python}
+
+% TODO: Navedite vaše ime i prezime.
+\author{Tomislav Bjelčić}
+
+\maketitle
+
+% Ispis stranice s napomenom o umetanju izvornika rada. Uklonite naredbu \izvornik ako želite izbaciti tu stranicu.
+\izvornik
+
+% Dodavanje zahvale ili prazne stranice. Ako ne želite dodati zahvalu, naredbu ostavite radi prazne stranice.
+\zahvala{}
+
+\tableofcontents
+
+\chapter{Uvod}
+
+\textbf{Grupiranje} \engl{clustering} je postupak kojim se neki skup podataka razvrstava u skupine, odnosno \textbf{grupe} \engl{clusters}, u kojima su podaci međusobno slični. Grupiranje je jedno od metoda nenadziranog strojnog učenja \engl{unsupervised learning}, dakle ulazni podaci nisu označeni, odnosno nemaju neku ciljnu vrijednost koja bi naznačila kojoj grupi pripada neki podatak. Algoritmi grupiranja iz takvih podataka onda moraju sami prepoznati grupe podataka i odrediti za svaki ulazni podatak kojoj grupi bi pripadao.
+
+Uzmimo neki jednostavan primjer. Neka na raspolaganju imamo podatke o visini i masi odraslih pasa iz nekog 
+skloništa za životinje. U ovom jednostavnom primjeru ulazni podaci imaju dvije značajke, odnosno dimenzije: visina i masa. Općenito, ulazni podaci mogu imati proizvoljno mnogo značajka. Prikažimo ulazne podatke kao 
+točke na grafu gdje os apscisa predstavlja masu, a os ordinata predstavlja visinu pojedinog psa.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[height=8cm]{img/uvod.png}
+    \caption{Podaci o psima u skloništu za životinje}
+\end{figure}
+
+Promatranjem točaka na grafu možemo uočiti da se podaci prirodno grupiraju u tri grupe, koje odgovaraju različitim pasminama. Sjetimo se, ulazni podaci nisu označeni, dakle jedino na raspolaganju imamo masu i visinu. Htjeli bismo da odabran algoritam grupiranja prepozna da se radi o tri grupe i slične točke pridruži istoj grupi. Općenito, poželjno je da algoritam grupiranja podatke grupira na onaj način koji odgovara prirodnom grupiranju. U našem primjeru je prirodno grupiranje vizualno očito i ono odgovara pasminama, no to ne mora biti slučaj. Neće uvijek ni vizualnom metodom biti jednoznačno jasno kakvo je njihovo prirodno grupiranje. Ovdje bismo mjeru sličnosti mogli definirati koristeći udaljenost točaka (što su točke bliže, više su slične) s obzirom da se radi o brojevnim podacima, no općenito podaci mogu biti bilo kakve prirode, što će pojedini algoritmi grupiranja uzimati u obzir.
+
+\chapter{Općenito o algoritmima grupiranja}
+Definirajmo što su ulazni podaci. U kontekstu algoritama grupiranja\footnote{Isto tako i u kontekstu nenadziranog strojnog učenja.} ulazni podaci su skup od $N$ neoznačenih, višedimenzionalnih \textbf{točaka} \[\mathcal{D} = \left\{ \mathbf{x}^{(i)} \right\}_{i=1}^{N} \]
+gdje svaka točka $\mathbf{x} = \left(x_1, x_2, \dots, x_{n-1}, x_n\right)$ ima $n$ \textbf{značajki} \engl{features}, odnosno dimenzija. Prostor podataka iz koje dolaze pojedine značajke, odnosno točke, mogu biti razne. Primjerice, može biti riječ o realnim brojevima (uvodni primjer), znakovima (primjerice grupiranje neoznačenih novinskih članaka), kategorijskim podacima poput vrijednosti istina/laž, itd. Neki algoritmi grupiranja imaju osnovne pretpostavke o tome iz kojeg prostora podataka dolaze značajke, što znači da ne funkcioniraju za one podatke koji nemaju ispunjene takve pretpostavke.
+
+\section{Udaljenost, sličnost i različitost točaka}
+U uvodnom poglavlju smo grupiranje opisali kao postupak kojim se skup podataka razvrstava u grupe na taj način gdje su točke u istoj grupi međusobno manje-više ‘‘slični’’. Potrebno je definirati kako se određuje, odnosno kako se mjeri takva ‘‘sličnost’’ između dvije točke. Definirajmo najprije \textbf{mjeru udaljenosti} \engl{distance measure}. Neka je $\mathcal{V}$ prostor iz kojeg dolaze ulazni podaci čiji je $\mathcal{D}$ podskup, te neka je $\mathbb{R}$ skup realnih brojeva. Udaljenost je funkcija
+\[d: \mathcal{V} \times \mathcal{V} \to \mathbb{R}\]
+koja za svaki \(\mathbf{x}, \mathbf{y}, \mathbf{z} \in \mathcal{V}\) zadovoljava sljedeće uvjete:
+\begin{enumerate}
+    \item \(d \left(\mathbf{x}, \mathbf{y}\right) \geq 0\)
+    \item \(d \left(\mathbf{x}, \mathbf{y}\right) = 0 \quad
+                \text{akko} \quad \mathbf{x} = \mathbf{y}\)
+    \item \(d \left(\mathbf{x}, \mathbf{y}\right) = d       \left(\mathbf{y}, \mathbf{x}\right)\)
+    \item \(d \left(\mathbf{x}, \mathbf{z}\right) \leq 
+            d \left(\mathbf{x}, \mathbf{y}\right)
+            + d \left(\mathbf{y}, \mathbf{z}\right)\)
+\end{enumerate}
+Jasno je da će dvije točke koje se više razlikuju imati veću udaljenost.
+Ponekad su podaci takvi da su sve značajke realni brojevi, to jest \(\mathcal{V} \subseteq \mathbb{R}^n\), tada je \textbf{Euklidska udaljenost} prikladna\footnote{Euklidska udaljenost nije jedina mjera udaljenosti za takav prostor, ali je najkorištenija.} mjera udaljenosti koja zadovoljava gore navedena svojstva:
+\begin{equation}
+    d \left(\mathbf{x}, \mathbf{y}\right) = 
+    \sqrt{\sum_{i=1}^{n} \left(x_i - y_i\right)^2}
+    \label{euclidean_distance}
+\end{equation}
+Općenito, ako je \(\mathcal{V}\) normirani vektorski prostor sa definiranom normom \(\Vert \cdot \Vert : \mathcal{V} \to \mathbb{R}\) tada se udaljenost može definirati pomoću te norme:
+\begin{equation}
+    d \left(\mathbf{x}, \mathbf{y}\right) = \Vert \mathbf{y} - \mathbf{x} \Vert
+    \label{norm_distance}
+\end{equation}
+U slučaju realnih značajki i ako se koristi Euklidova norma, dobijemo upravo \ref{euclidean_distance}.
+
+Vrlo često u praksi imamo značajke koje nisu realni brojevi niti dolaze iz nekog drugog normiranog prostora. Tada se koriste neke druge mjere udaljenosti specijalizirane za specifične prostore \(\mathcal{V}\). Primjerice, postoji
+\begin{itemize}
+    \item \textbf{Hammingova udaljenost}: binarni nizovi duljine $n$
+    \item \textbf{Jaccardova udaljenost}: skupovi i multiskupovi
+    \item \textbf{??? udaljenost} \engl{Edit distance}: znakovni nizovi %TODO: prevesti Edit distance
+\end{itemize}
+
+Sličnost je vrsta mjere koja brojčano iskazuje koliko se razlikuju dvije točke.
+\section{Vrste grupiranja}
+Ne postoji jedinstvena definicija grupe koja vrijedi za sve algoritme grupiranja. Svaki algoritam ima svoj model grupiranja u kojem je definirano što je to grupa, a sam algoritam pokušava točke grupirati na način koji to najviše odgovara za taj model.
+S obzirom na koji način se oblikuju grupe, grupiranje može biti:
+\begin{itemize}
+    \item \textbf{Hijerarhijsko grupiranje}
+    \item \textbf{Particijsko grupiranje}
+\end{itemize}
+
+Kod hijerarhijskog grupiranja svaka grupa, počevši od grupe koja predstavlja cijeli skup točaka $\mathcal{D}$, ima podgrupe koje se tako rekurzivno dijele sve dok svaka točka nije svoja grupa. Na taj način se gradi hijerarhija grupa (od tud i naziv hijerarhijskog grupiranja), koji se može prikazati \textbf{dendrogramom}. Kod hijerarhijskog grupiranja postoje dva pristupa:
+\begin{itemize}
+    \item \textbf{Aglomerativno grupiranje}: početno je svaka točka u svojoj grupi pa se spajaju u veće grupe.
+    \item \textbf{Divizivno grupiranje}: početna grupa je $\mathcal{D}$ pa se ona dijeli u manje podgrupe.
+\end{itemize}
+
+Na slici \ref{fig:hier_clustering} je prikazan tijek nekog hijerarhijskog aglomerativnog grupiranja nekog ulaznog skupa točaka.
+\begin{figure}[H]
+    \centering
+    \includegraphics{img/hier.png}
+    \caption{Tijek nekog hijerarhijskog aglomerativnog grupiranja}
+    \label{fig:hier_clustering}
+\end{figure}
+
+Na lijevoj strani crnom bojom su označene i numerirane točke ulaznog skupa podataka, a crvenim brojevima je označen redosljed kojim je postupak grupiranja spajao grupe u veće grupe. Na desnoj strani je postupak i rezultat grafički prikazan u obliku dendrograma. Na donjoj liniji su oznake točaka, a brojeve na lijevoj liniji zasad zanemarimo.
+
+Za razliku od hijerarhijskog grupiranja, particijsko grupiranje nema hijerarhiju grupa i podgrupa. Rezultat grupiranja je neki fiksiran broj grupa bez neke unutarnje strukture osim prikladnih točaka u njima. Najpopularniji i najučinkovitiji algoritmi su upravo particijska grupiranja.
+\\
+
+
+\chapter{Zaključak}
+Zaključak.
+
+\bibliography{literatura}
+\bibliographystyle{fer}
+
+\begin{sazetak}
+Sažetak na hrvatskom jeziku.
+
+\kljucnerijeci{Ključne riječi, odvojene zarezima.}
+\end{sazetak}
+
+% TODO: Navedite naslov na engleskom jeziku.
+\engtitle{Title}
+\begin{abstract}
+Abstract.
+
+\keywords{Keywords.}
+\end{abstract}
+
+\end{document}
+
