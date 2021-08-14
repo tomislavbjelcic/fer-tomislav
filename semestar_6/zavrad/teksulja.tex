@@ -24,7 +24,7 @@
 
 \chapter{Uvod}
 
-\textbf{Grupiranje} \engl{clustering} je postupak kojim se neki skup podataka razvrstava u skupine, odnosno \textbf{grupe} \engl{clusters}, u kojima su podaci međusobno slični. Grupiranje je jedno od metoda nenadziranog strojnog učenja \engl{unsupervised learning}, dakle ulazni podaci nisu označeni, odnosno nemaju neku ciljnu vrijednost koja bi naznačila kojoj grupi pripada neki podatak. Algoritmi grupiranja iz takvih podataka onda moraju sami prepoznati grupe podataka i odrediti za svaki ulazni podatak kojoj grupi bi pripadao.
+\textbf{Grupiranje} \engl{clustering} je postupak kojim se neki skup podataka razvrstava u skupine, odnosno \textbf{grupe} \engl{clusters}, u kojima su podaci međusobno slični. Grupiranje je jedno od metoda \textbf{nenadziranog strojnog učenja} \engl{unsupervised learning}, dakle ulazni podaci nisu označeni, odnosno nemaju neku ciljnu vrijednost koja bi naznačila kojoj grupi pripada neki podatak. Algoritmi grupiranja iz takvih podataka onda moraju sami prepoznati grupe podataka i odrediti za svaki ulazni podatak kojoj grupi bi pripadao.
 
 Uzmimo neki jednostavan primjer. Neka na raspolaganju imamo podatke o visini i masi odraslih pasa iz nekog 
 skloništa za životinje. U ovom jednostavnom primjeru ulazni podaci imaju dvije značajke, odnosno dimenzije: visina i masa. Općenito, ulazni podaci mogu imati proizvoljno mnogo značajka. Prikažimo ulazne podatke kao 
@@ -32,7 +32,7 @@ točke na grafu gdje os apscisa predstavlja masu, a os ordinata predstavlja visi
 
 \begin{figure}[H]
     \centering
-    \includegraphics[height=8cm]{img/uvod.png}
+    \includegraphics[scale=0.52]{img/uvod.png}
     \caption{Podaci o psima u skloništu za životinje}
 \end{figure}
 
@@ -45,18 +45,19 @@ gdje svaka točka $\mathbf{x} = \left(x_1, x_2, \dots, x_{n-1}, x_n\right)$ ima 
 \section{Udaljenost, sličnost i različitost točaka}
 U uvodnom poglavlju smo grupiranje opisali kao postupak kojim se skup podataka razvrstava u grupe na taj način gdje su točke u istoj grupi međusobno manje-više ‘‘slični’’. Potrebno je definirati kako se određuje, odnosno kako se mjeri takva ‘‘sličnost’’ između dvije točke. Definirajmo najprije \textbf{mjeru udaljenosti} \engl{distance measure}. Neka je $\mathcal{V}$ prostor iz kojeg dolaze ulazni podaci čiji je $\mathcal{D}$ podskup, te neka je $\mathbb{R}$ skup realnih brojeva. Udaljenost je funkcija
 \[d: \mathcal{V} \times \mathcal{V} \to \mathbb{R}\]
-koja za svaki \(\mathbf{x}, \mathbf{y}, \mathbf{z} \in \mathcal{V}\) zadovoljava sljedeće uvjete:
+koja za svaki \(\mathbf{x}, \mathbf{y}, \mathbf{z} \in \mathcal{V}\) zadovoljava tzv.\ svojstva \textbf{metrike}:
 \begin{enumerate}
-    \item \(d \left(\mathbf{x}, \mathbf{y}\right) \geq 0\)
     \item \(d \left(\mathbf{x}, \mathbf{y}\right) = 0 \quad
                 \text{akko} \quad \mathbf{x} = \mathbf{y}\)
-    \item \(d \left(\mathbf{x}, \mathbf{y}\right) = d       \left(\mathbf{y}, \mathbf{x}\right)\)
+    \item \(d \left(\mathbf{x}, \mathbf{y}\right) = d \left(\mathbf{y}, \mathbf{x}\right)\) \qquad (simetričnost)
     \item \(d \left(\mathbf{x}, \mathbf{z}\right) \leq 
             d \left(\mathbf{x}, \mathbf{y}\right)
-            + d \left(\mathbf{y}, \mathbf{z}\right)\)
+            + d \left(\mathbf{y}, \mathbf{z}\right)\) \qquad (nejednakost trokuta)
 \end{enumerate}
-Jasno je da će dvije točke koje se više razlikuju imati veću udaljenost.
-Ponekad su podaci takvi da su sve značajke realni brojevi, to jest \(\mathcal{V} \subseteq \mathbb{R}^n\), tada je \textbf{Euklidska udaljenost} prikladna\footnote{Euklidska udaljenost nije jedina mjera udaljenosti za takav prostor, ali je najkorištenija.} mjera udaljenosti koja zadovoljava gore navedena svojstva:
+Iz navedenih aksioma metrike može se pokazati da vrijedi \(d \left(\mathbf{x}, \mathbf{y}\right) \geq 0\)
+za svaki \(\mathbf{x}, \mathbf{y} \in \mathcal{V}\).
+Konceptualno, dvije točke koje se više ‘‘razlikuju’’ u svom prostoru imaju veću udaljenost.
+Ponekad su podaci takvi da su sve značajke realni brojevi, to jest \(\mathcal{V} \subseteq \mathbb{R}^n\), tada je \textbf{Euklidska udaljenost} prikladna\footnote{Euklidska udaljenost nije jedina mjera udaljenosti za takav prostor, ali je najkorištenija.} mjera udaljenosti koja zadovoljava svojstva metrike:
 \begin{equation}
     d \left(\mathbf{x}, \mathbf{y}\right) = 
     \sqrt{\sum_{i=1}^{n} \left(x_i - y_i\right)^2}
@@ -67,16 +68,15 @@ Općenito, ako je \(\mathcal{V}\) normirani vektorski prostor sa definiranom nor
     d \left(\mathbf{x}, \mathbf{y}\right) = \Vert \mathbf{y} - \mathbf{x} \Vert
     \label{norm_distance}
 \end{equation}
-U slučaju realnih značajki i ako se koristi Euklidova norma, dobijemo upravo \ref{euclidean_distance}.
-
+U slučaju realnih značajki i ako se koristi Euklidova norma, dobijemo upravo \ref{euclidean_distance}.\\
 Vrlo često u praksi imamo značajke koje nisu realni brojevi niti dolaze iz nekog drugog normiranog prostora. Tada se koriste neke druge mjere udaljenosti specijalizirane za specifične prostore \(\mathcal{V}\). Primjerice, postoji
 \begin{itemize}
     \item \textbf{Hammingova udaljenost}: binarni nizovi duljine $n$
     \item \textbf{Jaccardova udaljenost}: skupovi i multiskupovi
     \item \textbf{??? udaljenost} \engl{Edit distance}: znakovni nizovi %TODO: prevesti Edit distance
 \end{itemize}
+\textbf{Sličnost} \engl{similarity measure} je vrsta mjere koja, poput mjere udaljenosti, brojčano iskazuje koliko se razlikuju dvije točke. Za razliku od mjere udaljenosti, mjera sličnosti ne mora zadovoljavati sva svojstva metrike poput nejednakosti trokuta. Jednako vrijedi i za \textbf{mjeru različitosti} \engl{dissimilariy measure}. Kako su dvije točke ‘‘sličnije’’ tako mjera sličnosti raste, a mjera različitosti pada. Detaljnu definiciju mjera sličnosti i različitosti nećemo navoditi iz razloga što se u algoritmima grupiranja koriste uglavnom mjere udaljenosti u svrhu kvantificiranja sličnosti ili različitosti točaka.
 
-Sličnost je vrsta mjere koja brojčano iskazuje koliko se razlikuju dvije točke.
 \section{Vrste grupiranja}
 Ne postoji jedinstvena definicija grupe koja vrijedi za sve algoritme grupiranja. Svaki algoritam ima svoj model grupiranja u kojem je definirano što je to grupa, a sam algoritam pokušava točke grupirati na način koji to najviše odgovara za taj model.
 S obzirom na koji način se oblikuju grupe, grupiranje može biti:
@@ -84,26 +84,34 @@ S obzirom na koji način se oblikuju grupe, grupiranje može biti:
     \item \textbf{Hijerarhijsko grupiranje}
     \item \textbf{Particijsko grupiranje}
 \end{itemize}
-
 Kod hijerarhijskog grupiranja svaka grupa, počevši od grupe koja predstavlja cijeli skup točaka $\mathcal{D}$, ima podgrupe koje se tako rekurzivno dijele sve dok svaka točka nije svoja grupa. Na taj način se gradi hijerarhija grupa (od tud i naziv hijerarhijskog grupiranja), koji se može prikazati \textbf{dendrogramom}. Kod hijerarhijskog grupiranja postoje dva pristupa:
 \begin{itemize}
-    \item \textbf{Aglomerativno grupiranje}: početno je svaka točka u svojoj grupi pa se spajaju u veće grupe.
+    \item \textbf{Aglomerativno grupiranje}: početno je svaka točka u svojoj grupi pa se spajaju u veće grupe;
     \item \textbf{Divizivno grupiranje}: početna grupa je $\mathcal{D}$ pa se ona dijeli u manje podgrupe.
 \end{itemize}
-
 Na slici \ref{fig:hier_clustering} je prikazan tijek nekog hijerarhijskog aglomerativnog grupiranja nekog ulaznog skupa točaka.
 \begin{figure}[H]
     \centering
-    \includegraphics{img/hier.png}
+    \includegraphics[scale=0.95]{img/hier.png}
     \caption{Tijek nekog hijerarhijskog aglomerativnog grupiranja}
     \label{fig:hier_clustering}
 \end{figure}
-
-Na lijevoj strani crnom bojom su označene i numerirane točke ulaznog skupa podataka, a crvenim brojevima je označen redosljed kojim je postupak grupiranja spajao grupe u veće grupe. Na desnoj strani je postupak i rezultat grafički prikazan u obliku dendrograma. Na donjoj liniji su oznake točaka, a brojeve na lijevoj liniji zasad zanemarimo.
-
+Na lijevoj strani crnom bojom su označene i numerirane točke ulaznog skupa podataka, a crvenim brojevima je označen redosljed kojim je postupak grupiranja spajao grupe u veće grupe. Na desnoj strani je postupak i rezultat grafički prikazan u obliku dendrograma. Na donjoj liniji su oznake točaka, a brojeve na lijevoj liniji zasad zanemarimo. \\
 Za razliku od hijerarhijskog grupiranja, particijsko grupiranje nema hijerarhiju grupa i podgrupa. Rezultat grupiranja je neki fiksiran broj grupa bez neke unutarnje strukture osim prikladnih točaka u njima. Najpopularniji i najučinkovitiji algoritmi su upravo particijska grupiranja.
-\\
 
+Prirodne grupe točaka ponekad nije moguće jednoznačno odrediti. Grupiranja tada mogu, bilo grupiranje particijsko ili hijerarhijsko, neke točke svrstati ili u isključivo jednu grupu ili u više grupa istovremeno. Prema tome razlikujemo:
+\begin{itemize}
+    \item \textbf{Čvrsto grupiranje} \engl{hard clustering}: jedna točka može pripadati isključivo jednoj grupi;
+    \item \textbf{Meko grupiranje} \engl{soft clustering}: jedna točka može pripadati više grupa sa nekom mjerom pripadnošću svakoj od tih grupa. Primjerice, možemo vjerojatnošću da neka točka pripada nekoj grupi modelirati sigurnost ili nesigurnost njegovoj stvarnoj pripadnosti.
+\end{itemize}
+Na slici \ref{fig:hard_vs_soft_clustering} vizualno je prikazana razlika između čvrstog i mekog grupiranja nekog skupa točaka. 
+\begin{figure}[H]
+    \centering
+    \includegraphics[scale=0.4]{img/hard_vs_soft_clustering.png}
+    \caption{Primjer čvrstog i mekog grupiranja}
+    \label{fig:hard_vs_soft_clustering}
+\end{figure}
+ASa
 
 \chapter{Zaključak}
 Zaključak.
@@ -126,4 +134,3 @@ Abstract.
 \end{abstract}
 
 \end{document}
-
