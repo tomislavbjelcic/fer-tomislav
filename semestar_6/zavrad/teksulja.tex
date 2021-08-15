@@ -124,7 +124,16 @@ Centroid te grupe $\boldsymbol{\mu}$ se definira kao:
 Uočimo kako se centroid računa na isti način kako bismo računali aritmetičku sredinu, odakle dolazi naziv K-sredina. Također uočimo da se radi o zbrajanju točaka te u konačnici dijeljenju sa nekim brojem. Dakle da bi uopće bilo moguće računati centroide, nad točkama, odnosno ulaznim podacima, koje potječu iz prostora $\mathcal{V}$, moraju biti definirane operacije zbrajanja i množenja sa skalarom (u našem slučaju realnim brojem $\frac{1}{M}$). Tako dolazimo do prve pretpostavke modela: prostor podataka $\mathcal{V}$ mora biti vektorski prostor\footnote{Vektorski prostor je skup objekata, odnosno vektora, nad kojim su definirane operacije međusobnog zbrajanja i množenja sa skalarom, a te operacije zadovoljavaju 8 aksioma vektorskog prostora.}. Najčešće će u pitanju biti podskup realnog koordinatnog prostora, odnosno $\mathcal{V} \subseteq \mathbb{R}^n$.\\
 Kao što pojam sugerira, centroid neke grupe konceptualno predstavlja centar, odnosno središte te grupe. Jasno je da centroid grupe se uopće ne mora nalaziti u grupi.
 
-Cilj algoritma K-sredina jest minimizirati \textbf{kriterijsku funkciju}
+Cilj algoritma K-sredina jest minimizirati \textbf{kriterijsku funkciju}. Neka je ulazni skup točaka $\mathcal{D}$ čvrsto grupiran u $K$ grupa:
+\[\mathcal{D} = \bigcup_{k=1}^{K} \mathcal{C}_k, \qquad \forall i \neq j :  \mathcal{C}_i \cap \mathcal{C}_j = \emptyset\]
+Kako se radi o čvrstom grupiranju, grupe su međusobno disjunktne, odnosno ne može se dogoditi da neka točka iz $\mathcal{D}$ završi u više grupa. Neka je $\boldsymbol{\mu}_k$ centroid grupe $\mathcal{C}_k$. Kriterijska funkcija za dano grupiranje kod algoritma K-sredina se definira izrazom:
+\[J = \sum_{k=1}^{K} \sum_{\mathbf{x} \in \mathcal{C}_k} 
+d \left(\mathbf{x}, \boldsymbol{\mu}_k\right)^2\]
+Ako podaci dolaze iz podskupa realnog koordinatnog prostora, onda možemo koristiti Euklidsku udaljenost i Euklidsku normu, odnosno
+$d \left(\mathbf{x}, \boldsymbol{\mu}_k\right) = \Vert \mathbf{x} - \boldsymbol{\mu}_k \Vert$. Tada kriterijska funkcija glasi:
+\[J = \sum_{k=1}^{K} \sum_{\mathbf{x} \in \mathcal{C}_k} 
+\Vert \mathbf{x} - \boldsymbol{\mu}_k \Vert^2\]
+Kriterijska funkcija zbraja kvadratna odstupanja točaka od centroida grupe u kojima se nalaze. Što su točke bliže svojim centroidima to će iznos kriterijske funkcije biti manji, i to predstavlja bolje grupiranje kod algoritma K-sredina. Algoritam K-sredina nastoji minimizirati iznos kriterijske funkcije, odnosno particionirati (grupirati) skup $\mathcal{D}$ na način koji će dati minimalan iznos kriterijske funkcije.
 \chapter{Zaključak}
 Zaključak.
 
@@ -146,4 +155,3 @@ Abstract.
 \end{abstract}
 
 \end{document}
-

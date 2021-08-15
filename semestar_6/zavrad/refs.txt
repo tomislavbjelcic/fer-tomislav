@@ -6,4 +6,5 @@ https://en.wikipedia.org/wiki/Metric_(mathematics)
 https://en.wikipedia.org/wiki/Norm_(mathematics)
 Slika čvrsto vs meko grupiranje - https://towardsdatascience.com/a-friendly-introduction-to-text-clustering-fa996bcefd04
 https://scikit-learn.org/stable/modules/clustering.html#
+https://en.wikipedia.org/wiki/K-means_clustering
 
