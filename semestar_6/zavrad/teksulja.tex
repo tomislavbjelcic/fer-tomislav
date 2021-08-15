@@ -39,7 +39,7 @@ točke na grafu gdje os apscisa predstavlja masu, a os ordinata predstavlja visi
 Promatranjem točaka na grafu možemo uočiti da se podaci prirodno grupiraju u tri grupe, koje odgovaraju različitim pasminama. Sjetimo se, ulazni podaci nisu označeni, dakle jedino na raspolaganju imamo masu i visinu. Htjeli bismo da odabran algoritam grupiranja prepozna da se radi o tri grupe i slične točke pridruži istoj grupi. Općenito, poželjno je da algoritam grupiranja podatke grupira na onaj način koji odgovara prirodnom grupiranju. U našem primjeru je prirodno grupiranje vizualno očito i ono odgovara pasminama, no to ne mora biti slučaj. Neće uvijek ni vizualnom metodom biti jednoznačno jasno kakvo je njihovo prirodno grupiranje. Ovdje bismo mjeru sličnosti mogli definirati koristeći udaljenost točaka (što su točke bliže, više su slične) s obzirom da se radi o brojevnim podacima, no općenito podaci mogu biti bilo kakve prirode, što će pojedini algoritmi grupiranja uzimati u obzir.
 
 \chapter{Općenito o algoritmima grupiranja}
-Definirajmo što su ulazni podaci. U kontekstu algoritama grupiranja\footnote{Isto tako i u kontekstu nenadziranog strojnog učenja.} ulazni podaci su skup od $N$ neoznačenih, višedimenzionalnih \textbf{točaka} \[\mathcal{D} = \left\{ \mathbf{x}^{(i)} \right\}_{i=1}^{N} \]
+Definirajmo što su ulazni podaci. U kontekstu algoritama grupiranja\footnote{Isto tako i u kontekstu nenadziranog strojnog učenja.} ulazni podaci su skup od $N$ neoznačenih, višedimenzionalnih \textbf{točaka} (vektora) \[\mathcal{D} = \left\{ \mathbf{x}^{(i)} \right\}_{i=1}^{N} \]
 gdje svaka točka $\mathbf{x} = \left(x_1, x_2, \dots, x_{n-1}, x_n\right)$ ima $n$ \textbf{značajki} \engl{features}, odnosno dimenzija. Prostor podataka iz koje dolaze pojedine značajke, odnosno točke, mogu biti razne. Primjerice, može biti riječ o realnim brojevima (uvodni primjer), znakovima (primjerice grupiranje neoznačenih novinskih članaka), kategorijskim podacima poput vrijednosti istina/laž, itd. Neki algoritmi grupiranja imaju osnovne pretpostavke o tome iz kojeg prostora podataka dolaze značajke, što znači da ne funkcioniraju za one podatke koji nemaju ispunjene takve pretpostavke.
 
 \section{Udaljenost, sličnost i različitost točaka}
@@ -75,16 +75,16 @@ Vrlo često u praksi imamo značajke koje nisu realni brojevi niti dolaze iz nek
     \item \textbf{Jaccardova udaljenost}: skupovi i multiskupovi
     \item \textbf{??? udaljenost} \engl{Edit distance}: znakovni nizovi %TODO: prevesti Edit distance
 \end{itemize}
-\textbf{Sličnost} \engl{similarity measure} je vrsta mjere koja, poput mjere udaljenosti, brojčano iskazuje koliko se razlikuju dvije točke. Za razliku od mjere udaljenosti, mjera sličnosti ne mora zadovoljavati sva svojstva metrike poput nejednakosti trokuta. Jednako vrijedi i za \textbf{mjeru različitosti} \engl{dissimilariy measure}. Kako su dvije točke ‘‘sličnije’’ tako mjera sličnosti raste, a mjera različitosti pada. Detaljnu definiciju mjera sličnosti i različitosti nećemo navoditi iz razloga što se u algoritmima grupiranja koriste uglavnom mjere udaljenosti u svrhu kvantificiranja sličnosti ili različitosti točaka.
+\textbf{Sličnost} \engl{similarity measure} je vrsta mjere koja, poput mjere udaljenosti, brojčano iskazuje koliko se razlikuju dvije točke. Za razliku od mjere udaljenosti, mjera sličnosti ne mora zadovoljavati sva svojstva metrike poput nejednakosti trokuta. Jednako vrijedi i za \textbf{mjeru različitosti} \engl{dissimilariy measure}. Kako su dvije točke ‘‘sličnije’’ tako mjera sličnosti raste, a mjera različitosti pada. Detaljnu definiciju mjera sličnosti i različitosti nećemo navoditi iz razloga što se u algoritmima grupiranja (barem onih koje ćemo opisati) koriste uglavnom mjere udaljenosti u svrhu kvantificiranja sličnosti ili različitosti točaka.
 
 \section{Vrste grupiranja}
-Ne postoji jedinstvena definicija grupe koja vrijedi za sve algoritme grupiranja. Svaki algoritam ima svoj model grupiranja u kojem je definirano što je to grupa, a sam algoritam pokušava točke grupirati na način koji to najviše odgovara za taj model.
+Ne postoji jedinstvena definicija grupe koja vrijedi za sve algoritme grupiranja. Svaki algoritam ima svoj model grupiranja u kojem je definirano što je to grupa, a sam algoritam pokušava točke grupirati na način koji to najviše odgovara za taj model. Različite modele grupiranja ćemo detaljnije razmotriti u sljedećem poglavlju, a sada navedimo dvije generalne podijele.\\
 S obzirom na koji način se oblikuju grupe, grupiranje može biti:
 \begin{itemize}
     \item \textbf{Hijerarhijsko grupiranje}
     \item \textbf{Particijsko grupiranje}
 \end{itemize}
-Kod hijerarhijskog grupiranja svaka grupa, počevši od grupe koja predstavlja cijeli skup točaka $\mathcal{D}$, ima podgrupe koje se tako rekurzivno dijele sve dok svaka točka nije svoja grupa. Na taj način se gradi hijerarhija grupa (od tud i naziv hijerarhijskog grupiranja), koji se može prikazati \textbf{dendrogramom}. Kod hijerarhijskog grupiranja postoje dva pristupa:
+Kod hijerarhijskog grupiranja svaka grupa, počevši od grupe koja predstavlja cijeli skup točaka $\mathcal{D}$, ima podgrupe koje se tako rekurzivno dijele sve dok svaka točka nije svoja grupa. Na taj način se gradi hijerarhija grupa (od tud i naziv hijerarhijskog grupiranja) koji se može prikazati \textbf{dendrogramom}. Kod hijerarhijskog grupiranja postoje dva pristupa:
 \begin{itemize}
     \item \textbf{Aglomerativno grupiranje}: početno je svaka točka u svojoj grupi pa se spajaju u veće grupe;
     \item \textbf{Divizivno grupiranje}: početna grupa je $\mathcal{D}$ pa se ona dijeli u manje podgrupe.
@@ -96,7 +96,7 @@ Na slici \ref{fig:hier_clustering} je prikazan tijek nekog hijerarhijskog aglome
     \caption{Tijek nekog hijerarhijskog aglomerativnog grupiranja}
     \label{fig:hier_clustering}
 \end{figure}
-Na lijevoj strani crnom bojom su označene i numerirane točke ulaznog skupa podataka, a crvenim brojevima je označen redosljed kojim je postupak grupiranja spajao grupe u veće grupe. Na desnoj strani je postupak i rezultat grafički prikazan u obliku dendrograma. Na donjoj liniji su oznake točaka, a brojeve na lijevoj liniji zasad zanemarimo. \\
+Na lijevoj strani crnom bojom su označene i numerirane točke ulaznog skupa podataka, a crvenim brojevima je označen redosljed kojim je postupak grupiranja spajao grupe u veće grupe. Na desnoj strani je postupak i rezultat grafički prikazan u obliku dendrograma. Na donjoj liniji su oznake točaka, a brojeve na lijevoj liniji zasad zanemarimo. Ako dendrogram shvatimo kao stablo čiji su čvorovi (pod)grupe, a listovi točke iz $\mathcal{D}$, tada aglomerativno grupiranje gradi dendrogram od listova prema korijenu, a divizivno grupiranje od korijena prema listovima.\\
 Za razliku od hijerarhijskog grupiranja, particijsko grupiranje nema hijerarhiju grupa i podgrupa. Rezultat grupiranja je neki fiksiran broj grupa bez neke unutarnje strukture osim prikladnih točaka u njima. Najpopularniji i najučinkovitiji algoritmi su upravo particijska grupiranja.
 
 Prirodne grupe točaka ponekad nije moguće jednoznačno odrediti. Grupiranja tada mogu, bilo grupiranje particijsko ili hijerarhijsko, neke točke svrstati ili u isključivo jednu grupu ili u više grupa istovremeno. Prema tome razlikujemo:
@@ -110,9 +110,21 @@ Na slici \ref{fig:hard_vs_soft_clustering} vizualno je prikazana razlika između
     \includegraphics[scale=0.4]{img/hard_vs_soft_clustering.png}
     \caption{Primjer čvrstog i mekog grupiranja}
     \label{fig:hard_vs_soft_clustering}
-\end{figure}
-ASa
+\end{figure} Uočimo kako je primjerice crvenu točku meko grupiranje svrstalo u dvije grupe istovremeno, a čvrsto grupiranje u isključivo jednu.
 
+\chapter{Algoritmi grupiranja}
+U daljnjim potpoglavljima opisat ćemo podskup algoritama grupiranja implementiranih u Pythonovoj programskoj knjižnici \textbf{Scikit-learn}, unutar modula za grupiranje \texttt{sklearn.cluster}. Svako potpoglavlje sadrži najprije opis modela grupiranja kojeg taj algoritam koristi, a zatim opis samog algoritma. Krenimo sa najpopularnijim algoritmom grupiranja.
+\section{Algoritam K-sredina}
+Algoritam \textbf{K-sredina} \engl{K-means clustering} je jednostavan i učinkovit algoritam particijskog čvrstog grupiranja koji ulazni skup točaka $\mathcal{D}$ particionira u $K$ grupa. $K$ je broj grupa koje je potrebno proizvesti i on se zadaje unaprijed kao parametar algoritma.
+
+Algoritam K-sredina predstavlja svaku grupu sa jednom točkom koja označava središte te grupe: \textbf{centroidom}. Neka je $\mathcal{C}$ grupa koja sadrži $M$ točaka ($M = \vert \mathcal{C} \vert$, $\vert \mathcal{C} \vert$ predstavlja kardinalitet skupa $\mathcal{C}$), odnosno 
+$\mathcal{C} = \left\{ \mathbf{x}^{(i)}  \right\}_{i=1}^{M}$.
+Centroid te grupe $\boldsymbol{\mu}$ se definira kao:
+\[\boldsymbol{\mu} = \frac{1}{M} \sum_{i=1}^{M} \mathbf{x}^{(i)}\]
+Uočimo kako se centroid računa na isti način kako bismo računali aritmetičku sredinu, odakle dolazi naziv K-sredina. Također uočimo da se radi o zbrajanju točaka te u konačnici dijeljenju sa nekim brojem. Dakle da bi uopće bilo moguće računati centroide, nad točkama, odnosno ulaznim podacima, koje potječu iz prostora $\mathcal{V}$, moraju biti definirane operacije zbrajanja i množenja sa skalarom (u našem slučaju realnim brojem $\frac{1}{M}$). Tako dolazimo do prve pretpostavke modela: prostor podataka $\mathcal{V}$ mora biti vektorski prostor\footnote{Vektorski prostor je skup objekata, odnosno vektora, nad kojim su definirane operacije međusobnog zbrajanja i množenja sa skalarom, a te operacije zadovoljavaju 8 aksioma vektorskog prostora.}. Najčešće će u pitanju biti podskup realnog koordinatnog prostora, odnosno $\mathcal{V} \subseteq \mathbb{R}^n$.\\
+Kao što pojam sugerira, centroid neke grupe konceptualno predstavlja centar, odnosno središte te grupe. Jasno je da centroid grupe se uopće ne mora nalaziti u grupi.
+
+Cilj algoritma K-sredina jest minimizirati \textbf{kriterijsku funkciju}
 \chapter{Zaključak}
 Zaključak.
 
@@ -134,3 +146,4 @@ Abstract.
 \end{abstract}
 
 \end{document}
+
