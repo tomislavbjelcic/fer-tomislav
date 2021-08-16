@@ -1,6 +1,25 @@
 \documentclass[times, utf8, zavrsni]{fer}
 \usepackage{booktabs}
 \usepackage{float}
+\usepackage{algorithm}
+\usepackage{algorithmic}
+
+\newenvironment{croatianalgorithm}[1][]
+  {\begin{algorithm}[#1]
+     \selectlanguage{croatian}%
+     \floatname{algorithm}{Algoritam}%
+     \renewcommand{\algorithmicrepeat}{\textbf{ponavljaj}}%
+     \renewcommand{\algorithmicuntil}{\textbf{dok}}%
+     \renewcommand{\algorithmicforall}{\textbf{za svaki}}%
+     \renewcommand{\algorithmicendfor}{\textbf{kraj za}}
+     \renewcommand{\algorithmicdo}{\,}
+     % Set other language requirements
+  }
+  {\end{algorithm}}
+
+\DeclareMathOperator*{\argmax}{argmax}
+\DeclareMathOperator*{\argmin}{argmin}
+
 \begin{document}
 
 % TODO: Navedite broj rada.
@@ -114,14 +133,16 @@ Na slici \ref{fig:hard_vs_soft_clustering} vizualno je prikazana razlika između
 
 \chapter{Algoritmi grupiranja}
 U daljnjim potpoglavljima opisat ćemo podskup algoritama grupiranja implementiranih u Pythonovoj programskoj knjižnici \textbf{Scikit-learn}, unutar modula za grupiranje \texttt{sklearn.cluster}. Svako potpoglavlje sadrži najprije opis modela grupiranja kojeg taj algoritam koristi, a zatim opis samog algoritma. Krenimo sa najpopularnijim algoritmom grupiranja.
-\section{Algoritam K-sredina}
-Algoritam \textbf{K-sredina} \engl{K-means clustering} je jednostavan i učinkovit algoritam particijskog čvrstog grupiranja koji ulazni skup točaka $\mathcal{D}$ particionira u $K$ grupa. $K$ je broj grupa koje je potrebno proizvesti i on se zadaje unaprijed kao parametar algoritma.
+\section{Algoritam K-sredina} \label{kmeans}
+Algoritam \textbf{K-sredina} \engl{K-means clustering} je jednostavan i učinkovit algoritam particijskog čvrstog grupiranja koji ulazni skup točaka $\mathcal{D}$ particionira u $K$ grupa. $K$ je broj grupa koje je potrebno proizvesti i on se zadaje unaprijed kao parametar algoritma. Nešto kasnije ćemo reći nešto i o metodama kako odrediti broj grupa $K$.
 
 Algoritam K-sredina predstavlja svaku grupu sa jednom točkom koja označava središte te grupe: \textbf{centroidom}. Neka je $\mathcal{C}$ grupa koja sadrži $M$ točaka ($M = \vert \mathcal{C} \vert$, $\vert \mathcal{C} \vert$ predstavlja kardinalitet skupa $\mathcal{C}$), odnosno 
 $\mathcal{C} = \left\{ \mathbf{x}^{(i)}  \right\}_{i=1}^{M}$.
 Centroid te grupe $\boldsymbol{\mu}$ se definira kao:
-\[\boldsymbol{\mu} = \frac{1}{M} \sum_{i=1}^{M} \mathbf{x}^{(i)}\]
-Uočimo kako se centroid računa na isti način kako bismo računali aritmetičku sredinu, odakle dolazi naziv K-sredina. Također uočimo da se radi o zbrajanju točaka te u konačnici dijeljenju sa nekim brojem. Dakle da bi uopće bilo moguće računati centroide, nad točkama, odnosno ulaznim podacima, koje potječu iz prostora $\mathcal{V}$, moraju biti definirane operacije zbrajanja i množenja sa skalarom (u našem slučaju realnim brojem $\frac{1}{M}$). Tako dolazimo do prve pretpostavke modela: prostor podataka $\mathcal{V}$ mora biti vektorski prostor\footnote{Vektorski prostor je skup objekata, odnosno vektora, nad kojim su definirane operacije međusobnog zbrajanja i množenja sa skalarom, a te operacije zadovoljavaju 8 aksioma vektorskog prostora.}. Najčešće će u pitanju biti podskup realnog koordinatnog prostora, odnosno $\mathcal{V} \subseteq \mathbb{R}^n$.\\
+\[\boldsymbol{\mu} = \frac{1}{\vert \mathcal{C} \vert} \sum_{\mathbf{x} \in \mathcal{C}} \mathbf{x} = 
+\frac{1}{M} \sum_{i=1}^{M} \mathbf{x}^{(i)}\]
+Uočimo kako se centroid računa na isti način kako bismo računali aritmetičku sredinu, odakle dolazi naziv K-sredina. Također uočimo da se radi o zbrajanju točaka te u konačnici dijeljenju sa nekim brojem. Dakle da bi uopće bilo moguće računati centroide, nad točkama, odnosno ulaznim podacima, koje potječu iz prostora $\mathcal{V}$, moraju biti definirane operacije zbrajanja i množenja sa skalarom (u našem slučaju realnim brojem $\frac{1}{M}$). Tako dolazimo do prve pretpostavke modela: prostor podataka $\mathcal{V}$ mora biti vektorski prostor\footnote{Vektorski prostor je skup objekata, odnosno vektora, nad kojim su definirane operacije međusobnog zbrajanja i množenja sa skalarom, a te operacije zadovoljavaju 8 aksioma vektorskog prostora.}. Najčešće će u pitanju biti podskup realnog koordinatnog prostora, odnosno $\mathcal{V} \subseteq \mathbb{R}^n$. 
+Postoji i varijanta algoritma koja radi nad podacima bilo kakve prirode i koristi mjeru sličnosti (koja je općenitija, odnosno manje ‘‘zahtjevna’’ od mjere udaljenosti): \textbf{algoritam K-medoida}, no nećemo se time baviti.\\
 Kao što pojam sugerira, centroid neke grupe konceptualno predstavlja centar, odnosno središte te grupe. Jasno je da centroid grupe se uopće ne mora nalaziti u grupi.
 
 Cilj algoritma K-sredina jest minimizirati \textbf{kriterijsku funkciju}. Neka je ulazni skup točaka $\mathcal{D}$ čvrsto grupiran u $K$ grupa:
@@ -133,7 +154,66 @@ Ako podaci dolaze iz podskupa realnog koordinatnog prostora, onda možemo korist
 $d \left(\mathbf{x}, \boldsymbol{\mu}_k\right) = \Vert \mathbf{x} - \boldsymbol{\mu}_k \Vert$. Tada kriterijska funkcija glasi:
 \[J = \sum_{k=1}^{K} \sum_{\mathbf{x} \in \mathcal{C}_k} 
 \Vert \mathbf{x} - \boldsymbol{\mu}_k \Vert^2\]
-Kriterijska funkcija zbraja kvadratna odstupanja točaka od centroida grupe u kojima se nalaze. Što su točke bliže svojim centroidima to će iznos kriterijske funkcije biti manji, i to predstavlja bolje grupiranje kod algoritma K-sredina. Algoritam K-sredina nastoji minimizirati iznos kriterijske funkcije, odnosno particionirati (grupirati) skup $\mathcal{D}$ na način koji će dati minimalan iznos kriterijske funkcije.
+Kriterijska funkcija zbraja kvadratna odstupanja točaka od centroida grupe u kojima se nalaze. Što su točke bliže svojim centroidima to će iznos kriterijske funkcije biti manji, i to predstavlja bolje grupiranje kod algoritma K-sredina. Algoritam K-sredina nastoji minimizirati iznos kriterijske funkcije, odnosno particionirati (grupirati) skup $\mathcal{D}$ na način koji će dati minimalan iznos kriterijske funkcije. Analitičkim postupcima se ne može pronaći minimum kriterijske funkcije, stoga se optimizacija provodi iterativno, a iterativni postupak optimizacije nudi algoritam K-sredina.
+
+\subsection{Opis algoritma}
+Najprije se inicijalizira $K$ centroida, te se u svakoj iteraciji sve točke pridružuju najbližem centroidu. Zatim se centroidi svake grupe ponovno računaju na temelju točaka iz te grupe (pridruženi starom centroidu koji im je bio najbliži). Postupak se ponavlja do konvergencije, to jest dok dvije uzastopne iteracije nisu ništa promijenile u smislu da sve točke zadržavaju svoje grupe i ponovno računanje svih centroida ih ne mijenja. Formalno opišimo algoritam:
+\begin{croatianalgorithm}[H]
+\caption{Algoritam K-sredina}
+\label{algo:k-means}
+\begin{algorithmic}
+\STATE{\textbf{Parametri}: broj grupa $K$}
+\STATE{\textbf{Ulaz:} skup točaka $\mathcal{D} = \left\{ \mathbf{x}^{(i)}
+\right\}_{i=1}^{N}$ }
+\STATE{\textbf{Izlaz:} čvrste grupe $\mathcal{C}_k, \mathcal{D} = \bigcup_{k=1}^{K} \mathcal{C}_k$}
+\STATE
+\STATE{\textbf{inicijaliziraj} centroide $\boldsymbol{\mu}_k, \; k \in \left\{1, \dots, K\right\}$}
+\REPEAT
+\STATE{$\mathcal{C}_k \gets \emptyset, \; k \in \left\{1, \dots, K\right\}$}
+\FORALL{$\mathbf{x}^{(i)} \in \mathcal{D}$}
+\STATE{$k \gets \argmin_{j \in \left\{1, \dots, K\right\}} \Vert \mathbf{x}^{(i)} - \boldsymbol{\mu}_j \Vert$}
+\STATE{$\mathcal{C}_k \gets \mathcal{C}_k \cup \left\{\mathbf{x}^{(i)}\right\}$ }
+\ENDFOR
+\FORALL{$k \in \left\{1, \dots, K\right\}$}
+\STATE{$\boldsymbol{\mu}_k \gets \frac{1}{\vert \mathcal{C}_k \vert} \sum_{\mathbf{x} \in \mathcal{C}_k} \mathbf{x}$}
+\ENDFOR
+\UNTIL{$\boldsymbol{\mu}_k$ ne konvergiraju}
+\end{algorithmic}
+\end{croatianalgorithm}
+
+Na slici \ref{fig:kmeans_demo} je na jednostavnom primjeru prikazan princip rada algoritma sa zadanim brojem grupa $K = 3$. Križići predstavljaju centroide, a točke iste boje su pridružene istoj grupi.
+\begin{figure}[H]
+    \centering
+    \includegraphics{img/kmeans_demo.png}
+    \caption{Demonstracijski primjer grupiranja algoritmom K-sredina}
+    \label{fig:kmeans_demo}
+\end{figure}
+Potrebno je napomenuti da je algoritam kao inicijalne centroide odabrao već postojeće točke, no to općenito ne mora biti slučaj. Metode odabira inicijalnih centroida ćemo raspraviti u poglavlju %TODO: UBACITI REF POGLAVLJA%
+
+\subsection{Svojstva i složenost algoritma}
+Kao što smo spomenuli na početku poglavlja \ref{kmeans}, cilj algoritma K-sredina jest minimizirati kriterijsku funkciju. Postavlja se pitanje, hoće li algoritam u tome uvijek i uspjeti? Odgovor je: neće. Algoritam će pronaći lokalni optimum, ali ne garantira da će to biti i globalni optimum. Velik utjecaj na konačni rezultat ima upravo prvi korak algoritma: inicijalizacija početnih $K$ centroida. Kako bi se osigurao što bolji rezultat, odnosno što manji iznos kriterijske funkcije, jako je važno na pametan način odabrati početne centroide. Jednako tako je važno odabrati ispravan broj grupa: parametar $K$.
+
+Složenost algoritma K-sredina je $\mathcal{O} \left(TnKN\right)$, gdje je $T$ broj iteracija algoritma do konvergencije, $n$ broj značajki (dimenzija) točaka, a $N$ broj točaka. Korak algoritma u kojem pridružujemo točke najbližem centroidu je složenosti $\mathcal{O} \left(nKN\right)$ jer je potrebno za svaku od $N$ točaka ispitati koji od $K$ trenutnih centroida je najbliži, dakle mora ispitati udaljenost od svakog centroida, a računanje udaljenosti je složenosti $\mathcal{O} \left(n\right)$. Korak algoritma u kojem računamo centroide je složenosti $\mathcal{O} \left(nN\right)$ jer iako iteriramo po grupama, efektivno iteriramo po svim ulaznim točkama te radimo operacije zbrajanja i dijeljenja sa nekim brojem (koje je također složenosti $\mathcal{O} \left(n\right)$).\\
+Takva složenost je prihvatljiva i algoritam uz dobar odabir početnih centroida i dobar odabir parametra $K$ proizvodi dobre rezultate. Zbog povoljne složenosti, algoritam je dobar i za jako velike podatke (veliki $N$), a broj grupa i značajka ionako su najčešće\footnote{Kod velikog broja značajki tradicionalni algoritmi grupiranja, ali i postupci obrade podataka općenito, nisu učinkoviti. Tada govorimo o problemu prokletstva visoke dimenzionalnosti \engl{curse of dimensionality}} puno manji od $N$.
+
+\subsection{Odabir početnih $K$ centroida}
+Odabir početnih $K$ centroida.
+
+\section{Model Gaussove mješavine}
+GMM i EM.
+
+\section{DBSCAN}
+DBSCAN.
+
+\section{Hijerarhijsko aglomerativno grupiranje}
+HAC.
+
+\chapter{Postupci vrednovanja algoritama grupiranja}
+Postupci vrednovanja algoritama grupiranja.
+
+\chapter{Programsko ostvarenje i rezultati}
+Programsko ostvarenje i rezultati.
+
 \chapter{Zaključak}
 Zaključak.
 

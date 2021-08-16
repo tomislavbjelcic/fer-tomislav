@@ -1,5 +1,6 @@
 Jan Šnajder strojno učenje materijali - https://www.fer.unizg.hr/predmet/su/materijali#%23!p_rep_34381!_-172952-172970
 https://en.wikipedia.org/wiki/Cluster_analysis
+Dunjin završni rad...
 Mining of massive datasets knjiga
 Slika hijerarhijskog grupiranja - https://blogs.sap.com/2018/02/18/sap-hana-text-mining-functions-part1/
 https://en.wikipedia.org/wiki/Metric_(mathematics)
@@ -7,4 +8,5 @@ https://en.wikipedia.org/wiki/Norm_(mathematics)
 Slika čvrsto vs meko grupiranje - https://towardsdatascience.com/a-friendly-introduction-to-text-clustering-fa996bcefd04
 https://scikit-learn.org/stable/modules/clustering.html#
 https://en.wikipedia.org/wiki/K-means_clustering
-
+Slika k-means: https://www.researchgate.net/figure/Schematics-of-clustering-algorithms-a-The-demonstration-of-the-standard-k-means_fig2_282044429
+https://en.wikipedia.org/wiki/Curse_of_dimensionality
