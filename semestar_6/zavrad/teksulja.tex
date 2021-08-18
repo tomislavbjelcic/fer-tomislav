@@ -3,6 +3,7 @@
 \usepackage{float}
 \usepackage{algorithm}
 \usepackage{algorithmic}
+\usepackage{relsize}
 
 \newenvironment{croatianalgorithm}[1][]
   {\begin{algorithm}[#1]
@@ -13,6 +14,11 @@
      \renewcommand{\algorithmicforall}{\textbf{za svaki}}%
      \renewcommand{\algorithmicendfor}{\textbf{kraj za}}
      \renewcommand{\algorithmicdo}{\,}
+     \renewcommand{\algorithmicwhile}{\textbf{ponavljaj}}
+     \renewcommand{\algorithmicendwhile}{\textbf{kraj ponavljaj}}
+     \renewcommand{\algorithmicreturn}{\textbf{vrati}}
+     \renewcommand{\algorithmicif}{\textbf{ako}}
+     \renewcommand{\algorithmicendif}{\textbf{kraj ako}}
      % Set other language requirements
   }
   {\end{algorithm}}
@@ -43,7 +49,7 @@
 
 \chapter{Uvod}
 
-\textbf{Grupiranje} \engl{clustering} je postupak kojim se neki skup podataka razvrstava u skupine, odnosno \textbf{grupe} \engl{clusters}, u kojima su podaci međusobno slični. Grupiranje je jedno od metoda \textbf{nenadziranog strojnog učenja} \engl{unsupervised learning}, dakle ulazni podaci nisu označeni, odnosno nemaju neku ciljnu vrijednost koja bi naznačila kojoj grupi pripada neki podatak. Algoritmi grupiranja iz takvih podataka onda moraju sami prepoznati grupe podataka i odrediti za svaki ulazni podatak kojoj grupi bi pripadao.
+\textbf{Grupiranje} \engl{clustering} je postupak kojim se neki skup podataka razvrstava u skupine, odnosno \textbf{grupe} \engl{clusters}, u kojima su podaci međusobno slični. Grupiranje je jedno od metoda \textbf{nenadziranog strojnog učenja} \engl{unsupervised learning}, dakle ulazni podaci nisu označeni, odnosno nemaju neku ciljnu vrijednost koja bi naznačila kojoj grupi pripada neki podatak. Algoritmi grupiranja iz takvih podataka onda moraju sami prepoznati grupe podataka, odrediti za svaki ulazni podatak kojoj grupi bi pripadao i ukoliko je to moguće, odrediti \textbf{stršeće vrijednosti} \engl{outliers}.
 
 Uzmimo neki jednostavan primjer. Neka na raspolaganju imamo podatke o visini i masi odraslih pasa iz nekog 
 skloništa za životinje. U ovom jednostavnom primjeru ulazni podaci imaju dvije značajke, odnosno dimenzije: visina i masa. Općenito, ulazni podaci mogu imati proizvoljno mnogo značajka. Prikažimo ulazne podatke kao 
@@ -62,6 +68,7 @@ Definirajmo što su ulazni podaci. U kontekstu algoritama grupiranja\footnote{Is
 gdje svaka točka $\mathbf{x} = \left(x_1, x_2, \dots, x_{n-1}, x_n\right)$ ima $n$ \textbf{značajki} \engl{features}, odnosno dimenzija. Prostor podataka iz koje dolaze pojedine značajke, odnosno točke, mogu biti razne. Primjerice, može biti riječ o realnim brojevima (uvodni primjer), znakovima (primjerice grupiranje neoznačenih novinskih članaka), kategorijskim podacima poput vrijednosti istina/laž, itd. Neki algoritmi grupiranja imaju osnovne pretpostavke o tome iz kojeg prostora podataka dolaze značajke, što znači da ne funkcioniraju za one podatke koji nemaju ispunjene takve pretpostavke.
 
 \section{Udaljenost, sličnost i različitost točaka}
+\label{pointsimilarity}
 U uvodnom poglavlju smo grupiranje opisali kao postupak kojim se skup podataka razvrstava u grupe na taj način gdje su točke u istoj grupi međusobno manje-više ‘‘slični’’. Potrebno je definirati kako se određuje, odnosno kako se mjeri takva ‘‘sličnost’’ između dvije točke. Definirajmo najprije \textbf{mjeru udaljenosti} \engl{distance measure}. Neka je $\mathcal{V}$ prostor iz kojeg dolaze ulazni podaci čiji je $\mathcal{D}$ podskup, te neka je $\mathbb{R}$ skup realnih brojeva. Udaljenost je funkcija
 \[d: \mathcal{V} \times \mathcal{V} \to \mathbb{R}\]
 koja za svaki \(\mathbf{x}, \mathbf{y}, \mathbf{z} \in \mathcal{V}\) zadovoljava tzv.\ svojstva \textbf{metrike}:
@@ -92,11 +99,13 @@ Vrlo često u praksi imamo značajke koje nisu realni brojevi niti dolaze iz nek
 \begin{itemize}
     \item \textbf{Hammingova udaljenost}: binarni nizovi duljine $n$
     \item \textbf{Jaccardova udaljenost}: skupovi i multiskupovi
-    \item \textbf{??? udaljenost} \engl{Edit distance}: znakovni nizovi %TODO: prevesti Edit distance
+    \item \textbf{??? udaljenost} \engl{Edit distance}: znakovni nizovi
+    %TODO: PREVESTI EDIT DISTANCE
 \end{itemize}
 \textbf{Sličnost} \engl{similarity measure} je vrsta mjere koja, poput mjere udaljenosti, brojčano iskazuje koliko se razlikuju dvije točke. Za razliku od mjere udaljenosti, mjera sličnosti ne mora zadovoljavati sva svojstva metrike poput nejednakosti trokuta. Jednako vrijedi i za \textbf{mjeru različitosti} \engl{dissimilariy measure}. Kako su dvije točke ‘‘sličnije’’ tako mjera sličnosti raste, a mjera različitosti pada. Detaljnu definiciju mjera sličnosti i različitosti nećemo navoditi iz razloga što se u algoritmima grupiranja (barem onih koje ćemo opisati) koriste uglavnom mjere udaljenosti u svrhu kvantificiranja sličnosti ili različitosti točaka.
 
 \section{Vrste grupiranja}
+\label{vrstegrupiranja}
 Ne postoji jedinstvena definicija grupe koja vrijedi za sve algoritme grupiranja. Svaki algoritam ima svoj model grupiranja u kojem je definirano što je to grupa, a sam algoritam pokušava točke grupirati na način koji to najviše odgovara za taj model. Različite modele grupiranja ćemo detaljnije razmotriti u sljedećem poglavlju, a sada navedimo dvije generalne podijele.\\
 S obzirom na koji način se oblikuju grupe, grupiranje može biti:
 \begin{itemize}
@@ -188,25 +197,167 @@ Na slici \ref{fig:kmeans_demo} je na jednostavnom primjeru prikazan princip rada
     \caption{Demonstracijski primjer grupiranja algoritmom K-sredina}
     \label{fig:kmeans_demo}
 \end{figure}
-Potrebno je napomenuti da je algoritam kao inicijalne centroide odabrao već postojeće točke, no to općenito ne mora biti slučaj. Metode odabira inicijalnih centroida ćemo raspraviti u poglavlju %TODO: UBACITI REF POGLAVLJA%
+Potrebno je napomenuti da je algoritam kao inicijalne centroide odabrao već postojeće točke, no to općenito ne mora biti slučaj. Metode odabira inicijalnih centroida ćemo raspraviti u poglavlju \ref{kminitial}.
 
 \subsection{Svojstva i složenost algoritma}
+\label{kmsvojstva}
 Kao što smo spomenuli na početku poglavlja \ref{kmeans}, cilj algoritma K-sredina jest minimizirati kriterijsku funkciju. Postavlja se pitanje, hoće li algoritam u tome uvijek i uspjeti? Odgovor je: neće. Algoritam će pronaći lokalni optimum, ali ne garantira da će to biti i globalni optimum. Velik utjecaj na konačni rezultat ima upravo prvi korak algoritma: inicijalizacija početnih $K$ centroida. Kako bi se osigurao što bolji rezultat, odnosno što manji iznos kriterijske funkcije, jako je važno na pametan način odabrati početne centroide. Jednako tako je važno odabrati ispravan broj grupa: parametar $K$.
 
 Složenost algoritma K-sredina je $\mathcal{O} \left(TnKN\right)$, gdje je $T$ broj iteracija algoritma do konvergencije, $n$ broj značajki (dimenzija) točaka, a $N$ broj točaka. Korak algoritma u kojem pridružujemo točke najbližem centroidu je složenosti $\mathcal{O} \left(nKN\right)$ jer je potrebno za svaku od $N$ točaka ispitati koji od $K$ trenutnih centroida je najbliži, dakle mora ispitati udaljenost od svakog centroida, a računanje udaljenosti je složenosti $\mathcal{O} \left(n\right)$. Korak algoritma u kojem računamo centroide je složenosti $\mathcal{O} \left(nN\right)$ jer iako iteriramo po grupama, efektivno iteriramo po svim ulaznim točkama te radimo operacije zbrajanja i dijeljenja sa nekim brojem (koje je također složenosti $\mathcal{O} \left(n\right)$).\\
 Takva složenost je prihvatljiva i algoritam uz dobar odabir početnih centroida i dobar odabir parametra $K$ proizvodi dobre rezultate. Zbog povoljne složenosti, algoritam je dobar i za jako velike podatke (veliki $N$), a broj grupa i značajka ionako su najčešće\footnote{Kod velikog broja značajki tradicionalni algoritmi grupiranja, ali i postupci obrade podataka općenito, nisu učinkoviti. Tada govorimo o problemu prokletstva visoke dimenzionalnosti \engl{curse of dimensionality}} puno manji od $N$.
 
 \subsection{Odabir početnih $K$ centroida}
-Odabir početnih $K$ centroida.
+\label{kminitial}
+Način na koji odabiremo početne centroide kod algoritma K-sredina nije jasno naznačen u algoritmu, a u poglavlju \ref{kmsvojstva} smo spomenuli da je to jako važno kako bi algoritam imao priliku postići globalni optimum.
+
+Postoji niz strategija za odabir početnih $K$ centroida. Prvo što pada na pamet jest kao početne centroide postaviti $K$ slučajno izabranih točaka iz $\mathcal{D}$. Slučajan odabir nije baš najbolja ideja, jer rezultati neće biti dobri ako neki od početnih $K$ centroida se nalazi unutar istih prirodnih grupa.\\
+Početni centroidi se mogu izabrati na način da samo prvi centroid bude slučajno odabrana točka iz $\mathcal{D}$, a daljnje centroide izabiremo isto iz $\mathcal{D}$ (ali među onima koji nisu još odabrani kao centroidi) na način da su što udaljenije od već odabranih centroida. Kao uzastopni centroid odabrat ćemo točku koja maksimizira udaljenost do najbližeg, već odabranog centroida. Opišimo to sljedećim algoritmom: 
+\begin{croatianalgorithm}[H]
+\begin{algorithmic}
+\STATE{\textbf{Parametri}: broj grupa $K$}
+\STATE{\textbf{Ulaz:} skup točaka $\mathcal{D} = \left\{ \mathbf{x}^{(i)}
+\right\}_{i=1}^{N}$ }
+\STATE{\textbf{Izlaz:} skup inicijalnih $K$ centroida: 
+$\mathcal{I} = \left\{ \boldsymbol{\mu}_k \right\}_{k=1}^{K}$}
+\STATE
+\STATE{$\mathcal{I} \gets \emptyset$}
+\STATE{$\widehat{\mathcal{D}} \gets \mathcal{D}$}
+\STATE{\textbf{slučajno odaberi} točku $\mathbf{x} \in \widehat{\mathcal{D}}$}
+\STATE{$\mathcal{I} \gets \mathcal{I} \cup \left\{ \mathbf{x} \right\}$}
+\STATE{$\widehat{\mathcal{D}} \gets \widehat{\mathcal{D}} \setminus
+        \left\{ \mathbf{x} \right\}$}
+\WHILE{dokle god $\left\vert \widehat{\mathcal{D}} \right\vert < K$}
+\STATE{$\boldsymbol{\mu} \gets \argmax_{\textbf{x} \in \widehat{\mathcal{D}}} 
+        \left\Vert \mathbf{x} - \argmin_{\boldsymbol{\mu}' \in \mathcal{I}}
+                \Vert \mathbf{x} - \boldsymbol{\mu}' \Vert
+        \right\Vert$}
+\STATE{$\mathcal{I} \gets \mathcal{I} \cup \left\{ \boldsymbol{\mu} \right\}$}
+\STATE{$\widehat{\mathcal{D}} \gets \widehat{\mathcal{D}} \setminus
+        \left\{ \boldsymbol{\mu} \right\}$}
+\ENDWHILE
+\RETURN{$\mathcal{I}$}
+\end{algorithmic}
+\end{croatianalgorithm}
+Ova strategija odabira početnih centroida je u pravilu dobra, no postoji jedna mana: odabirat će se stršeće vrijednosti, a kako su one relativno udaljeni od prirodnih grupa, to bi moglo uzrokovati neoptimalno grupiranje. Postoji alternativa ovakvoj strategiji koja do neke mjere rješava problem odabira stršećih vrijednosti.
+
+Umjesto odabira točke koja maksimizira udaljenost do najbližeg centroida, možemo svakoj točki pridružiti vjerojatnost odabira koja je proporcionalna kvadratu udaljenosti do najbližeg centroida. Takva strategija odabira je poznata kao \textbf{K-means++}.
+Pretpostavimo da u nekom trenutku smo odabrali $k$ centroida i one se nalaze u skupu $\mathcal{I}$, tada vjerojatnost odabira neke točke $\mathbf{x} \in \widehat{\mathcal{D}}$ kao sljedeći centroid glasi:
+\[P \left( \boldsymbol{\mu}_{k+1} = \mathbf{x} \middle| \widehat{\mathcal{D}}, \mathcal{I}\right)
+= \frac{\min_{\boldsymbol{\mu}' \in \mathcal{I}} \Vert \mathbf{x} - \boldsymbol{\mu}' \Vert^2}{\sum_{\mathbf{x}' \in \widehat{\mathcal{D}}} 
+\min_{\boldsymbol{\mu}' \in \mathcal{I}} \Vert \mathbf{x}' - \boldsymbol{\mu}' \Vert^2}\]
+Nakon što se izračunaju vjerojatnosti za svaku od neodabranih točaka iz $\widehat{\mathcal{D}}$, onda se slučajno točka slučajno odabire prema navedenoj razdiobi vjerojatnosti. Stršeće vrijednosti će i dalje imati najveću vjerojatnost odabira, ali stršećih vrijednosti nema mnogo, pa je ipak vjerojatniji odabir neki od prirodno prosječnih primjera.\\
+K-means++ u praksi daje bolje rezultate od varijante K-sredina u kojem se početni centroidi odabiru slučajno. Iznosi kriterijskih funkcija ispadaju manji i algoritam prije konvergira, odnosno potreban je manji broj iteracija do stacionarnog stanja.
 
 \section{Model Gaussove mješavine}
 GMM i EM.
 
+\section{Hijerarhijsko aglomerativno grupiranje}
+U poglavlju \ref{vrstegrupiranja} smo naveli na koji način hijerarhijsko grupiranje gradi grupe, te smo spomenuli dva pristupa hijerarhijskog grupiranja: aglomerativno i divizivno. U ovom poglavlju ćemo se baviti standardnim algoritmom hijerarhijskog aglomerativnog grupiranja. Također smo u poglavlju \ref{vrstegrupiranja} dali primjer jednog hijerarhijskog aglomerativnog grupiranja na slici \ref{fig:hier_clustering} i vidjeli spajanje grupa. Odluka koje dvije grupe spojiti nije slučajna, stoga prije formalnog opisa algoritma potrebno je prvo definirati pojmove vezane za spajanje grupa.
+
+\subsection{Spajanje grupa}
+Odluka koje dvije grupe spojiti se temelji na \textbf{kriteriju spajanja} \engl{linkage criterion}. Kriterij spajanja mjeri koliko su dvije grupe slične, odnosno različite. On se temelji na nekoj od mjera sličnosti između dviju točaka, bila to udaljenost, sličnost ili različitost, i njih smo opisali u poglavlju \ref{vrstegrupiranja}. Najčešće se u svrhu definiranja kriterija spajanja koriste mjere udaljenosti, no mogu se koristiti i mjere sličnosti ili različitosti.
+
+Kriterij spajanja nećemo detaljno opisati kao mjeru udaljenosti, samo na površnoj razini. Neka su su $\mathcal{C}_i$, $\mathcal{C}_j \subset \mathcal{D}$ neprazni i disjunktni podskupovi skupa ulaznih točaka $\mathcal{D}$. Kriterij povezanosti ćemo tada označiti sa $D \left(\mathcal{C}_i, \mathcal{C}_j\right)$ (bitno je ovu oznaku razlikovati od oznake udaljenosti između dvije točke, npr.\ $d \left(\mathbf{x}, \mathbf{y}\right)$) i on mjeri koliko su grupe $\mathcal{C}_i$ i $\mathcal{C}_j$ udaljene. Postoji mnogo kriterija spajanja, mi ćemo navesti one koje su implementirane u programskoj knjižnici Scikit-learn.
+
+\textbf{Jednostruka povezanost} \engl{single-linkage clustering} udaljenost između grupa definira kao minimalnu udaljenost između točaka u tim grupama, gdje je jedna točka iz jedne, a druga točka iz druge grupe:
+\[D_{\text{min}} \left( \mathcal{C}_i, \mathcal{C}_j \right) 
+        = \min_{\left(\mathbf{x}, \mathbf{y}\right) \in \mathcal{C}_i \times \mathcal{C}_j} d\left(\mathbf{x}, \mathbf{y}\right)
+\]
+\textbf{Potpuna povezanost} \engl{complete-linkage clustering} udaljenost između grupa definira slično kao i jednostruka povezanost, ali ovaj put se gleda maksimalna udaljenost:
+\[D_{\text{max}} \left( \mathcal{C}_i, \mathcal{C}_j \right) 
+        = \max_{\left(\mathbf{x}, \mathbf{y}\right) \in \mathcal{C}_i \times \mathcal{C}_j} d\left(\mathbf{x}, \mathbf{y}\right)
+\]
+\textbf{Prosječna povezanost} \engl{average-linkage clustering} udaljenost između grupa definira kao prosječnu udaljenost svih parova grupa, opet gdje je jedna točka iz jedna druga točka iz druge grupe:
+\[D_{\text{avg}} \left( \mathcal{C}_i, \mathcal{C}_j \right) 
+        = \frac{1}{\vert \mathcal{C}_i \vert \cdot \vert \mathcal{C}_j \vert} 
+            \sum_{\left(\mathbf{x}, \mathbf{y}\right) \in \mathcal{C}_i \times \mathcal{C}_j} d\left(\mathbf{x}, \mathbf{y}\right)
+\]
+\textbf{Wardova metoda}, također poznata kao Wardova metoda minimalne varijance, prati zbroj kvadratnih pogrešaka (između točaka i centroida) u grupama prije i nakon spajanja. U osnovi Wardova metoda pretpostavlja da točke dolaze iz realnog koordinatnog prostora, no postoje generalizacije na bilo kakve podatke koje koriste mjeru sličnosti. Prema tome se kao mjera pogreške koristi Euklidska udaljenost između točke i centroida, odnosno koristi se Euklidsku norma. Definirajmo zbroj kvadratnih pogreški \engl{error sum of squares} neke neprazne grupe $\mathcal{C}$ čiji je centroid $\boldsymbol{\mu}$:
+\[\operatorname{ESS} \left(\mathcal{C}\right) = \sum_{\mathbf{x} \in \mathcal{C}} 
+\Vert \mathbf{x} - \boldsymbol{\mu} \Vert^2\]
+Wardova metoda udaljenost između grupa definira kao razliku sume kvadratnih pogrešaka nakon i prije spajanja grupa:
+\[D_{\text{Ward}} \left( \mathcal{C}_i, \mathcal{C}_j \right) 
+= \operatorname{ESS} \left(\mathcal{C}_i \cup \mathcal{C}_j\right) - \left(\operatorname{ESS} \left(\mathcal{C}_i\right) + \operatorname{ESS} \left(\mathcal{C}_j\right)\right)
+\]
+Gornja formula se može raspisivanjem svesti na jednostavniju formulu:
+\[D_{\text{Ward}} \left( \mathcal{C}_i, \mathcal{C}_j \right)
+= \frac{\vert \mathcal{C}_i \vert \cdot \vert \mathcal{C}_j \vert}
+{\vert \mathcal{C}_i \vert + \vert \mathcal{C}_j \vert}
+\left\Vert \boldsymbol{\mu}_i - \boldsymbol{\mu}_j \right\Vert^2
+\]
+gdje su $\boldsymbol{\mu}_i$ i $\boldsymbol{\mu}_j$ redom centroidi grupa $\mathcal{C}_i$ i $\mathcal{C}_j$.
+
+\subsection{Opis algoritma}
+Hijerarhijskog aglomerativno grupiranje najprije stvara $N$ grupa, odnosno na početku tretira svaku ulaznu točku iz $\mathcal{D}$ kao zasebnu grupu. Prilikom svake iteracije donosi odluku koje dvije grupe spojiti na temelju kriterija spajanja: spojiti one dvije grupe koje su najbliže prema kriteriju spajanja koji je unaprijed odabran kao parametar algoritma. Nakon spajanja grupa, broj ukupnih grupa se smanjuje za 1 i postupak se ponavlja.\\
+Naravno, algoritam može ponavljati postupak dok ne ostane samo jedna grupa, ali to nam nije od koristi. Umjesto toga, postupak možemo zaustaviti\footnote{Tada u neku ruku imamo particijsko grupiranje, jer kada zaustavimo postupak, onda smo ‘‘presjekli’’ horizontalno dendrogram i prihvatili grupe kakve jesu na toj razini, bez hijerarhijske strukture.} kada se ispuni neki kriterij zaustavljanja, a to može biti jedno od sljedećih opcija:
+\begin{itemize}
+    \item dostignut je željeni broj grupa;
+    \item najmanja udaljenost između dvije grupe je premašila neku granicu.
+\end{itemize}
+Odluka kada će postupak završiti je također parametar algoritma. Ukoliko želimo zaustaviti postupak nakon dostignutih $K$ grupa, broj $K$ moramo predati kao parametar, a ako želimo da se ne premaši najmanja udaljenost $\epsilon$ tijekom spajanja, tada moramo specificirati broj $\epsilon$.\\
+Formalno opišimo algoritam:
+\begin{croatianalgorithm}[H]
+\caption{Hijerarhijsko aglomerativno grupiranje}
+\label{algo:hac}
+\begin{algorithmic}
+\STATE{\textbf{Parametri}: kriterij spajanja $D \left(\mathcal{C}_i, \mathcal{C}_j\right)$, uvjet zaustavljanja: broj grupa $K$ ili najveća dopuštena minimalna udaljenost između grupa $\epsilon$}
+\STATE{\textbf{Ulaz:} skup točaka $\mathcal{D} = \left\{ \mathbf{x}^{(i)}
+\right\}_{i=1}^{N}$ }
+\STATE{\textbf{Izlaz:} grupiranje: skup međusobno disjunktnih grupa
+$\Gamma = \left\{ \mathcal{C}_i\right\}_{i=1}^{M}$ koji sačinjavaju skup točaka
+$ \mathcal{D} = \bigcup_{i=1}^{M} \mathcal{C}_i $}, gdje broj grupa $M$ je ili nepoznat ili $M = K$ ovisno o uvjetu zaustavljanja
+
+\STATE
+
+\STATE{$\Gamma \gets \emptyset$}
+\FORALL{$i \in \left\{1, \dots, N\right\}$}
+    \STATE{$\mathcal{C}_i \gets \left\{ \mathbf{x}^{(i)} \right\}$}
+    \STATE{$\Gamma \gets \Gamma \cup \left\{ \mathcal{C}_i \right\}$}
+\ENDFOR
+\WHILE{}
+\STATE{\textbf{prekini} ako je zadan $K$ i vrijedi $\vert \Gamma \vert \leq K$}
+\STATE{$\left(\mathcal{C}_i, \mathcal{C}_j\right) \gets 
+        \argmin_{\left(\mathcal{C}_a, \mathcal{C}_b\right) \in \Gamma \times \Gamma}
+        D \left(\mathcal{C}_a, \mathcal{C}_b\right)
+$}
+\STATE{\textbf{prekini} ako je zadan $\epsilon$ i vrijedi $D \left(\mathcal{C}_i, \mathcal{C}_j\right) > \epsilon$}
+\STATE{$\mathcal{C}_i \gets \mathcal{C}_i \cup \mathcal{C}_j$}
+\STATE{$\Gamma \gets \Gamma \setminus \left\{\mathcal{C}_j\right\}$}
+\ENDWHILE
+\RETURN{$\Gamma$}
+\end{algorithmic}
+\end{croatianalgorithm}
+
+\subsection{Primjer grupiranja}
+Pogledajmo jednostavan primjer hijerarhijskog aglomerativnog grupiranja. Neka su ulazni podaci točke sa dvjema realnim značajkama prikazani na slici \ref{fig:hierdata}. Radi lakšeg snalaženja, sve točke su označene brojevima.
+\begin{figure}[H]
+    \centering
+    \includegraphics[scale=0.75]{img/hierdata.png}
+    \caption{Ulazni podaci}
+    \label{fig:hierdata}
+\end{figure}
+Provedimo hijerarhijsko aglomerativno gurpiranje tih točaka. Neka kriterij spajanja bude prosječna povezanost i neka algoritam spoji sve podgrupe, odnosno postavimo broj grupa $K = 1$. Vizualni rezultat grupiranja prikažimo dendrogramom na slici \ref{fig:dendrogram}.
+\begin{figure}[H]
+    \centering
+    \includegraphics[scale=0.85]{img/dendro.png}
+    \caption{Dendrogram hijerarhijskog aglomerativnog grupiranja}
+    \label{fig:dendrogram}
+\end{figure}
+Na donjoj liniji se nalaze oznake svake točke, a na lijevoj liniji se nalazi mjera koja iskazuje koja je bila prosječna udaljenost (jer koristimo prosječnu povezanost kao kriterij spajanja) između grupa u trenutku spajanja. Ukoliko bismo htjeli particijski grupirati primjere, to možemo odlučiti prema vlastitoj volji. Primjerice, ukoliko ne želimo spojiti grupe čija prosječna udaljenost prelazi $\epsilon = 3.5$, tada bismo dendrogram ‘‘presjekli’’ horizontalno na toj razini i kao rezultat bismo dobili 3 grupe jer bismo presjekli dendrogram na 3 mjesta. Na sličan način možemo i po volji grupirati točke u proizvoljan broj grupa. Na slici \ref{fig:hiereps} je prikazan rezultat grupiranja ako se specificira $\epsilon = 3.5$.
+\begin{figure}[H]
+    \centering
+    \includegraphics[scale=0.75]{img/hiereps.png}
+    \caption{Hijerarhijsko aglomerativno grupiranje uz $\epsilon = 3.5$}
+    \label{fig:hiereps}
+\end{figure}
+
+\subsection{Svojstva i složenost algoritma}
+Opisani algoritam daje dobre rezultate, no najveći nedostatak je vremenska i prostorna složenost. Pretpostavimo da se algoritam zaustavlja nakon što je preostalo $K$ grupa. To znači da algoritam u glavnoj petlji radi $N-K$ koraka. Korak u kojem se odlučuje koje dvije grupe spojiti mora proći kroz sve kombinacije grupa, što je vremenske složenosti $\mathcal{O} \left(N^2\right)$. Prema tome, vremenska složenost algoritma je $\mathcal{O} \left(N^2 \left(N-K\right)\right)$, a kako je u praksi $N$ puno veći od $K$, onda je vremenska složenost $\mathcal{O} \left(N^3\right)$. Iz tog razloga algoritam nije dobar izbor za velike skupove podataka. Također se informacija o udaljenosti između točaka jako često koristi tijekom izvršenja algoritma, stoga implementacije u pravilu najprije konstruiraju tzv.\ \textbf{matricu udaljenosti} \engl{distance matrix}. Matrica udaljenosti je dimenzija $N \times N$ i sadrži izračunatu udaljenost između svih parova točaka. Računanje udaljenosti je tada vremenski brzo, ali problem je u prostornoj složenosti: $\mathcal{O} \left(N^2\right)$ (jer u najmanju ruku moramo spremiti ${N}\choose2$ brojeva), i to za velike skupove podataka već predstavlja veliki problem. Umjesto matrice udaljenosti, analogno postoji matrica sličnosti i matrica udaljenosti.
+
+Standardni ‘‘naivni’’ algoritam je vremenske složenosti $\mathcal{O} \left(N^3\right)$, no postoje bolje implementacije složenosti $\mathcal{O} \left(N^2 \log N\right)$. Specijalno, ako se koriste jednostruka ili potpuna povezanost, postoje algoritmi složenosti $\mathcal{O} \left(N^2\right)$ poznati kao SLINK i CLINK.
+
 \section{DBSCAN}
 DBSCAN.
-
-\section{Hijerarhijsko aglomerativno grupiranje}
-HAC.
 
 \chapter{Postupci vrednovanja algoritama grupiranja}
 Postupci vrednovanja algoritama grupiranja.
@@ -225,7 +376,7 @@ Sažetak na hrvatskom jeziku.
 
 \kljucnerijeci{Ključne riječi, odvojene zarezima.}
 \end{sazetak}
-
+%‘‘slični’’
 % TODO: Navedite naslov na engleskom jeziku.
 \engtitle{Title}
 \begin{abstract}
