@@ -64,7 +64,7 @@ točke na grafu gdje os apscisa predstavlja masu, a os ordinata predstavlja visi
 Promatranjem točaka na grafu možemo uočiti da se podaci prirodno grupiraju u tri grupe, koje odgovaraju različitim pasminama. Sjetimo se, ulazni podaci nisu označeni, dakle jedino na raspolaganju imamo masu i visinu. Htjeli bismo da odabran algoritam grupiranja prepozna da se radi o tri grupe i slične točke pridruži istoj grupi. Općenito, poželjno je da algoritam grupiranja podatke grupira na onaj način koji odgovara prirodnom grupiranju. U našem primjeru je prirodno grupiranje vizualno očito i ono odgovara pasminama, no to ne mora biti slučaj. Neće uvijek ni vizualnom metodom biti jednoznačno jasno kakvo je njihovo prirodno grupiranje. Ovdje bismo mjeru sličnosti mogli definirati koristeći udaljenost točaka (što su točke bliže, više su slične) s obzirom da se radi o brojevnim podacima, no općenito podaci mogu biti bilo kakve prirode, što će pojedini algoritmi grupiranja uzimati u obzir.
 
 \chapter{Općenito o algoritmima grupiranja}
-Definirajmo što su ulazni podaci. U kontekstu algoritama grupiranja\footnote{Isto tako i u kontekstu nenadziranog strojnog učenja.} ulazni podaci su skup od $N$ neoznačenih, višedimenzionalnih \textbf{točaka} (vektora) \[\mathcal{D} = \left\{ \mathbf{x}^{(i)} \right\}_{i=1}^{N} \]
+Definirajmo što su ulazni podaci. U kontekstu algoritama grupiranja\footnote{Isto tako i u kontekstu nenadziranog strojnog učenja.} ulazni podaci (primjeri) su skup od $N$ neoznačenih, višedimenzionalnih \textbf{točaka} (vektora) \[\mathcal{D} = \left\{ \mathbf{x}^{(i)} \right\}_{i=1}^{N} \]
 gdje svaka točka $\mathbf{x} = \left(x_1, x_2, \dots, x_{n-1}, x_n\right)$ ima $n$ \textbf{značajki} \engl{features}, odnosno dimenzija. Prostor podataka iz koje dolaze pojedine značajke, odnosno točke, mogu biti razne. Primjerice, može biti riječ o realnim brojevima (uvodni primjer), znakovima (primjerice grupiranje neoznačenih novinskih članaka), kategorijskim podacima poput vrijednosti istina/laž, itd. Neki algoritmi grupiranja imaju osnovne pretpostavke o tome iz kojeg prostora podataka dolaze značajke, što znači da ne funkcioniraju za one podatke koji nemaju ispunjene takve pretpostavke.
 
 \section{Udaljenost, sličnost i različitost točaka}
@@ -145,7 +145,7 @@ U daljnjim potpoglavljima opisat ćemo podskup algoritama grupiranja implementir
 \section{Algoritam K-sredina} \label{kmeans}
 Algoritam \textbf{K-sredina} \engl{K-means clustering} je jednostavan i učinkovit algoritam particijskog čvrstog grupiranja koji ulazni skup točaka $\mathcal{D}$ particionira u $K$ grupa. $K$ je broj grupa koje je potrebno proizvesti i on se zadaje unaprijed kao parametar algoritma. Nešto kasnije ćemo reći nešto i o metodama kako odrediti broj grupa $K$.
 
-Algoritam K-sredina predstavlja svaku grupu sa jednom točkom koja označava središte te grupe: \textbf{centroidom}. Neka je $\mathcal{C}$ grupa koja sadrži $M$ točaka ($M = \vert \mathcal{C} \vert$, $\vert \mathcal{C} \vert$ predstavlja kardinalitet skupa $\mathcal{C}$), odnosno 
+Algoritam K-sredina predstavlja svaku grupu sa jednom točkom koja označava središte te grupe: \textbf{centroidom}. Neka je $\mathcal{C} \subseteq \mathcal{D}$ grupa koja sadrži $M$ točaka ($M = \vert \mathcal{C} \vert$, $\vert \mathcal{C} \vert$ predstavlja kardinalitet skupa $\mathcal{C}$), odnosno 
 $\mathcal{C} = \left\{ \mathbf{x}^{(i)}  \right\}_{i=1}^{M}$.
 Centroid te grupe $\boldsymbol{\mu}$ se definira kao:
 \[\boldsymbol{\mu} = \frac{1}{\vert \mathcal{C} \vert} \sum_{\mathbf{x} \in \mathcal{C}} \mathbf{x} = 
@@ -352,7 +352,7 @@ Na donjoj liniji se nalaze oznake svake točke, a na lijevoj liniji se nalazi mj
 \end{figure}
 
 \subsection{Svojstva i složenost algoritma}
-Opisani algoritam daje dobre rezultate, no najveći nedostatak je vremenska i prostorna složenost. Pretpostavimo da se algoritam zaustavlja nakon što je preostalo $K$ grupa. To znači da algoritam u glavnoj petlji radi $N-K$ koraka. Korak u kojem se odlučuje koje dvije grupe spojiti mora proći kroz sve kombinacije grupa, što je vremenske složenosti $\mathcal{O} \left(N^2\right)$. Prema tome, vremenska složenost algoritma je $\mathcal{O} \left(N^2 \left(N-K\right)\right)$, a kako je u praksi $N$ puno veći od $K$, onda je vremenska složenost $\mathcal{O} \left(N^3\right)$. Iz tog razloga algoritam nije dobar izbor za velike skupove podataka. Također se informacija o udaljenosti između točaka jako često koristi tijekom izvršenja algoritma, stoga implementacije u pravilu najprije konstruiraju tzv.\ \textbf{matricu udaljenosti} \engl{distance matrix}. Matrica udaljenosti je simetrična matrica dimenzija $N \times N$ i sadrži izračunatu udaljenost između svih parova točaka. Računanje udaljenosti je tada vremenski brzo, ali problem je u prostornoj složenosti: $\mathcal{O} \left(N^2\right)$ (jer u najmanju ruku moramo spremiti ${N}\choose2$ brojeva), i to za velike skupove podataka već predstavlja veliki problem. Umjesto matrice udaljenosti, analogno postoji matrica sličnosti i matrica udaljenosti.
+Opisani algoritam daje dobre rezultate, no najveći nedostatak je vremenska i prostorna složenost. Pretpostavimo da se algoritam zaustavlja nakon što je preostalo $K$ grupa. To znači da algoritam u glavnoj petlji radi $N-K$ koraka. Korak u kojem se odlučuje koje dvije grupe spojiti mora proći kroz sve kombinacije grupa, što je vremenske složenosti $\mathcal{O} \left(N^2\right)$. Prema tome, vremenska složenost algoritma je $\mathcal{O} \left(N^2 \left(N-K\right)\right)$, a kako je u praksi $N$ puno veći od $K$, onda je vremenska složenost $\mathcal{O} \left(N^3\right)$. Iz tog razloga algoritam nije dobar izbor za velike skupove podataka. Također se informacija o udaljenosti između točaka jako često koristi tijekom izvršenja algoritma, stoga implementacije u pravilu najprije konstruiraju tzv.\ \textbf{matricu udaljenosti} \engl{distance matrix}. Matrica udaljenosti je simetrična matrica dimenzija $N \times N$ i sadrži izračunatu udaljenost između svih parova točaka. Računanje udaljenosti je tada vremenski brzo, ali problem je u prostornoj složenosti: $\mathcal{O} \left(N^2\right)$ (jer u najmanju ruku moramo spremiti $\binom{N}{2}$ brojeva), i to za velike skupove podataka već predstavlja veliki problem. Umjesto matrice udaljenosti, analogno postoji matrica sličnosti i matrica udaljenosti.
 
 Standardni ‘‘naivni’’ algoritam je vremenske složenosti $\mathcal{O} \left(N^3\right)$, no postoje bolje implementacije složenosti $\mathcal{O} \left(N^2 \log N\right)$. Specijalno, ako se koriste jednostruka ili potpuna povezanost, postoje algoritmi složenosti $\mathcal{O} \left(N^2\right)$ poznati kao SLINK i CLINK.
 
@@ -360,7 +360,57 @@ Standardni ‘‘naivni’’ algoritam je vremenske složenosti $\mathcal{O} \l
 DBSCAN.
 
 \chapter{Postupci vrednovanja algoritama grupiranja}
-Postupci vrednovanja algoritama grupiranja.
+Dosad smo se bavili problemom grupiranja: na koji način podijeliti ulazni skup točaka u grupe sa međusobno sličnim točkama. Nakon što to napravimo na neki način, postavlja se pitanje na koji način ocijeniti rezultat grupiranja. Taj zadatak može biti jednako težak kao i sam problem grupiranja ukoliko nemamo neku vanjsku informaciju o tome kako bi podaci trebali stvarno biti grupirani. Naravno, kada bismo na raspolaganju imali takve informacije, ne bi bilo potrebe za grupiranjem. Prema tome, vrednovanje grupiranja dijelimo na \textbf{unutarnje} \engl{internal evaluation} i \textbf{vanjsko} \engl{external evaluation} vrednovanje. Kod vanjskog vrednovanja, osim ulaznih podataka dostupne su nam i njihove oznake, dok to nije slučaj kod unutarnjeg vrednovanja.
+
+\section{Unutarnje vrednovanje}
+Unutarnje vrednovanje nastoji nekom grupiranju dodijeliti ocjenu samo na temelju ulaznih podataka i oznaka koje je generiralo grupiranje. Kriteriji vrednovanja najčećše daju veće ocjene grupiranjima koja stvaraju grupe u kojima su točke međusobno slične, a različite u odnosu na točke iz ostalih grupa. Nedostatak takvih vrednovanja jest taj da će ono dati bolje rezultate algoritmima koji upravo nastoje povećati ocjenu tog specifičnog vrednovanja, a da takav algoritam nije u stvarnosti obavio grupiranje na optimalan način.
+
+\subsection{Metoda siluete}
+Metoda siluete je grafička metoda kojom se mjeri koliko je svaka točka iz $\mathcal{D}$ slična svojoj grupi u odnosu na ostale grupe. Svakoj točki se pridružuje \textbf{vrijednost siluete}. Za svaku točku $\mathbf{x}^{(i)}$ iz ulaznog skupa točaka $\mathcal{D} = \left\{\mathbf{x}^{(i)}\right\}_{i=1}^{N}$ uvedimo oznaku $\mathcal{C} \left(i\right)$ koja označava grupu kojoj pripada ta točka. Također na raspolaganju imamo grupiranje koje je generiralo promatrani algoritam, odnosno skup od $K$ grupa $\Gamma = \left\{\mathcal{C}_k\right\}_{k=1}^{K}$.
+Prije nego što definiramo vrijednost siluete $s (i)$, definirajmo $a (i)$ kao prosječnu udaljenost točke $\mathbf{x}^{(i)}$ do ostalih točaka u svojoj grupi):
+\[a (i) = \frac{1}{\left\vert \mathcal{C} \left(i\right) \right\vert - 1} \sum_{\substack{\mathbf{y} \in \mathcal{C} \left(i\right) \\ \mathbf{y} \neq \mathbf{x}^{(i)}}} d \left(\mathbf{x}^{(i)}, \mathbf{y}\right)
+\]
+Zatim definirajmo $b (i)$ kao prosječnu udaljenost točke $\mathbf{x}^{(i)}$ do točaka najbliže grupe:
+\[b (i) = \min_{\substack{\mathcal{C} \in \Gamma \\ \mathcal{C} \neq \mathcal{C} \left(i\right)}} \frac{1}{\vert \mathcal{C} \vert} \sum_{\mathbf{y} \in \mathcal{C}}
+d \left(\mathbf{x}^{(i)}, \mathbf{y}\right)\]
+Vrijednost siluete se tada definira kao
+\[s (i) = \frac{b (i) - a (i)}{\operatorname{max} \left\{a (i), b (i)\right\}}\]
+a u slučaju da je točka $\mathbf{x}^{(i)}$ sama u svojoj grupi, odnosno $\left\vert \mathcal{C} \left(i\right) \right\vert = 1$, tada je $s (i) = 0$ jer vrijednost $a (i)$ nema smisla. Uzimajući u obzir međusobne odnose $a (i)$ i $b (i)$, definiciju vrijednosti siluete možemo izraziti na sljedeći način:
+\[
+s (i) = \begin{cases}
+ 0 & \text{ako} \; \left\vert \mathcal{C} \left(i\right) \right\vert = 1 \\
+ 1 - \frac{a (i)}{b (i)} & \text{ako} \; a (i) < b (i) \\  
+ 0 & \text{ako} \; a (i) = b (i) \\  
+ \frac{b (i)}{a (i)} - 1 & \text{ako} \; a (i) > b(i)  
+ \end{cases}
+\]
+Jasno je vidljivo iz ovakve definicije vrijednosti siluete da ona može samo poprimiti vrijednosti između -1 i 1, odnosno $-1 \leq s (i) \geq 1$. Kako $a (i)$ mjeri koliko je točka $\mathbf{x}^{(i)}$ blizu ostalim točkama iz svoje grupe, manja vrijedost $a(i)$ znači veću sličnost $\mathbf{x}^{(i)}$ sa ostalim točkama iz svoje grupe. S druge strane, $b(i)$ mjeri koliko je $\mathbf{x}^{(i)}$ blizu točkama iz najbliže susjedne grupe, stoga veća vrijednost $b (i)$ znači veću ‘‘razdvojenost’’, odnosno veću različitost od ostalih grupa. Prema tome, kada je $a(i)$ puno manji od $b(i)$, vrijednost siluete $s (i)$ će biti blizu 1, što označava dobro grupiranje konkretno za promatranu točku. Analogno, kada je $b (i)$ puno veći od $a (i)$, to znači da je točka bliža nekoj drugoj grupi nego vlastitoj. Tada će $s(i)$ biti blizu -1 i to označava loše grupiranje. Vrijednost siluete blizu 0 znači da se $a(i)$ i $b(i)$ malo razlikuju, što znači da je točka $\mathbf{x}^{(i)}$ na granici dvije grupe.
+%TODO: NASTAVITI METODU SILUETE%
+
+\section{Vanjsko vrednovanje}
+Vanjsko vrednovanje, uz ulazne podatke i grupe koje je promatrani algoritam generirao, na raspolaganju ima i oznake svake točke koje otkrivaju referentno grupiranje. Te oznake nisu poznate postupcima nenadziranog strojnog učenja, pa tako i algoritmima grupiranja. Do njih je ponekad moguće doći primjerice ljudskom ocjenom ulaznog skupa primjera, ili smo ih mogli imati od prije, no odlučili smo ih ne specificirati metodama nenadziranog strojnog učenja (pa tako i grupiranja).
+
+
+\subsection{Randov indeks}
+Randov indeks mjeri preciznost grupiranja tako da promatra sve parove ulaznih primjera i uspoređuje dva grupiranja istovremeno. Jedno grupiranje je ono koje je generirao algoritam grupiranja, a drugo grupiranje (referentno grupiranje) je prema prethodno poznatim oznakama: dva primjera su u istoj grupi ako imaju istu oznaku. Za svaki mogući par promatramo jesu li završili u istoj grupi, i jesu li oni u istoj grupi kod referentnog grupiranja. Parove ulaznih primjera tada dijelimo na:
+\begin{enumerate}
+    \item \textbf{istinito pozitivne} \engl{true positive}: primjeri se nalaze u istoj grupi u oba grupiranja, broj takvih parova označimo sa $TP$;
+    \item \textbf{istinito negativne} \engl{true negative}: primjeri se nalaze u različitim grupama u oba grupiranja, broj takvih parova označimo sa $TN$;
+    \item \textbf{lažno pozitivne} \engl{false positive}: primjeri se nalaze u istoj grupi u dobivenom grupiranju, a u referentnom grupiranju se nalaze u različitim grupama, broj takvih parova označimo sa $FP$;
+    \item \textbf{lažno negativne} \engl{false negative}: primjeri se nalaze u različitim grupama u dobivenom grupiranju, a u referentnom grupiranju se nalaze u istoj grupi, broj takvih parova označimo sa $FN$;
+\end{enumerate}
+
+Parovi primjera su dobro grupirani ako situacija odgovara referentnom grupiranju, dakle zanimaju nas primjeri koji su istinito pozitivni i istinito negativni.
+Randov indeks $R$ se tada definira kao:
+\[R = \frac{TP + TN}{TP + TN + FP + FN} = \frac{TP + TN}{\binom{N}{2}}\]
+Jasno je da su u nazivniku pokriveni svi mogući parovi ulaznih primjera, broj takvih parova znamo da mora biti $\binom{N}{2}$.
+
+Kao primjer uzmimo da su podaci skup od 6 prirodnih brojeva od 1 do 6. Pretpostavimo da smo podatke grupirali na sljedeći način:
+\[\left\{ \left\{1, 2, 4\right\}, \left\{3, 5\right\} \right\}\]
+U programskim implementacijama obično se grupiranje specificira nizom oznakama. Za ovaj primjer bi onda u pitanju bio niz $\left\{0, 0, 1, 0, 1\right\}$ (kod oznaka je samo bitno da primjeri iste grupe imaju istu oznaku, kakva je oznaka je nebitno). Pretpostavimo da je referentno grupiranje:
+\[\left\{\left\{1,2\right\}, \left\{3,4\right\}, \left\{5\right\}\right\}\]
+odnosno u terminima oznaka bi onda specificirali nešto poput $\left\{0, 0, 1, 1, 2\right\}$.
+Za ovaj primjer je $TP = 1$ jer samo par 12 se nalazi u istim grupama u oba grupiranja, a $TN = 5$ i radi se o parovima 13, 15, 23, 25, 45. Prema tome $R = \frac{1 + 5}{\binom{5}{2}} = \frac{6}{10} = 0.6$.
 
 \chapter{Programsko ostvarenje i rezultati}
 Programsko ostvarenje i rezultati.
@@ -386,4 +436,3 @@ Abstract.
 \end{abstract}
 
 \end{document}
-
