@@ -45,3 +45,10 @@ abstract = {A new graphical display is proposed for partitioning techniques. Eac
 
 https://en.wikipedia.org/wiki/Silhouette_(clustering)
 https://en.wikipedia.org/wiki/Rand_index
+
+http://cs.uef.fi/sipu/pub/DBI-SPC2000.pdf
+
+https://en.wikipedia.org/wiki/Multivariate_normal_distribution
+https://en.wikipedia.org/wiki/Maximum_likelihood_estimation
+https://en.wikipedia.org/wiki/Mixture_model#General_mixture_model
+https://en.wikipedia.org/wiki/Expectation%E2%80%93maximization_algorithm

@@ -226,7 +226,7 @@ $\mathcal{I} = \left\{ \boldsymbol{\mu}_k \right\}_{k=1}^{K}$}
 \STATE{$\mathcal{I} \gets \mathcal{I} \cup \left\{ \mathbf{x} \right\}$}
 \STATE{$\widehat{\mathcal{D}} \gets \widehat{\mathcal{D}} \setminus
         \left\{ \mathbf{x} \right\}$}
-\WHILE{dokle god $\left\vert \widehat{\mathcal{D}} \right\vert < K$}
+\WHILE{dokle god $\left\vert \mathcal{I} \right\vert < K$}
 \STATE{$\boldsymbol{\mu} \gets \argmax_{\textbf{x} \in \widehat{\mathcal{D}}} 
         \left\Vert \mathbf{x} - \argmin_{\boldsymbol{\mu}' \in \mathcal{I}}
                 \Vert \mathbf{x} - \boldsymbol{\mu}' \Vert
@@ -249,10 +249,179 @@ Nakon što se izračunaju vjerojatnosti za svaku od neodabranih točaka iz $\wid
 K-means++ u praksi daje bolje rezultate od varijante K-sredina u kojem se početni centroidi odabiru slučajno. Iznosi kriterijskih funkcija ispadaju manji i algoritam prije konvergira, odnosno potreban je manji broj iteracija do stacionarnog stanja.
 
 \section{Model Gaussove mješavine}
-GMM i EM.
+\label{gmm}
+\textbf{Model Gaussove mješavine} \engl{Gaussian mixture model, GMM} je najčešće korišten algoritam mekog probabilističkog grupiranja koji kao cilj ima svakoj točki iz $\mathcal{D}$ pridružiti vjerojatnosti da pripada različitim grupama: tzv.\ \textbf{odgovornost}. Model Gaussove mješavine pretpostavlja da su podaci ‘‘nastali’’ iz kombinacije (mješavine) $K$ različitih vjerojatnosnih distribucija, odnosno gustoća. Svaka od $K$ grupa je predstavljena svojom vjerojatnosnom gustoćom, a u slučaju Gaussovih mješavina, radi se o multivarijatnim $n$-dimenzijskim normalnim (Gaussovim) razdiobama. To znači da je svaka grupa predstavljena svojom višedimenzijskom normalnom razdiobom: svojom lokacijom, kovarijacijskom matricom i vjerojatnosnom gustoćom.
+
+\subsection{Multivarijatna normalna razdioba}
+Slučajni $n$-dimenzijski stupčani vektor $\mathbf{X} = \left(X_1, \dots, X_n\right)^{\mathrm{T}}$ ima multivarijatnu normalnu razdiobu, odnosno
+\[\mathbf{X} \sim \mathcal{N} \left(\boldsymbol{\mu}, \boldsymbol{\Sigma}\right)\]
+sa \textbf{lokacijom}
+$\boldsymbol{\mu} = \left(\operatorname{E}[X_1], \dots, \operatorname{E}[X_n]\right)^{\mathrm{T}}$ i \textbf{kovarijacijskom matricom} $\boldsymbol{\Sigma}$ kada svaka komponenta $X_i$ ima univarijatnu normalnu razdiobu. Kovarijacijska matrica je simetrična, pozitivno semidefinitna matrica reda $n \times n$ čiji elementi predstavljaju kovarijancu između komponenata, odnosno
+\[\boldsymbol{\Sigma}_{i,j} = \operatorname{cov}
+\left[X_i, X_j\right] 
+= \operatorname{E}\left[ 
+            \left(X_i - \operatorname{E}[X_i]\right)
+            \left(X_j - \operatorname{E}[X_j]\right)
+\right]
+\]
+Funkcija gustoće takvog slučajnog vektora tada glasi:
+\begin{equation}
+\label{gaussdensity}
+p \left(\mathbf{x} \middle| \boldsymbol{\mu}, \boldsymbol{\Sigma}\right)
+= \frac{1}{\sqrt{\left(2 \pi\right)^n \operatorname{det} \left(\boldsymbol{\Sigma}\right)}}
+\exp{\left(
+    -\frac{1}{2}
+        \left(\mathbf{x} - \boldsymbol{\mu}\right)^{\mathrm{T}}
+        \boldsymbol{\Sigma}^{-1}
+        \left(\mathbf{x} - \boldsymbol{\mu}\right)
+\right)}
+\end{equation}
+
+\subsection{Model miješane gustoće}
+Model miješane gustoće, pa tako i model Gaussove mješavine, je \textbf{generativan model} podataka koji svaki primjer generira, odnosno uzorkuje, iz miješane gustoće: linearne kombinacije $K$ gustoća svake grupe, odnosno $K$ komponenata. Svaki podatak u tom modelu se uzorkuje na sljedeći način: prvo se prema kategoričkoj distribuciji grupa, koje možemo promatrati kao apriorno nepoznate oznake $y$ (jer govorimo o nenadziranom strojnom učenju), odabere grupa $k$. Označimo sa $P \left(y = k\right)$ vjerojatnost da je odabrana grupa $k$. Nakon što se odabere grupa, primjer $\mathbf{x}$ se onda uzorkuje prema vjerojatnosnoj gustoći te grupe koju ćemo označiti sa $p \left(\mathbf{x} \middle| y = k\right)$, odnosno ako označimo parametre distribucije (gustoće) grupe $k$ sa $\boldsymbol{\theta}_k$, onda tu vjerojatnost možemo označiti sa $p \left(\mathbf{x} \middle| \boldsymbol{\theta}_k\right)$. Apriornu gustoću $p \left(\mathbf{x}\right)$ iz koje su uzorkovani ulazni primjeri možemo iskazati prema formuli potpune vjerojatnosti:
+\begin{equation}
+\label{mixdensity}
+p \left(\mathbf{x}\right)
+=
+\sum_{k=1}^{K} P \left(y = k\right) p \left(\mathbf{x} \middle| y = k\right)
+=
+\sum_{k=1}^{K} \pi_k \, p \left(\mathbf{x} \middle| \boldsymbol{\theta}_k\right)
+\end{equation}
+Uveli smo oznaku $\pi_k = P \left(y = k\right)$, i tu vjerojatnost nazivamo \textbf{koeficijent mješavine} \engl{mixture weight}. U slučaju modela Gaussove mješavine, gustoća grupe $p \left(\mathbf{x} \middle| \boldsymbol{\theta}_k\right)$ se računa prema \ref{gaussdensity}, gdje su parametri grupe
+$\boldsymbol{\theta}_k = \left\{
+    \boldsymbol{\mu}_k, \boldsymbol{\Sigma}_k
+\right\}$.\\
+Ono što nas zanima kod mekog grupiranja jest kolika je vjerojatnost da primjer $\mathbf{x}$ pripada nekoj grupi $k$, odnosno zapravo nas zanima $P \left(y = k \middle| \mathbf{x}\right)$. Za svaki podatak $\mathbf{x}^{(i)}$ iz skupa od $N$ ulaznih primjera $\mathcal{D} = \left\{\mathbf{x}^{(i)}\right\}_{i=1}^{N}$ nas zanima odgovornost: vjerojatnost da je $\mathbf{x}^{(i)}$ uzorkovan iz grupe $k$. To možemo izraziti Bayesovom formulom:
+\begin{equation}
+\label{odgovornost}
+P \left(y = k \middle| \mathbf{x}^{(i)}\right)
+=
+\frac
+{P \left(y = k\right) p \left(\mathbf{x}^{(i)} \middle| y = k\right)}
+{p \left(\mathbf{x}^{(i)}\right)}
+=
+\frac
+{\pi_k \, p \left(\mathbf{x}^{(i)} \middle| \boldsymbol{\theta}_k\right)}
+{\sum_{j=1}^{K} \pi_j \, p \left(\mathbf{x}^{(i)} \middle| \boldsymbol{\theta}_j\right)}
+\end{equation}
+Da bismo mogli računati ovakvu vjerojatnost, moramo poznavati parametre modela miješane. To znači da za svaku od $K$ komponenata moramo poznavati koeficijent mješavine i parametre gustoće svake komponente. U slučaju Gaussove mješavine, parametri svake komponente su lokacije i kovarijacijske matrice svake komponente. Označimo parametre modela sa
+\[\boldsymbol{\theta} 
+= \left\{ \pi_k, \boldsymbol{\theta}_k \right\}_{k=1}^{K}
+= \left\{ \pi_k, \boldsymbol{\mu}_k, \boldsymbol{\Sigma}_k \right\}_{k=1}^{K}
+\]
+U sljedećem poglavlju ćemo se baviti pitanjem na koji način i kojim kriterijem određujemo parametre modela $\boldsymbol{\theta}$.
+
+\subsection{Metoda najveće izglednosti}
+Parametre modela $\boldsymbol{\theta}$ procjenjujemo \textbf{metodom najveće izglednosti} \engl{maximum likelihood estimation}. Definirajmo funkciju izglednosti parametara $\boldsymbol{\theta}$ na uzorku $\mathcal{D}$. Pretpostavimo da su primjeri iz uzorka nezavisni, tada možemo funkciju izglednosti definirati kao umnožak gustoća svakog primjera iz uzorka:
+\[L \left(\boldsymbol{\theta} ; \mathcal{D} \right)
+= \prod_{i=1}^{N} p \left( \mathbf{x}^{(i)} \right)
+= \prod_{i=1}^{N} 
+\sum_{k=1}^{K} \pi_k \, p \left(\mathbf{x}^{(i)} \middle| \boldsymbol{\theta}_k\right)
+\]
+Iz definicije i iz \ref{mixdensity} je jasno da funkcija izglednosti ovisi o parametrima $\boldsymbol{\theta}$.
+
+Cilj metode najveće najveće izglednosti jest procijeniti parametre $\boldsymbol{\theta}$, koji će uz uzorak $\mathcal{D}$ maksimizirati funkciju izglednosti. Drugim riječima, potrebno je pronaći parametre koje od svih mogućih parametara (tzv.\ prostor parametara $\boldsymbol{\Theta}$) maksimiziraju vjerojatnost pojavljivanja podataka iz uzorka $\mathcal{D}$. Formalno, tražimo
+\[\widehat{\boldsymbol{\theta}}_{\text{mle}} =
+\argmax_{\boldsymbol{\theta} \in \boldsymbol{\Theta}}
+L \left(\boldsymbol{\theta} ; \mathcal{D} \right)
+\]
+Vrlo često u praksi se ne maksimizira funkcija izglednosti, nego \textbf{log-izglednosti}:
+\[\ell \left(\boldsymbol{\theta} ; \mathcal{D} \right) 
+= \ln {L \left(\boldsymbol{\theta} ; \mathcal{D} \right)}
+= \ln{\prod_{i=1}^{N} 
+\sum_{k=1}^{K} \pi_k \, p \left(\mathbf{x}^{(i)} \middle| \boldsymbol{\theta}_k\right)}
+= \sum_{i=1}^{N} \ln{ 
+\sum_{k=1}^{K} \pi_k \, p \left(\mathbf{x}^{(i)} \middle| \boldsymbol{\theta}_k\right)
+}
+\]
+Razlog tomu je taj što primjerice u našem slučaju radimo sa produktom, a lakše nam je raditi sa sumama, a logaritmiranje će produkte pretvoriti u sume. Zbog toga što je prirodni logaritam monotono rastuća funkcija, kad god se postiže maksimum funkcije izglednosti, tada i log-izglednost postiže svoj maksimum:
+\[\widehat{\boldsymbol{\theta}}_{\text{mle}} =
+\argmax_{\boldsymbol{\theta} \in \boldsymbol{\Theta}}
+L \left(\boldsymbol{\theta} ; \mathcal{D} \right)
+= \argmax_{\boldsymbol{\theta} \in \boldsymbol{\Theta}}
+\ell \left(\boldsymbol{\theta} ; \mathcal{D} \right)
+= \argmax_{\boldsymbol{\theta} \in \boldsymbol{\Theta}}
+\sum_{i=1}^{N} \ln{ 
+\sum_{k=1}^{K} \pi_k \, p \left(\mathbf{x}^{(i)} \middle| \boldsymbol{\theta}_k\right)
+}
+\]
+Ovakav optimizacijski problem nema rješejne u zatvorenoj formi, stoga su potrebne iterativne optimizacijske metode koje će pokušati maksimizirati log-izglednost. Jedan od takvih metoda je \textbf{algoritam maksimizacije očekivanja}.
+
+\subsection{Algoritam maksimizacije očekivanja}
+Algoritam maksimizacije očekivanja \engl{expectation-maximization algorithm, EM} se osniva na proširenju generativnog modela opisanog u \ref{gmm} sa tzv.\ \textbf{skrivenim (latentnim) varijablama} koje modeliraju vrijednosti koje ne opažamo u podacima. Takvo proširenje modela u konačnici omogućuje pronalazak iterativnog postupka koji postupno povećava log-izglednost. Proširenje modela i matematičke formulacije iza njega nećemo navoditi, nego ćemo samo iskazati konačni algoritam.
+
+EM algoritam ima vrlo sličnu strukturu kao i algoritam K-sredina. Najprije se na neki način inicijaliziraju parametri modela Gaussove mješavine $\boldsymbol{\theta} = 
+\left\{\pi_k, \boldsymbol{\mu}_k, \boldsymbol{\Sigma}_k\right\}_{k=1}^{K}$ kao što je algoritam K-sredina inicijalizirao početnih $K$ centroida. Broj komponenata Gaussove mješavine $K$ je, kao i kod algoritma K-sredina, parametar algoritma (razlikovati od parametara modela) i on u smislu algoritma mora biti unaprijed poznat. Nakon što su inicijalizirani parametri modela, iterativni postupak počinje. Najprije se za sve ulazne primjere računa odgovornost za svaku komponentu, odnosno grupu, prema formuli \ref{odgovornost}. Taj korak kod EM algoritma se naziva \textbf{E-korak}. U usporedbi sa algoritmom K-sredina, ovo je analogno pridruživanju točaka najbližim centroidima, što je bilo ‘‘tvrdo’’ pridruživanje, a sada se radi o probabilističkom mekom pridruživanju. Nakon što se izračunaju odgovornosti, parametri modela se iznova računaju na temelju novih izračunatih odgovornosti, što je analogno ponovnom računanju centroida kod algoritma K-sredina. Taj korak se naziva \textbf{M-korak}. Koraci E i M se ponavljaju do konvergencije parametara ili log-izglednosti. Uvedimo oznaku odgovornosti
+\[h_{k}^{(i)} = P \left(y = k \middle| \mathbf{x}^{(i)}\right)\]
+Formalno opišimo algoritam:
+
+\begin{croatianalgorithm}
+\label{em}
+\caption{Algoritam maksimizacije očekivanja nad GMM}
+\begin{algorithmic}
+
+\STATE{\textbf{Parametri:} broj grupa, odnosno komponenata $K$}
+\STATE{\textbf{Ulaz:} skup ulaznih primjera 
+$\mathcal{D} = \left\{ \mathbf{x}^{(i)} \right\}_{i=1}^{N}$}
+\STATE{\textbf{Izlaz:} parametri modela
+$\boldsymbol{\theta} = \left\{ 
+    \pi_k, \boldsymbol{\mu}_k, \boldsymbol{\Sigma}_k
+\right\}_{k=1}^{K}$}
+\STATE{}
+
+\STATE{\textbf{inicijaliziraj} parametre modela 
+$\boldsymbol{\theta} = \left\{ 
+    \pi_k, \boldsymbol{\mu}_k, \boldsymbol{\Sigma}_k
+\right\}_{k=1}^{K}$}
+
+\REPEAT
+\STATE{\textbf{E-korak:}}
+\FORALL{ $\mathbf{x}^{(i)} \in \mathcal{D}$ i 
+    $k \in \left\{1, \dots, K\right\}$ }
+    \STATE{$h_{k}^{(i)} \gets 
+    \frac
+{\pi_k \, p \left(\mathbf{x}^{(i)} \middle| \boldsymbol{\mu}_k, \boldsymbol{\Sigma}_k\right)}
+{\sum_{j=1}^{K} \pi_j \, p \left(\mathbf{x}^{(i)} \middle| \boldsymbol{\mu}_j, \boldsymbol{\Sigma}_j\right)}
+    $}
+\ENDFOR
+\STATE{}
+
+\STATE{\textbf{M-korak:}}
+\FORALL{ $k \in \left\{1, \dots, K\right\}$ }
+    \STATE{$\boldsymbol{\mu}_k
+    \gets \frac{\sum_{i=1}^{N} h_{k}^{(i)} \mathbf{x}^{(i)}}
+    {\sum_{i=1}^{N} h_{k}^{(i)}}
+    $}
+    \STATE{$\boldsymbol{\Sigma}_k \gets
+    \frac
+    {\sum_{i=1}^{N} h_{k}^{(i)}
+        \left( \mathbf{x}^{(i)} - \boldsymbol{\mu}_k \right)
+        \left( \mathbf{x}^{(i)} - \boldsymbol{\mu}_k \right)^{\mathrm{T}}}
+    {\sum_{i=1}^{N} h_{k}^{(i)}}$}
+    \STATE{$\pi_k \gets 
+    \frac{1}{N} \sum_{i=1}^{N} h_{k}^{(i)}$}
+\ENDFOR
+\STATE{}
+\STATE{$\ell \left(\boldsymbol{\theta} ; \mathcal{D} \right) 
+\gets \sum_{i=1}^{N} \ln{ 
+\sum_{k=1}^{K} \pi_k \, p \left(\mathbf{x}^{(i)} \middle| \boldsymbol{\mu}_k, \boldsymbol{\Sigma}_k\right)
+}$}
+\UNTIL{ne konvergiraju parametri $\boldsymbol{\theta}$ ili log-izglednost $\ell \left(\boldsymbol{\theta} ; \mathcal{D} \right)$}
+\RETURN{$\boldsymbol{\theta}$}
+
+\end{algorithmic}
+\end{croatianalgorithm}
+Iz ‘‘natreniranih’’ parametara modela lako možemo izračunati odgovornosti iz formule \ref{odgovornost}, što je rezultat mekog grupiranja:
+\[
+P \left(y = k \middle| \mathbf{x}^{(i)}\right) =
+h_{k}^{(i)} =
+\frac
+{\pi_k \, p \left(\mathbf{x}^{(i)} \middle| \boldsymbol{\mu}_k, \boldsymbol{\Sigma}_k\right)}
+{\sum_{j=1}^{K} \pi_j \, p \left(\mathbf{x}^{(i)} \middle| \boldsymbol{\mu}_j, \boldsymbol{\Sigma}_j\right)}
+\]
 
 \section{Hijerarhijsko aglomerativno grupiranje}
-U poglavlju \ref{vrstegrupiranja} smo naveli na koji način hijerarhijsko grupiranje gradi grupe, te smo spomenuli dva pristupa hijerarhijskog grupiranja: aglomerativno i divizivno. U ovom poglavlju ćemo se baviti standardnim algoritmom hijerarhijskog aglomerativnog grupiranja. Također smo u poglavlju \ref{vrstegrupiranja} dali primjer jednog hijerarhijskog aglomerativnog grupiranja na slici \ref{fig:hier_clustering} i vidjeli spajanje grupa. Odluka koje dvije grupe spojiti nije slučajna, stoga prije formalnog opisa algoritma potrebno je prvo definirati pojmove vezane za spajanje grupa.
+U poglavlju \ref{vrstegrupiranja} smo naveli na koji način hijerarhijsko grupiranje gradi grupe, te smo spomenuli dva pristupa hijerarhijskog grupiranja: aglomerativno i divizivno. U ovom poglavlju ćemo se baviti standardnim algoritmom \textbf{hijerarhijskog aglomerativnog grupiranja} \engl{hierarchical agglomerative clustering, HAC}. Također smo u poglavlju \ref{vrstegrupiranja} dali primjer jednog hijerarhijskog aglomerativnog grupiranja na slici \ref{fig:hier_clustering} i vidjeli spajanje grupa. Odluka koje dvije grupe spojiti nije slučajna, stoga prije formalnog opisa algoritma potrebno je prvo definirati pojmove vezane za spajanje grupa.
 
 \subsection{Spajanje grupa}
 Odluka koje dvije grupe spojiti se temelji na \textbf{kriteriju spajanja} \engl{linkage criterion}. Kriterij spajanja mjeri koliko su dvije grupe slične, odnosno različite. On se temelji na nekoj od mjera sličnosti između dviju točaka, bila to udaljenost, sličnost ili različitost, i njih smo opisali u poglavlju \ref{vrstegrupiranja}. Najčešće se u svrhu definiranja kriterija spajanja koriste mjere udaljenosti, no mogu se koristiti i mjere sličnosti ili različitosti.
@@ -365,12 +534,26 @@ Dosad smo se bavili problemom grupiranja: na koji način podijeliti ulazni skup 
 \section{Unutarnje vrednovanje}
 Unutarnje vrednovanje nastoji nekom grupiranju dodijeliti ocjenu samo na temelju ulaznih podataka i oznaka koje je generiralo grupiranje. Kriteriji vrednovanja najčećše daju veće ocjene grupiranjima koja stvaraju grupe u kojima su točke međusobno slične, a različite u odnosu na točke iz ostalih grupa. Nedostatak takvih vrednovanja jest taj da će ono dati bolje rezultate algoritmima koji upravo nastoje povećati ocjenu tog specifičnog vrednovanja, a da takav algoritam nije u stvarnosti obavio grupiranje na optimalan način.
 
-\subsection{Metoda siluete}
-Metoda siluete je grafička metoda kojom se mjeri koliko je svaka točka iz $\mathcal{D}$ slična svojoj grupi u odnosu na ostale grupe. Svakoj točki se pridružuje \textbf{vrijednost siluete}. Za svaku točku $\mathbf{x}^{(i)}$ iz ulaznog skupa točaka $\mathcal{D} = \left\{\mathbf{x}^{(i)}\right\}_{i=1}^{N}$ uvedimo oznaku $\mathcal{C} \left(i\right)$ koja označava grupu kojoj pripada ta točka. Također na raspolaganju imamo grupiranje koje je generiralo promatrani algoritam, odnosno skup od $K$ grupa $\Gamma = \left\{\mathcal{C}_k\right\}_{k=1}^{K}$.
+\subsection{Davies-Bouldin indeks}
+Davies-Bouldin indeks promatra sve parove grupa i bilježi koliko su grupe udaljene, kao i koliko su grupe same po sebi raspršene. Neka je dano grupiranje $\Gamma = \left\{\mathcal{C}_k\right\}_{k=1}^{K}$. Definirajmo $S_i$ kao mjeru prosječnu kvadratnu udaljenost točaka iz grupe $\mathcal{C}_i$ od centroida $\boldsymbol{\mu}_i$ te grupe:
+\[S_i = \frac{1}{\left\vert \mathcal{C}_i \right\vert}
+\sum_{\mathbf{x} \in \mathcal{C}_i} \Vert \mathbf{x} - \boldsymbol{\mu}_i  \Vert^2
+\]
+$S_i$ je mjera raspršenja unutar grupe $\mathcal{C}_i$. Naravno, da bismo mogli prema ovakvoj definiciji računati $S_i$, potrebno je da se može izračunati centroid, a prisjetimo se da je to moguće jedino ako podaci dolaze iz nekog vektorskog prostora. Također smo rekli da se najčešće radi o realnom koordinatnom prostoru pa se koristi Euklidska udaljenost i Euklidska norma. Definirajmo $M_{ij}$ kao udaljenost centroida grupa $\mathcal{C}_i$ i $\mathcal{C}_j$:
+\[M_{ij} = \Vert \boldsymbol{\mu}_i - \boldsymbol{\mu}_j \Vert\]
+$M_{ij}$ mjeri koliko dobro su razdvojene grupe u smislu koliko su im udaljeni centroidi. Definirajmo $R_{ij}$ kao
+\[R_{ij} = \frac{S_i + S_j}{M_{ij}}\]
+Ono mjeri koliko dobro su grupirane međusobno grupe $\mathcal{C}_i$ i $\mathcal{C}_j$: veća razdvojenost i manje raspršenje unutar grupa će dati manji iznos $R_{ij}$, što znači bolje grupiranje između te dvije grupe. $R_{ij}$ se može shvatiti kao neka mjera sličnosti između dvije grupe. Definirajmo $R_i$ kao najveći iznos $R_{ij}$ za grupu $\mathcal{C}_i$ i sve ostale grupe:
+\[R_i = \max_{\substack{1 \leq j \leq K \\ j \neq i}} R_{ij}\]
+Davies-Bouldin indeks $DBI$ se tada definira kao
+\[DBI = \frac{1}{K} \sum_{k=1}^{K} R_k\]
+
+\subsection{Vrijednost siluete}
+Vrijednost siluete \engl{silhouette score} mjeri koliko je svaka točka iz $\mathcal{D}$ slična svojoj grupi u odnosu na ostale grupe, dakle svakoj točki se pridružuje vrijednost siluete. Metoda koja se zasniva na ovoj mjeri se naziva \textbf{metoda siluete} i tu metodu ćemo spomenuti u poglavlju. Za svaku točku $\mathbf{x}^{(i)}$ iz ulaznog skupa točaka $\mathcal{D} = \left\{\mathbf{x}^{(i)}\right\}_{i=1}^{N}$ uvedimo oznaku $\mathcal{C} \left(i\right)$ koja označava grupu kojoj pripada ta točka. Također na raspolaganju imamo grupiranje koje je generiralo promatrani algoritam, odnosno skup od $K$ grupa $\Gamma = \left\{\mathcal{C}_k\right\}_{k=1}^{K}$.
 Prije nego što definiramo vrijednost siluete $s (i)$, definirajmo $a (i)$ kao prosječnu udaljenost točke $\mathbf{x}^{(i)}$ do ostalih točaka u svojoj grupi):
 \[a (i) = \frac{1}{\left\vert \mathcal{C} \left(i\right) \right\vert - 1} \sum_{\substack{\mathbf{y} \in \mathcal{C} \left(i\right) \\ \mathbf{y} \neq \mathbf{x}^{(i)}}} d \left(\mathbf{x}^{(i)}, \mathbf{y}\right)
 \]
-Zatim definirajmo $b (i)$ kao prosječnu udaljenost točke $\mathbf{x}^{(i)}$ do točaka najbliže grupe:
+Zatim definirajmo $b (i)$ kao prosječnu udaljenost točke $\mathbf{x}^{(i)}$ do točaka najbliže grupe (najbližu u smislu prosječne udaljenosti):
 \[b (i) = \min_{\substack{\mathcal{C} \in \Gamma \\ \mathcal{C} \neq \mathcal{C} \left(i\right)}} \frac{1}{\vert \mathcal{C} \vert} \sum_{\mathbf{y} \in \mathcal{C}}
 d \left(\mathbf{x}^{(i)}, \mathbf{y}\right)\]
 Vrijednost siluete se tada definira kao
@@ -384,7 +567,7 @@ s (i) = \begin{cases}
  \frac{b (i)}{a (i)} - 1 & \text{ako} \; a (i) > b(i)  
  \end{cases}
 \]
-Jasno je vidljivo iz ovakve definicije vrijednosti siluete da ona može samo poprimiti vrijednosti između -1 i 1, odnosno $-1 \leq s (i) \geq 1$. Kako $a (i)$ mjeri koliko je točka $\mathbf{x}^{(i)}$ blizu ostalim točkama iz svoje grupe, manja vrijedost $a(i)$ znači veću sličnost $\mathbf{x}^{(i)}$ sa ostalim točkama iz svoje grupe. S druge strane, $b(i)$ mjeri koliko je $\mathbf{x}^{(i)}$ blizu točkama iz najbliže susjedne grupe, stoga veća vrijednost $b (i)$ znači veću ‘‘razdvojenost’’, odnosno veću različitost od ostalih grupa. Prema tome, kada je $a(i)$ puno manji od $b(i)$, vrijednost siluete $s (i)$ će biti blizu 1, što označava dobro grupiranje konkretno za promatranu točku. Analogno, kada je $b (i)$ puno veći od $a (i)$, to znači da je točka bliža nekoj drugoj grupi nego vlastitoj. Tada će $s(i)$ biti blizu -1 i to označava loše grupiranje. Vrijednost siluete blizu 0 znači da se $a(i)$ i $b(i)$ malo razlikuju, što znači da je točka $\mathbf{x}^{(i)}$ na granici dvije grupe.
+Jasno je vidljivo iz ovakve definicije vrijednosti siluete da ona može samo poprimiti vrijednosti između -1 i 1, odnosno $-1 \leq s (i) \leq 1$. Kako $a (i)$ mjeri koliko je točka $\mathbf{x}^{(i)}$ blizu ostalim točkama iz svoje grupe, manja vrijedost $a(i)$ znači veću sličnost $\mathbf{x}^{(i)}$ sa ostalim točkama iz svoje grupe. S druge strane, $b(i)$ mjeri koliko je $\mathbf{x}^{(i)}$ blizu točkama iz najbliže susjedne grupe, stoga veća vrijednost $b (i)$ znači veću ‘‘razdvojenost’’, odnosno veću različitost od ostalih grupa. Prema tome, kada je $a(i)$ puno manji od $b(i)$, vrijednost siluete $s (i)$ će biti blizu 1, što označava dobro grupiranje konkretno za promatranu točku. Analogno, kada je $b (i)$ puno veći od $a (i)$, to znači da je točka bliža nekoj drugoj grupi nego vlastitoj. Tada će $s(i)$ biti blizu -1 i to označava loše grupiranje. Vrijednost siluete blizu 0 znači da se $a(i)$ i $b(i)$ malo razlikuju, što znači da je točka $\mathbf{x}^{(i)}$ na granici dvije grupe.
 %TODO: NASTAVITI METODU SILUETE%
 
 \section{Vanjsko vrednovanje}
@@ -436,3 +619,4 @@ Abstract.
 \end{abstract}
 
 \end{document}
+
