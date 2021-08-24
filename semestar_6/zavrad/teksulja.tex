@@ -29,7 +29,7 @@
 \begin{document}
 
 % TODO: Navedite broj rada.
-\thesisnumber{000}
+\thesisnumber{121}
 
 % TODO: Navedite naslov rada.
 \title{Usporedba metoda grupiranja primjenom programskog jezika Python}
@@ -287,7 +287,9 @@ p \left(\mathbf{x}\right)
 =
 \sum_{k=1}^{K} \pi_k \, p \left(\mathbf{x} \middle| \boldsymbol{\theta}_k\right)
 \end{equation}
-Uveli smo oznaku $\pi_k = P \left(y = k\right)$, i tu vjerojatnost nazivamo \textbf{koeficijent mješavine} \engl{mixture weight}. U slučaju modela Gaussove mješavine, gustoća grupe $p \left(\mathbf{x} \middle| \boldsymbol{\theta}_k\right)$ se računa prema \ref{gaussdensity}, gdje su parametri grupe
+Uveli smo oznaku $\pi_k = P \left(y = k\right)$, i tu vjerojatnost nazivamo \textbf{koeficijent mješavine} \engl{mixture weight}. Jasno je da mora vrijediti
+\[\sum_{k=1}^{K} \pi_k = 1\]
+U slučaju modela Gaussove mješavine, gustoća grupe $p \left(\mathbf{x} \middle| \boldsymbol{\theta}_k\right)$ se računa prema \ref{gaussdensity}, gdje su parametri grupe
 $\boldsymbol{\theta}_k = \left\{
     \boldsymbol{\mu}_k, \boldsymbol{\Sigma}_k
 \right\}$.\\
@@ -304,7 +306,7 @@ P \left(y = k \middle| \mathbf{x}^{(i)}\right)
 {\pi_k \, p \left(\mathbf{x}^{(i)} \middle| \boldsymbol{\theta}_k\right)}
 {\sum_{j=1}^{K} \pi_j \, p \left(\mathbf{x}^{(i)} \middle| \boldsymbol{\theta}_j\right)}
 \end{equation}
-Da bismo mogli računati ovakvu vjerojatnost, moramo poznavati parametre modela miješane. To znači da za svaku od $K$ komponenata moramo poznavati koeficijent mješavine i parametre gustoće svake komponente. U slučaju Gaussove mješavine, parametri svake komponente su lokacije i kovarijacijske matrice svake komponente. Označimo parametre modela sa
+Da bismo mogli računati ovakvu vjerojatnost, moramo poznavati parametre modela miješane gustoće. To znači da za svaku od $K$ komponenata moramo poznavati koeficijent mješavine i parametre gustoće svake komponente. U slučaju Gaussove mješavine, parametri svake komponente su lokacije i kovarijacijske matrice svake komponente. Označimo parametre modela sa
 \[\boldsymbol{\theta} 
 = \left\{ \pi_k, \boldsymbol{\theta}_k \right\}_{k=1}^{K}
 = \left\{ \pi_k, \boldsymbol{\mu}_k, \boldsymbol{\Sigma}_k \right\}_{k=1}^{K}
@@ -326,14 +328,16 @@ Cilj metode najveće najveće izglednosti jest procijeniti parametre $\boldsymbo
 L \left(\boldsymbol{\theta} ; \mathcal{D} \right)
 \]
 Vrlo često u praksi se ne maksimizira funkcija izglednosti, nego \textbf{log-izglednosti}:
-\[\ell \left(\boldsymbol{\theta} ; \mathcal{D} \right) 
+\begin{equation}
+\label{loglikelihood}
+\ell \left(\boldsymbol{\theta} ; \mathcal{D} \right) 
 = \ln {L \left(\boldsymbol{\theta} ; \mathcal{D} \right)}
 = \ln{\prod_{i=1}^{N} 
 \sum_{k=1}^{K} \pi_k \, p \left(\mathbf{x}^{(i)} \middle| \boldsymbol{\theta}_k\right)}
 = \sum_{i=1}^{N} \ln{ 
 \sum_{k=1}^{K} \pi_k \, p \left(\mathbf{x}^{(i)} \middle| \boldsymbol{\theta}_k\right)
 }
-\]
+\end{equation}
 Razlog tomu je taj što primjerice u našem slučaju radimo sa produktom, a lakše nam je raditi sa sumama, a logaritmiranje će produkte pretvoriti u sume. Zbog toga što je prirodni logaritam monotono rastuća funkcija, kad god se postiže maksimum funkcije izglednosti, tada i log-izglednost postiže svoj maksimum:
 \[\widehat{\boldsymbol{\theta}}_{\text{mle}} =
 \argmax_{\boldsymbol{\theta} \in \boldsymbol{\Theta}}
@@ -351,7 +355,7 @@ Ovakav optimizacijski problem nema rješejne u zatvorenoj formi, stoga su potreb
 Algoritam maksimizacije očekivanja \engl{expectation-maximization algorithm, EM} se osniva na proširenju generativnog modela opisanog u \ref{gmm} sa tzv.\ \textbf{skrivenim (latentnim) varijablama} koje modeliraju vrijednosti koje ne opažamo u podacima. Takvo proširenje modela u konačnici omogućuje pronalazak iterativnog postupka koji postupno povećava log-izglednost. Proširenje modela i matematičke formulacije iza njega nećemo navoditi, nego ćemo samo iskazati konačni algoritam.
 
 EM algoritam ima vrlo sličnu strukturu kao i algoritam K-sredina. Najprije se na neki način inicijaliziraju parametri modela Gaussove mješavine $\boldsymbol{\theta} = 
-\left\{\pi_k, \boldsymbol{\mu}_k, \boldsymbol{\Sigma}_k\right\}_{k=1}^{K}$ kao što je algoritam K-sredina inicijalizirao početnih $K$ centroida. Broj komponenata Gaussove mješavine $K$ je, kao i kod algoritma K-sredina, parametar algoritma (razlikovati od parametara modela) i on u smislu algoritma mora biti unaprijed poznat. Nakon što su inicijalizirani parametri modela, iterativni postupak počinje. Najprije se za sve ulazne primjere računa odgovornost za svaku komponentu, odnosno grupu, prema formuli \ref{odgovornost}. Taj korak kod EM algoritma se naziva \textbf{E-korak}. U usporedbi sa algoritmom K-sredina, ovo je analogno pridruživanju točaka najbližim centroidima, što je bilo ‘‘tvrdo’’ pridruživanje, a sada se radi o probabilističkom mekom pridruživanju. Nakon što se izračunaju odgovornosti, parametri modela se iznova računaju na temelju novih izračunatih odgovornosti, što je analogno ponovnom računanju centroida kod algoritma K-sredina. Taj korak se naziva \textbf{M-korak}. Koraci E i M se ponavljaju do konvergencije parametara ili log-izglednosti. Uvedimo oznaku odgovornosti
+\left\{\pi_k, \boldsymbol{\mu}_k, \boldsymbol{\Sigma}_k\right\}_{k=1}^{K}$ kao što je algoritam K-sredina inicijalizirao početnih $K$ centroida. Broj komponenata Gaussove mješavine $K$ je, kao i kod algoritma K-sredina, parametar algoritma (razlikovati od parametara modela) i on u smislu algoritma mora biti unaprijed poznat. Nakon što su inicijalizirani parametri modela, iterativni postupak počinje. Najprije se za sve ulazne primjere računa odgovornost za svaku komponentu, odnosno grupu, prema formuli \ref{odgovornost}. Taj korak kod EM algoritma se naziva \textbf{E-korak}. U usporedbi sa algoritmom K-sredina, ovo je analogno pridruživanju točaka najbližim centroidima, što je bilo ‘‘čvrsto’’ pridruživanje, a sada se radi o probabilističkom mekom pridruživanju. Nakon što se izračunaju odgovornosti, parametri modela se iznova računaju na temelju novih izračunatih odgovornosti, što je analogno ponovnom računanju centroida kod algoritma K-sredina. Taj korak se naziva \textbf{M-korak}. Koraci E i M se ponavljaju do konvergencije parametara ili log-izglednosti. Uvedimo oznaku odgovornosti
 \[h_{k}^{(i)} = P \left(y = k \middle| \mathbf{x}^{(i)}\right)\]
 Formalno opišimo algoritam:
 
@@ -419,6 +423,28 @@ h_{k}^{(i)} =
 {\pi_k \, p \left(\mathbf{x}^{(i)} \middle| \boldsymbol{\mu}_k, \boldsymbol{\Sigma}_k\right)}
 {\sum_{j=1}^{K} \pi_j \, p \left(\mathbf{x}^{(i)} \middle| \boldsymbol{\mu}_j, \boldsymbol{\Sigma}_j\right)}
 \]
+Na slici \ref{fig:gmmem} je prikazan tijek rada algoritma nad dvodimenzijskim primjerima sa zadanim brojem komponenata $K = 2$. 
+\begin{figure}[H]
+    \centering
+    \includegraphics[scale=0.7]{img/gmmem.jpg}
+    \caption{Tijek rada algoritma maksimizacije očekivanja nad modelom Gaussovih mješavina}
+    \label{fig:gmmem}
+\end{figure}
+Nijanse boja točaka označuju u kojoj mjeri točka pripada pojedinim grupama. Nakon svake iteracije se lokacije (zamišljene točke sa crnim obrubom) i kovarijacijske matrice (vizualizirane elipsama) mijenjaju dok se ne postigne stacionarno stanje: konvergencija log-izglednosti ili parametara modela. 
+
+\subsection{Svojstva i složenost algoritma}
+Algoritam maksimizacije očekivanja nastoji maksimizirati log-izglednost opisanu formulom \ref{loglikelihood}, ali u tome neće uvijek uspjeti. Pronaći će lokalni maksimum log-izglednosti, ali to ne mora biti globalni maksimum. Rezultat uvelike ovisi o kvalitetnoj inicijalizaciji parametara $\boldsymbol{\theta}$. Slučajna inicijalizacija je moguća, ali najčešće se parametri inicijaliziraju tako da se najprije nad skupom primjera provede algoritam K-sredina koji će kao rezultat dati $K$ čvrstih grupa. Lokacije $\boldsymbol{\mu}_k$ svake komponente se inicijaliziraju centroidima dobivenih grupa, a koeficijenti mješavine $\pi_k$ se računaju kao udjeli broja primjera u grupi $k$ u odnosu na ukupan broj primjera $N$. Kovarijacijske matrice $\boldsymbol{\Sigma}_k$ se mogu inicijalizirati procjenama kovarijanci iz uzorka: primjera iz grupe $k$.
+
+Što se tiče vremenske složenosti, algoritam je učinkovit jer je linearan sa brojem primjera i brojem komponenata. Računanje Gaussove gustoće, uz prethodno izračunatu determinantu i inverz kovarijacijske matrice\footnote{Takozvana matrica preciznosti ili samo preciznost.}, je $\mathcal{O} \left(n^2\right)$. Prema tome, E-korak je vremenske složenosti $\mathcal{O} \left(N K n^2\right)$ i prostorne složenosti $\mathcal{O} \left(N K\right)$. Što se tiče M-koraka, za svaku komponentu, računanje nove lokacije je $\mathcal{O} \left(N n\right)$, računanje nove kovarijacijske matrice je $\mathcal{O} \left(N n^2\right)$, a računanje novog koeficijenta mješavine je $\mathcal{O} \left(N\right)$. U opisu algoritma nije eksplicitno navedeno, ali potrebno je i računati inverz i determinantu nove kovarijacijske matrice jer su potrebni za kasnije računanje gustoće, što je u općenitom slučaju $\mathcal{O} \left(n^3\right)$. Dakle, M-korak je složenosti $\mathcal{O} \left(K \left(N n^2 + n^3\right)\right)$. Računanje log-izglednosti je vremenske složenosti $\mathcal{O} \left(N K n^2\right)$. Najzahtjevniji od svih tih koraka je M-korak, stoga je uz $T$ iteracija vremenska složenost $\mathcal{O} \left(T K \left(N n^2 + n^3\right)\right)$.
+
+Složenost se može poboljšati ako se uvedu ograničenja na oblik kovarijacijske matrice, što pojednostavljuje model Gaussove mješavine i operacije poput matričnog množenja, invertiranja i računanje determinante postaju jednostavnije. Tako primjerice kovarijacijske matrice mogu biti
+\begin{enumerate}
+    \item \textbf{Izotropne}: svaka komponenta ima kovarijacijsku matricu oblika $\boldsymbol{\Sigma}_k = \sigma_{k}^2 \, \mathbf{I}$, gdje je $\mathbf{I}$ jedinična matrica, a $\sigma_{k}^2$ dijeljena varijanca svake komponente. Značajke svake komponente su tada nekorelirane, imaju jednaku varijancu i grupe su sferičnog oblika.
+    \item \textbf{Dijeljene}: svaka komponenta ima istu kovarijacijsku matricu.
+    \item \textbf{Dijagonalne}: značajke komponente su nekorelirane.
+\end{enumerate}
+Algoritam je učinkovit i na velikim skupovima primjera zbog toga što je složenost u svakom slučaju linearan sa brojem primjera.
+
 
 \section{Hijerarhijsko aglomerativno grupiranje}
 U poglavlju \ref{vrstegrupiranja} smo naveli na koji način hijerarhijsko grupiranje gradi grupe, te smo spomenuli dva pristupa hijerarhijskog grupiranja: aglomerativno i divizivno. U ovom poglavlju ćemo se baviti standardnim algoritmom \textbf{hijerarhijskog aglomerativnog grupiranja} \engl{hierarchical agglomerative clustering, HAC}. Također smo u poglavlju \ref{vrstegrupiranja} dali primjer jednog hijerarhijskog aglomerativnog grupiranja na slici \ref{fig:hier_clustering} i vidjeli spajanje grupa. Odluka koje dvije grupe spojiti nije slučajna, stoga prije formalnog opisa algoritma potrebno je prvo definirati pojmove vezane za spajanje grupa.
@@ -587,8 +613,9 @@ Parovi primjera su dobro grupirani ako situacija odgovara referentnom grupiranju
 Randov indeks $R$ se tada definira kao:
 \[R = \frac{TP + TN}{TP + TN + FP + FN} = \frac{TP + TN}{\binom{N}{2}}\]
 Jasno je da su u nazivniku pokriveni svi mogući parovi ulaznih primjera, broj takvih parova znamo da mora biti $\binom{N}{2}$.
+Grupiranje koje je identično referentnom grupiranju ima $R = 1$.
 
-Kao primjer uzmimo da su podaci skup od 6 prirodnih brojeva od 1 do 6. Pretpostavimo da smo podatke grupirali na sljedeći način:
+Kao primjer uzmimo da su podaci skup od 5 prirodnih brojeva od 1 do 5. Pretpostavimo da smo podatke grupirali na sljedeći način:
 \[\left\{ \left\{1, 2, 4\right\}, \left\{3, 5\right\} \right\}\]
 U programskim implementacijama obično se grupiranje specificira nizom oznakama. Za ovaj primjer bi onda u pitanju bio niz $\left\{0, 0, 1, 0, 1\right\}$ (kod oznaka je samo bitno da primjeri iste grupe imaju istu oznaku, kakva je oznaka je nebitno). Pretpostavimo da je referentno grupiranje:
 \[\left\{\left\{1,2\right\}, \left\{3,4\right\}, \left\{5\right\}\right\}\]
@@ -619,4 +646,3 @@ Abstract.
 \end{abstract}
 
 \end{document}
-
