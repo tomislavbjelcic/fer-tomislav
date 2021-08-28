@@ -13,6 +13,7 @@ Slika k-means: https://www.researchgate.net/figure/Schematics-of-clustering-algo
 https://en.wikipedia.org/wiki/Curse_of_dimensionality
 https://en.wikipedia.org/wiki/K-means%2B%2B
 K-means++: http://ilpubs.stanford.edu:8090/778/1/2006-13.pdf
+Slika konveksnog i nekonveksnog skupa: https://www.researchgate.net/figure/A-convex-set-and-a-non-convex-set_fig1_316282987
 
 https://www.researchgate.net/publication/51962445_Ward's_Hierarchical_Clustering_Method_Clustering_Criterion_andAgglomerative_Algorithm
 https://www.stat.cmu.edu/~cshalizi/350/lectures/08/lecture-08.pdf

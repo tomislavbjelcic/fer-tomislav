@@ -223,6 +223,16 @@ Kao što je spomenuto na početku poglavlja \ref{kmeans}, cilj algoritma K-sredi
 Vremenska složenost algoritma K-sredina je $\mathcal{O} \left(TnKN\right)$, gdje je $T$ broj iteracija algoritma do konvergencije, $n$ broj značajki (dimenzija) točaka, a $N$ broj točaka. Korak algoritma u kojem se točke pridružuju najbližem centroidu je složenosti $\mathcal{O} \left(nKN\right)$ jer je potrebno za svaku od $N$ točaka ispitati koji od $K$ trenutnih centroida je najbliži, dakle mora ispitati udaljenost od svakog centroida, a računanje udaljenosti je složenosti $\mathcal{O} \left(n\right)$. Korak algoritma u kojem se računaju centroidi je složenosti $\mathcal{O} \left(nN\right)$ jer iako se iterira po grupama, efektivno se iterira po svim ulaznim točkama i obavljaju se operacije zbrajanja i dijeljenja sa nekim brojem (koje su također složenosti $\mathcal{O} \left(n\right)$).\\
 Takva složenost je prihvatljiva i algoritam uz dobar odabir početnih centroida i dobar odabir parametra $K$ proizvodi dobre rezultate. Zbog povoljne složenosti, algoritam je učinkovit i za velike količine podatka (veliki $N$), a broj grupa i značajka ionako su najčešće\footnote{Kod velikog broja značajki tradicionalni algoritmi grupiranja, ali i postupci obrade podataka općenito, nisu učinkoviti. Tada se radi o problemu prokletstva visoke dimenzionalnosti \engl{curse of dimensionality}} puno manji od $N$.
 
+Što se tiče kvalitete grupiranja, postoje slučajevi u kojima algoritam neće ispravno razdvojiti grupe čak i ako odaberemo optimalan $K$ i uvijek se dobro odaberu početni centroidi. Implicitna pretpostavka algoritma, zbog prirode računanja centroida i pridruživanja točaka najbližem centroidu, jest konveksan oblik grupe. Ukratko, skup u nekom prostoru je konveksan ako je segment između bilo koje dvije točke iz skupa također u skupu, u cjelosti. Na slici \ref{fig:convexset} su prikazana dva skupa, plavi je konveksan, a zeleni nije jer postoje dvije točke između kojih segment nije u cjelosti u skupu.
+\begin{figure}[H]
+    \centering
+    \includegraphics[scale=0.4]{img/convex_nonconvex.png}
+    \caption{Konveksan i nekonvenksan skup}
+    \label{fig:convexset}
+\end{figure}
+Algoritam K-sredina neće dobro razdvojiti grupe koje nisu konveksnog oblika. Razlog tomu je mogućnost da je centroid takve grupe izvan oblika grupe, pa ako se blizu tog centroida pojavljuje neka druga grupa, algoritam K-sredina ih neće moći dobro razdvojiti.\\
+Postoji mogućnost da grupiranje neće biti kvalitetno čak i ako su sve prirodne grupe konveksne. Takvi slučajevi su primjerice bliske grupe nejednako velikih oblika, ili grupe koje su ‘‘nakošenog’’ oblika. Demonstracija takvih neoptimalnih grupiranja dana je u poglavlju \ref{chap:results}.
+
 \subsection{Odabir početnih $K$ centroida}
 \label{kminitial}
 Način na koji se početni centroidi odabiru kod algoritma K-sredina nije jasno naznačen u algoritmu, a u poglavlju \ref{kmsvojstva} je spomenuto da je to jako važno kako bi algoritam što više smanjio iznos kriterijske funkcije.
@@ -333,7 +343,10 @@ p \left(\mathbf{x}\right)
 \sum_{k=1}^{K} \pi_k \, p \left(\mathbf{x} \middle| \boldsymbol{\theta}_k\right)
 \end{equation}
 Uvedena je oznaka oznaku $\pi_k = P \left(y = k\right)$, i ta vjerojatnost se naziva \textbf{koeficijent mješavine} \engl{mixture weight}. Jasno je da mora vrijediti
-\[\sum_{k=1}^{K} \pi_k = 1\]
+\begin{equation}
+\label{eq:summixture}
+    \sum_{k=1}^{K} \pi_k = 1
+\end{equation}
 U slučaju modela Gaussove mješavine, gustoća grupe $p \left(\mathbf{x} \middle| \boldsymbol{\theta}_k\right)$ se računa prema \ref{gaussdensity}, gdje su parametri grupe
 $\boldsymbol{\theta}_k = \left\{
     \boldsymbol{\mu}_k, \boldsymbol{\Sigma}_k
@@ -489,6 +502,26 @@ Složenost se može poboljšati ako se uvedu ograničenja na oblik kovarijacijsk
 \end{enumerate}
 Algoritam je učinkovit i na velikim skupovima primjera zbog toga što je složenost u svakom slučaju linearan sa brojem primjera.
 
+Zbog prirode generativnog modela podataka, kao i kod algoritma K-sredina, postoji implicitna pretpostavka o konveksnom obliku grupa. EM algoritam najčešće neće moći kvalitetno razdvojiti dvije grupe koje su relativno blizu, a barem jedna od njih ima nekonveksan oblik. Za razliku od algoritma K-sredina, EM algoritam će ispravno razdvojiti konveksne nejednako velike ili ukošene grupe, jer se svi takvi oblici mogu ispravno modelirati različitim oblicima kovarijacijske matrice.
+
+\subsection{Odabir broja komponenata $K$}
+Odabir optimalnog broja komponenata je nužan uvjet kvalitetnog grupiranja, isto kao što je to bio slučaj kod algoritma K-sredina. Zbog toga što je model Gaussove mješavine statistički model, prikladno je koristiti \textbf{Akaikeov informacijski kriterij} \engl{Akaike information criterion, AIC} za određivanje optimalnog broja komponenata. Akaikeov informacijski kriterij se računa izrazom
+\[AIC = 2m - 2 \ln{L}\]
+gdje $m$ predstavlja broj parametara modela, a $L$ maksimizirana izglednost. Dobra procjena optimalnog broja komponenata $K$ kod modela Gaussovih mješavina je ona vrijednost $K$ koja minimizira Akaikeov informacijski kriterij. Akaikeov informacijski kriterij pada povećanjem izglednosti, a raste povećanjem broja parametara.\\
+U slučaju Gaussovih mješavina, parametri modela su lokacije, kovarijacijske matrice i koeficijenti mješavine. Svaka lokacija se sastoji od $n$ parametara s obzirom da se radi o $n$-dimenzijskom vektoru, dakle za $K$ lokacija radi se o $Kn$ mnogo parametara. Koeficijenata mješavine ima $K$ jer toliko ima komponenata, ali uvijek se zadnji može izračunati iz ostalih $K-1$ jer vrijedi jednakost \ref{eq:summixture}, prema tome radi se o $K - 1$ mnogo parametara. Što se tiče kovarijacijskih matrica, broj parametara ovisi o tome postoje li ograničenja na oblik matrice i ako postoji, o kojem ograničenju se radi. U općenitom slučaju bez ograničenja, svaka kovarijacijska matrica sadrži $n$ dijagonalnih elemenata i $\binom{n}{2}$ nedijagonalnih elemenata, što za svaku kovarijacijsku matricu daje ukupno $\frac{n \left(n+1\right)}{2}$ parametara, a za njih $K$ mnogo to je ukupno $\frac{K n \left(n+1\right)}{2}$ parametara. Ovaj broj je manji ako se uvedu ograničenja na kovarijacijsku matricu. Primjerice, ako su kovarijacijske matrice dijagonalne, tada se broje samo dijagonalni elementi, što daje broj parametara $Kn$. Iz navedenih razmatranja za model Gaussove mješavine vrijedi, u općenitom slučaju
+\[m = \frac{K n \left(n+1\right)}{2} + K n + K - 1\]
+U svakom slučaju radi se o direktnoj ovisnosti o broju komponenata. Izglednost $L$ također u konačnici ovisi o broju komponenata uz fiksan skup podataka. U tu svrhu ima smisla označiti broj parametara sa $m \left(K\right)$, a izglednost sa $L \left(K\right)$. Optimalan broj komponenata neka je $K^{\ast}$ i koristeći Akaikeov informacijski kriterij on se procjenjuje kao
+\[K^{\ast} = \argmin_{K \in \mathbb{N}} \left(2 \, m \left(K\right) - 2 \ln{L \left(K\right)}\right)\]
+
+\subsubsection{Određivanje optimalnog modela}
+Osim variranja broja komponenata, mogu se varirati i ograničenja na kovarijacijske matrice modela Gaussove mješavine. Na slici \ref{fig:gmmaic} je prikazan primjer skupa dvodimenzijskih podataka i želi se pronaći najbolji model Gaussove mješavine s obzirom na broj komponenata i ograničenja kovarijacijske matrice.
+\begin{figure}
+    \centering
+    \includegraphics[scale=0.7]{img/gmmaic.png}
+    \caption{Primjer odabira optimalnog modela Gaussovih mješavinae}
+    \label{fig:gmmaic}
+\end{figure}
+Za svaki broj komponenata pokrenut je EM algoritam sa navedenim ograničenjima i zabilježena vrijednost Akaikeovog informacijskog kriterija na gornjem dijagramu. Iz dijagrama je vidljivo da za sve brojeve komponenata AIC ispada najmanji za modele bez ograničenja. Uz to, iznos AIC ispada najmanji za 2 komponente, stoga je takav model najbolji izbor. Zaista, promatranjem podataka vidljivo je da se radi o mješavini dvaju komponenata i općenitim kovarijacijskim matricama bez ograničenja. 
 
 \section{Hijerarhijsko aglomerativno grupiranje}
 U poglavlju \ref{vrstegrupiranja} je navedeno na koji način hijerarhijsko grupiranje gradi grupe, te su spomenuta dva pristupa hijerarhijskog grupiranja: aglomerativno i divizivno. Ovo poglavlje se se bavi standardnim algoritmom \textbf{hijerarhijskog aglomerativnog grupiranja} \engl{hierarchical agglomerative clustering, HAC}. Također je u poglavlju \ref{vrstegrupiranja} dan primjer jednog hijerarhijskog aglomerativnog grupiranja na slici \ref{fig:hier_clustering}. U tom primjeru je prikazano kako su se grupe međusobno spajale. Odluka koje dvije grupe spojiti nije slučajna, stoga prije formalnog opisa algoritma potrebno je prvo definirati pojmove vezane za spajanje grupa.
@@ -639,7 +672,11 @@ s (i) = \begin{cases}
  \end{cases}
 \]
 Jasno je vidljivo iz ovakve definicije vrijednosti siluete da ona može samo poprimiti vrijednosti između -1 i 1, odnosno $-1 \leq s (i) \leq 1$. Kako $a (i)$ mjeri koliko je točka $\mathbf{x}^{(i)}$ blizu ostalim točkama iz svoje grupe, manja vrijedost $a(i)$ znači veću sličnost $\mathbf{x}^{(i)}$ sa ostalim točkama iz svoje grupe. S druge strane, $b(i)$ mjeri koliko je $\mathbf{x}^{(i)}$ blizu točkama iz najbliže susjedne grupe, stoga veća vrijednost $b (i)$ znači veću ‘‘razdvojenost’’, odnosno veću različitost od ostalih grupa. Prema tome, kada je $a(i)$ puno manji od $b(i)$, vrijednost siluete $s (i)$ će biti blizu 1, što označava dobro grupiranje konkretno za promatranu točku. Analogno, kada je $b (i)$ puno veći od $a (i)$, to znači da je točka bliža nekoj drugoj grupi nego vlastitoj. Tada će $s(i)$ biti blizu -1 i to označava loše grupiranje. Vrijednost siluete blizu 0 znači da se $a(i)$ i $b(i)$ malo razlikuju, što znači da je točka $\mathbf{x}^{(i)}$ na granici dvije grupe.
-%TODO: NASTAVITI METODU SILUETE%
+
+\subsubsection{Metoda siluete}
+Metoda siluete, odnosno analiza siluete, se zasniva na računanju vrijednosti siluete svake točke iz ulaznog skupa. Metoda siluete se može iskoristiti kako bi se odredio optimalan broj grupa kod algoritma K-sredina. U nastavku je primjer analize siluete nad istim ulaznim podacima kao na slici \ref{fig:elbowdata} gdje je bila demonstrirana metoda koljena.
+
+Neka je dano grupiranje koje je proizvelo K-sredina. Nakon grupiranja, vrijednost siluete se računa za svaku točku iz ulaznog skupa i grafički se prikazuje na dijagramu uz zabilježenu informaciju u kojoj grupi se nalazi svaka točka. Također se prati koja je prosječna vrijednost siluete za sve točke, te se grafički pokušava zaključiti koliko je kvalitetno grupiranje s obzirom na dobivene vrijednosti siluete u odnosu na prosječnu vrijednost.
 
 \section{Vanjsko vrednovanje}
 Vanjsko vrednovanje, uz ulazne podatke i grupe koje je promatrani algoritam generirao, na raspolaganju ima i oznake svake točke koje otkrivaju referentno grupiranje. Te oznake nisu poznate postupcima nenadziranog strojnog učenja, pa tako i algoritmima grupiranja. Do njih je ponekad moguće doći primjerice ljudskom ocjenom ulaznog skupa primjera, ili su mogli biti poznati ranije, no odluka je bila ne specificirati oznake metodama nenadziranog strojnog učenja (pa tako i grupiranja).
