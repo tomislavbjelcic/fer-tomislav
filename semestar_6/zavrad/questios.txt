@@ -1,0 +1,26 @@
+1. Navođenje literature koja nigdje nije direktno citirana
+Referenciranje preuzetog i u manjoj mjeri modificiranog programskog koda sa scikit-learn stranice
+
+2. Edit distance prijevod na engleski
+
+3. Vezano za formalni opis teme završnog rada
+"Programski ostvariti i provesti postupak vrednovanja algoritama s naglaskom na mjere učinkovitosti, 
+primjerice gustoću grupa, te s obzirom na računalnu učinkovitost"
+
+"odabrat će se neki skup podataka i pokrenuti nekoliko algoritama grupiranja te usporediti rezultati korištenjem 
+neke standardne metrike, ima ih dosta - broj grupa, gustoća itd"
+
+Nije mi jasno na što se točno misli ovo "mjere učinkovitosti" "broj grupa, gustoća grupa"
+
+4. Koliko detaljno treba opisati cilj završnog u uvodu? Treba li navoditi konkretne algoritme, 
+konkretne skupove podataka i konkretne mjere vrednovanja u tom dijelu?
+
+5. Što je sve potrebno za obranu osim dovršenog završnog rada?
+
+6. Najkasniji mogući rok za predaju ----
+
+7. Složenost EM algoritma?
+
+REMINDER: UPISATI DIPLOMSKI LMAO, ROK DO 3.9.
+
+
