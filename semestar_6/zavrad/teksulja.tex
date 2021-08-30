@@ -18,6 +18,7 @@
      \renewcommand{\algorithmicendwhile}{\textbf{kraj ponavljaj}}
      \renewcommand{\algorithmicreturn}{\textbf{vrati}}
      \renewcommand{\algorithmicif}{\textbf{ako}}
+     \renewcommand{\algorithmicthen}{\textbf{onda}}
      \renewcommand{\algorithmicendif}{\textbf{kraj ako}}
      % Set other language requirements
   }
@@ -515,7 +516,7 @@ U svakom slučaju radi se o direktnoj ovisnosti o broju komponenata. Izglednost 
 
 \subsubsection{Određivanje optimalnog modela}
 Osim variranja broja komponenata, mogu se varirati i ograničenja na kovarijacijske matrice modela Gaussove mješavine. Na slici \ref{fig:gmmaic} je prikazan primjer skupa dvodimenzijskih podataka i želi se pronaći najbolji model Gaussove mješavine s obzirom na broj komponenata i ograničenja kovarijacijske matrice.
-\begin{figure}
+\begin{figure}[H]
     \centering
     \includegraphics[scale=0.7]{img/gmmaic.png}
     \caption{Primjer odabira optimalnog modela Gaussovih mješavinae}
@@ -628,7 +629,102 @@ Opisani algoritam daje dobre rezultate, no najveći nedostatak je vremenska i pr
 Standardni ‘‘naivni’’ algoritam je vremenske složenosti $\mathcal{O} \left(N^3\right)$, no postoje bolje implementacije složenosti $\mathcal{O} \left(N^2 \log N\right)$. Specijalno, ako se koriste jednostruka ili potpuna povezanost, postoje algoritmi složenosti $\mathcal{O} \left(N^2\right)$ poznati kao SLINK i CLINK.
 
 \section{DBSCAN}
-DBSCAN.
+DBSCAN \engl{Density-based spatial clustering of applications with noise} je algoritam čvrstog particijskog grupiranja koji se zasniva na \textbf{modelu gustoće} \engl{density model} točaka u prostoru. Kod takvog modela grupe su sačinjene od ‘‘gusto’’ skupljenih točaka, odnosno točaka koje oko sebe imaju puno bliskih susjednih točaka.
+
+\subsection{Model gustoće točaka u prostoru}
+Pojam ‘‘gusto’’ skupljenih točaka se definira u odnosu na svaku točku $\mathbf{x}$ u prostoru kao dovoljan broj ostalih točaka (uključujući i $\mathbf{x}$) čija je udaljenost do $\mathbf{x}$ manja od neke fiksne vrijednosti. Neka je parametar $\varepsilon \geq 0$ polumjer okoline u kojoj se traže susjedne točke, odnosno točke udaljene za $\varepsilon$. Neka $\mathcal{R} \left(\mathcal{D}, d, \mathbf{x}, \varepsilon\right)$ označava okolinu točke $\mathbf{x}$ polumjera $\varepsilon$: skup točaka iz $\mathcal{D}$ čija je udaljenost od $\mathbf{x}$ manja ili jednaka $\varepsilon$, s obzirom na mjeru udaljenosti $d$:
+\[\mathcal{R} \left(\mathcal{D}, d, \mathbf{x}, \varepsilon\right) = \left\{
+    \mathbf{y}
+    \mid
+    \mathbf{y} \in \mathcal{D},
+    d \left(\mathbf{x}, \mathbf{y}\right) \leq \varepsilon
+\right\}\]
+Bitno je napomenuti da točka $\mathbf{x}$ također pripada toj okolini.
+
+Kako bi se upotpunio model gustoće točaka, potrebno je specificirati i koliko najmanje točaka unutar okoline polumjera $\varepsilon$ (oko neke točke) se mora nalaziti da bi se područje smatralo ‘‘gustim’’, odnosno koliko najmanje točaka mora biti da bi se stvorila jedna grupa. Neka je taj parametar $m$.\\
+Dakle uz standardne podatke poput ulaznog skupa točaka i mjere udaljenosti, potrebno je specificirati i dodatne parametre $\varepsilon$ i $m$. S obzirom na uvedene pojmove, model gustoće točaka sve točke iz ulaznog skupa primjera $\mathcal{D}$ dijeli na:
+\begin{enumerate}
+    \item \textbf{Jezgrene točke} \engl{core points}: točke koje u svojoj okolini polumjera $\varepsilon$ imaju barem $m$ točaka (uključujući i sebe). Točka $\mathbf{x}$ je jezgrena točka ako vrijedi $\left\vert\mathcal{R} \left(\mathcal{D}, d, \mathbf{x}, \varepsilon\right)\right\vert \geq m$.
+    
+    \item \textbf{Granične točke} \engl{border points}: točke koje nemaju dovoljno ($m$) točaka u svojoj okolini polumjera $\varepsilon$, ali su dio okoline barem jedne jezgrene točke. Točka $\mathbf{x}$ je granična točka ako vrijedi:\\
+    $\left\vert\mathcal{R} \left(\mathcal{D}, d, \mathbf{x}, \varepsilon\right)\right\vert < m, \, 
+    \exists \mathbf{y} \in \mathcal{D} \, : \,
+    \mathbf{x} \in \mathcal{R} \left(\mathcal{D}, d, \mathbf{y}, \varepsilon\right), \,
+    \mathbf{y} \, \text{je jezgrena točka}$
+    
+    \item \textbf{Šum} \engl{noise points}: točke koje nemaju dovoljno točaka u svojoj okolini polumjera $\varepsilon$ i nisu dio okoline nijedne jezgrene točke.
+\end{enumerate}
+Kod takvog modela grupom se smatraju jezgrene točke i okoline oko njih. Ako se u okolini jezgrene točke nalazi neka druga jezgrena točka, oni zajedno sa svojim okolinama čine istu grupu. Na taj način se točke povezuju u istu grupu, odnosno čine gusto skupljene točke (gusto s obzirom na parametre $\varepsilon$ i $m$). Točka šuma u svojoj okolini može imati samo ostale točke šuma i granične točke. Granične točke će se nalaziti na rubovima takvih grupa, a šum predstavljaju stršeće vrijednosti i takve točke nisu svrstane ni u koju grupu. Ovakav model omogućava koncept stršećih vrijednosti, za razliku od prethodnih modela kod kojih su oni mogli predstavljati problem kod formiranja grupa jer se nalaze daleko od svih ostalih točaka.
+
+Na slici \ref{fig:densitycluster} vizualiziran je primjer grupe kod takvog modela.
+\begin{figure}[H]
+    \centering
+    \includegraphics[scale=0.8]{img/densitycluster.png}
+    \caption{Primjer grupe kod modela gustoća točaka}
+    \label{fig:densitycluster}
+\end{figure} Okoline točaka polumjera $\varepsilon$ vizualizirane su kružnicama oko točaka. U ovom primjeru $m = 4$. Crvene točke su jezgrene, žute su granične, a plava točka N je šum. Sve crvene točke oko sebe imaju 4 ili više točaka u svojoj okolini, što ih čini jezgrenima. Granične točke B i C imaju samo dvije točke u svojoj okolini, no nalaze se u barem jednoj okolini jezgrene točke, dok to nije slučaj sa točkom N. Dakle postoji jedna grupa koju čine sve crvene i žute točke, te postoji jedna točka šuma.
+
+\subsection{Opis algoritma}
+Cilj algoritma DBSCAN jest pronaći jezgrene točke i ‘‘proširivati’’ ih sve dok se ne nađu granične točke. Algoritam započinje tako da uzme proizvoljnu točku iz ulaznog skupa i provjerava koliko točaka ima u svojoj okolini. Ako nema dovoljno, onda se na trenutak točka svrstava kao šum, ako ima, onda je pronađena jezgrena točka i započinje se nova grupa. Točke iz okoline su također u toj grupi, pa ako je neka od tih točaka opet jezgrena, onda je i njihova okolina dio grupe i na taj način se gradi grupa do graničnih točaka. Tada se uzima nova neobrađena točka i postupak se ponavlja.
+
+Rezultat grupiranja u kontekstu algoritma DBSCAN su oznake svake točke: točke sa istim oznakama su u istoj grupi. Jedina iznimka su točke šuma: za njih mora postojati posebna oznaka ali to ne znači da čine jednu grupu, nego se oni smatraju nesvrstanima. Stoga će ulazni skup podataka nakon završetka algoritma biti skup uređenih parova
+\[\mathcal{D} = \left\{
+    \left( \mathbf{x}^{(i)}, y^{(i)}  \right)
+\right\}_{i=1}^{N}\]
+gdje $y^{(i)}$ predstavlja oznaku točke $\mathbf{x}^{(i)}$. Prije izvršena algoritma, s obzirom da se radi o nenazdiranom strojnom učenju, oznake nisu poznate, odnosno nisu definirane. DBSCAN će tijekom izvršavanja dodjeljivati oznake svakoj točki koju obradi, najjednostavnije u obliku cijelih brojeva počevši od 0. Oznaka šuma bit će posebna oznaka. Neka je $\operatorname{L} \left(\mathbf{x}\right)$ oznaka grupe za točku $\mathbf{x}$, dakle za svaki $\mathbf{x}^{(i)} \in \mathcal{D}$ vrijedi
+\[\operatorname{L} \left(\mathbf{x}^{(i)}\right) = y^{(i)}\]
+
+\begin{croatianalgorithm}[H]
+\caption{DBSCAN}
+\label{algo:dbscan}
+\begin{algorithmic}
+\STATE{\textbf{Parametri}: mjera udaljenosti $d$, minimalan broj točaka grupe $m$, polumjer okoline $\varepsilon$
+}
+\STATE{\textbf{Ulaz:} neoznačeni skup točaka $\mathcal{D} = \left\{\mathbf{x}^{(i)}
+\right\}_{i=1}^{N}$}
+\STATE{\textbf{Izlaz:} označeni skup točaka $\mathcal{D} = \left\{ \left(\mathbf{x}^{(i)}, y^{(i)}\right)
+\right\}_{i=1}^{N}$ sa \textbf{definiranim} oznakama $y^{(i)}$
+}
+
+\STATE
+
+\STATE{$k \gets 0$}
+\FORALL{$\mathbf{x}^{(i)} \in \mathcal{D}$}
+    \STATE{\textbf{vrati se na} početak petlje ako je oznaka $\operatorname{L} \left(\mathbf{x}^{(i)}\right)$ definirana}
+    \STATE{$\mathcal{R} \gets \mathcal{R} \left(\mathcal{D}, d, \mathbf{x}^{(i)}, \varepsilon\right)$}
+    \IF{$\left\vert \mathcal{R} \right\vert < m$}
+        \STATE{$\operatorname{L} \left(\mathbf{x}^{(i)}\right) \gets \text{šum}$}
+        \STATE{\textbf{vrati se na} početak petlje}
+    \ENDIF
+    \STATE
+    \STATE{$k \gets k + 1$}
+    \STATE{$\operatorname{L} \left(\mathbf{x}^{(i)}\right) \gets k$}
+    \STATE{$\mathcal{R} \gets \mathcal{R} \setminus
+    \left\{\mathbf{x}^{(i)}\right\}$}
+    \STATE{\textbf{stvori} red elemenata $\mathcal{Q} \gets \mathcal{R}$}
+    \WHILE{dok red $\mathcal{Q}$ nije prazan}
+        \STATE{\textbf{ukloni} prvi element $\mathbf{q}$ iz reda $\mathcal{Q}$}
+    \ENDWHILE
+\ENDFOR
+
+\STATE{$\Gamma \gets \emptyset$}
+\FORALL{$i \in \left\{1, \dots, N\right\}$}
+    \STATE{$\mathcal{C}_i \gets \left\{ \mathbf{x}^{(i)} \right\}$}
+    \STATE{$\Gamma \gets \Gamma \cup \left\{ \mathcal{C}_i \right\}$}
+\ENDFOR
+\WHILE{}
+\STATE{\textbf{prekini} ako je zadan $K$ i vrijedi $\vert \Gamma \vert \leq K$}
+\STATE{$\left(\mathcal{C}_i, \mathcal{C}_j\right) \gets 
+        \argmin_{\left(\mathcal{C}_a, \mathcal{C}_b\right) \in \Gamma \times \Gamma}
+        D \left(\mathcal{C}_a, \mathcal{C}_b\right)
+$}
+\STATE{\textbf{prekini} ako je zadan $\epsilon$ i vrijedi $D \left(\mathcal{C}_i, \mathcal{C}_j\right) > \epsilon$}
+\STATE{$\mathcal{C}_i \gets \mathcal{C}_i \cup \mathcal{C}_j$}
+\STATE{$\Gamma \gets \Gamma \setminus \left\{\mathcal{C}_j\right\}$}
+\ENDWHILE
+\RETURN{$\Gamma$}
+\end{algorithmic}
+\end{croatianalgorithm}
 
 \chapter{Postupci vrednovanja algoritama grupiranja}
 \label{evaluation}
@@ -653,7 +749,7 @@ Davies-Bouldin indeks $DBI$ se tada definira kao
 
 \subsection{Vrijednost siluete}
 \label{subsec:silhouette}
-Vrijednost siluete \engl{silhouette score} mjeri koliko je svaka točka iz $\mathcal{D}$ slična svojoj grupi u odnosu na ostale grupe, dakle svakoj točki se pridružuje vrijednost siluete. Metoda koja se zasniva na ovoj mjeri se naziva \textbf{metoda siluete} i ta metoda se spominje u poglavlju. Za svaku točku $\mathbf{x}^{(i)}$ iz ulaznog skupa točaka $\mathcal{D} = \left\{\mathbf{x}^{(i)}\right\}_{i=1}^{N}$ neka $\mathcal{C} \left(i\right)$ označava grupu kojoj pripada ta točka. Također je na raspolaganju grupiranje koje je generirao promatrani algoritam, odnosno skup od $K$ grupa $\Gamma = \left\{\mathcal{C}_k\right\}_{k=1}^{K}$.
+Vrijednost siluete \engl{silhouette score} mjeri koliko je svaka točka iz $\mathcal{D}$ slična svojoj grupi u odnosu na ostale grupe, dakle svakoj točki se pridružuje vrijednost siluete. Metoda koja se zasniva na ovoj mjeri se naziva \textbf{metoda siluete}. Za svaku točku $\mathbf{x}^{(i)}$ iz ulaznog skupa točaka $\mathcal{D} = \left\{\mathbf{x}^{(i)}\right\}_{i=1}^{N}$ neka $\mathcal{C} \left(i\right)$ označava grupu kojoj pripada ta točka. Također je na raspolaganju grupiranje koje je generirao promatrani algoritam, odnosno skup od $K$ grupa $\Gamma = \left\{\mathcal{C}_k\right\}_{k=1}^{K}$.
 Prije nego što se definira vrijednost siluete $s (i)$,  neka $a (i)$ označava prosječnu udaljenost točke $\mathbf{x}^{(i)}$ do ostalih točaka u svojoj grupi:
 \[a (i) = \frac{1}{\left\vert \mathcal{C} \left(i\right) \right\vert - 1} \sum_{\substack{\mathbf{y} \in \mathcal{C} \left(i\right) \\ \mathbf{y} \neq \mathbf{x}^{(i)}}} d \left(\mathbf{x}^{(i)}, \mathbf{y}\right)
 \]
@@ -730,3 +826,4 @@ Abstract.
 \end{abstract}
 
 \end{document}
+

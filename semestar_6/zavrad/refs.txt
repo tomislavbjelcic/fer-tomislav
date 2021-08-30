@@ -56,3 +56,5 @@ https://en.wikipedia.org/wiki/Mixture_model#General_mixture_model
 https://en.wikipedia.org/wiki/Expectation%E2%80%93maximization_algorithm
 
 Slika GMM i EM: https://www.researchgate.net/figure/Illustrative-example-of-the-EM-algorithm-for-estimation-of-parameters-of-a-GMM-with-2_fig19_329773081
+
+Slika density modela: https://en.wikipedia.org/wiki/DBSCAN
