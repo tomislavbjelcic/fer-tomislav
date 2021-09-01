@@ -107,7 +107,7 @@ Vrlo često se u praksi pojavljuju značajke koje nisu realni brojevi niti dolaz
 \begin{itemize}
     \item \textbf{Hammingova udaljenost}: binarni nizovi duljine $n$
     \item \textbf{Jaccardova udaljenost}: skupovi i multiskupovi
-    \item \textbf{??? udaljenost} \engl{Edit distance}: znakovni nizovi
+    \item \textbf{Udaljenost uređivanja} \engl{Edit distance}: znakovni nizovi
     %TODO: PREVESTI EDIT DISTANCE
 \end{itemize}
 \textbf{Sličnost} \engl{similarity measure} je vrsta mjere koja, poput mjere udaljenosti, brojčano iskazuje koliko se razlikuju dvije točke. Za razliku od mjere udaljenosti, mjera sličnosti ne mora zadovoljavati sva svojstva metrike poput nejednakosti trokuta. Jednako vrijedi i za \textbf{mjeru različitosti} \engl{dissimilariy measure}. Kako su dvije točke ‘‘sličnije’’ tako mjera sličnosti raste, a mjera različitosti pada. Detaljna definicija mjera sličnosti i različitosti neće biti navedena u ovom poglavlju iz razloga što se u algoritmima grupiranja (barem onim koji će biti opisani) koriste uglavnom mjere udaljenosti u svrhu kvantificiranja sličnosti ili različitosti točaka.
@@ -129,7 +129,7 @@ Na slici \ref{fig:hier_clustering} je prikazan tijek nekog hijerarhijskog aglome
 \begin{figure}[H]
     \centering
     \includegraphics[scale=0.95]{img/hier.png}
-    \caption{Tijek nekog hijerarhijskog aglomerativnog grupiranja}
+    \caption{Tijek nekog hijerarhijskog aglomerativnog grupiranja \citep{rajpal2018hier}}
     \label{fig:hier_clustering}
 \end{figure}
 Na lijevoj strani crnom bojom su označene i numerirane točke ulaznog skupa podataka, a crvenim brojevima je označen redoslijed kojim je postupak grupiranja spajao grupe u veće grupe. Na desnoj strani je postupak i rezultat grafički prikazan u obliku dendrograma. Na donjoj liniji su oznake točaka, a značenje brojeva na lijevoj liniji će biti objašnjeno u poglavlju koje detaljnije opisuje hijerarhijsko grupiranje. Ako se dendrogram promatra kao stablo čiji su čvorovi (pod)grupe, a listovi točke iz $\mathcal{D}$, tada aglomerativno grupiranje gradi dendrogram od listova prema korijenu, a divizivno grupiranje od korijena prema listovima.\\
@@ -139,7 +139,7 @@ Primjer na slici \ref{fig:partvshier} ilustrira razliku particijskog i hijerarhi
 \begin{figure}[H]
     \centering
     \includegraphics[scale=0.6]{img/partvshier.jpg}
-    \caption{Usporedba particijskog i hijerarhijskog grupiranja}
+    \caption{Usporedba particijskog i hijerarhijskog grupiranja \citep{viktormysko}}
     \label{fig:partvshier}
 \end{figure}
 
@@ -158,7 +158,7 @@ Na slici \ref{fig:hard_vs_soft_clustering} vizualno je prikazana razlika između
 
 \chapter{Algoritmi grupiranja}
 \label{clusteringalgos}
-U daljnjim potpoglavljima opisujemo podskup algoritama grupiranja implementiranih u Pythonovoj programskoj knjižnici \textbf{Scikit-learn}, unutar modula za grupiranje \texttt{sklearn.cluster}. Svako potpoglavlje sadrži najprije opis modela grupiranja kojeg taj algoritam koristi, a zatim opis samog algoritma.
+U daljnjim potpoglavljima opisan je podskup algoritama grupiranja implementiranih u Pythonovoj programskoj knjižnici \textbf{Scikit-learn}, unutar modula za grupiranje \texttt{sklearn.cluster}. Svako potpoglavlje sadrži najprije opis modela grupiranja kojeg taj algoritam koristi, a zatim opis samog algoritma.
 \section{Algoritam K-sredina} \label{kmeans}
 Algoritam \textbf{K-sredina} \engl{K-means clustering} je jednostavan, učinkovit i najpopularniji algoritam particijskog čvrstog grupiranja koji ulazni skup točaka $\mathcal{D}$ particionira u $K$ grupa. $K$ je broj grupa koje je potrebno proizvesti i on se zadaje unaprijed kao parametar algoritma. U poglavlju \ref{subsection:odabirK} su opisane neke metode određivanja optimalnog broja grupa $K$.
 
@@ -167,8 +167,8 @@ $\mathcal{C} = \left\{ \mathbf{x}^{(i)}  \right\}_{i=1}^{M}$.
 Centroid te grupe $\boldsymbol{\mu}$ se definira kao:
 \[\boldsymbol{\mu} = \frac{1}{\vert \mathcal{C} \vert} \sum_{\mathbf{x} \in \mathcal{C}} \mathbf{x} = 
 \frac{1}{M} \sum_{i=1}^{M} \mathbf{x}^{(i)}\]
-Centroid se računa na isti način kao i aritmetička sredina, odakle dolazi naziv K-sredina. Radi se o operacijama zbrajanja točaka te u konačnici dijeljenja sa nekim brojem. Dakle da bi uopće bilo moguće računati centroide, nad točkama, odnosno ulaznim podacima, koje potječu iz prostora $\mathcal{V}$, moraju biti definirane operacije zbrajanja i množenja sa skalarom (u našem slučaju realnim brojem $\frac{1}{M}$). Ovo razmatranje dovodi do pretpostavke modela u kojem prostor podataka $\mathcal{V}$ mora biti vektorski prostor\footnote{Vektorski prostor je skup objekata, odnosno vektora, nad kojim su definirane operacije međusobnog zbrajanja i množenja sa skalarom, a te operacije zadovoljavaju 8 aksioma vektorskog prostora.}. Standardni algoritam K-sredina je tada primjenjiv samo ako se radi o vektorskom prostoru. Najčešće će u pitanju biti podskup realnog koordinatnog prostora, odnosno $\mathcal{V} \subseteq \mathbb{R}^n$. 
-Postoji i varijanta algoritma koja radi nad podacima bilo kakve prirode i koristi mjeru sličnosti (koja je općenitija, odnosno manje ‘‘zahtjevna’’ od mjere udaljenosti): \textbf{algoritam K-medoida}, no taj algoritam neće biti opisan u ovom radu.\\
+Centroid se računa na isti način kao i aritmetička sredina, odakle dolazi naziv K-sredina. Radi se o operacijama zbrajanja točaka te u konačnici dijeljenja sa nekim brojem. Dakle da bi uopće bilo moguće računati centroide, nad točkama, odnosno ulaznim podacima, koje potječu iz prostora $\mathcal{V}$, moraju biti definirane operacije zbrajanja i množenja sa skalarom (u našem slučaju realnim brojem $\frac{1}{M}$). Ovo razmatranje dovodi do pretpostavke modela u kojem prostor podataka $\mathcal{V}$ mora biti vektorski prostor\footnote{Vektorski prostor je skup objekata, odnosno vektora, nad kojim su definirane operacije međusobnog zbrajanja i množenja sa skalarom, a te operacije zadovoljavaju 8 aksioma vektorskog prostora.}. Standardni algoritam K-sredina je tada primjenjiv samo ako se radi o vektorskom prostoru. Najčešće je u pitanju podskup realnog koordinatnog prostora, odnosno $\mathcal{V} \subseteq \mathbb{R}^n$. 
+Postoji i varijanta algoritma koja radi nad podacima bilo kakve prirode i koristi mjeru sličnosti (koja je općenitija, odnosno manje ‘‘zahtjevna’’ od mjere udaljenosti): \textbf{algoritam K-medoida}, no taj algoritam nije opisan u ovom radu.\\
 Kao što pojam sugerira, centroid neke grupe konceptualno predstavlja centar, odnosno središte te grupe. Jasno je da centroid grupe se uopće ne mora nalaziti u grupi.
 
 Cilj algoritma K-sredina jest minimizirati \textbf{kriterijsku funkciju}. Neka je ulazni skup točaka $\mathcal{D}$ čvrsto grupiran u $K$ grupa:
@@ -224,14 +224,14 @@ Kao što je spomenuto na početku poglavlja \ref{kmeans}, cilj algoritma K-sredi
 Vremenska složenost algoritma K-sredina je $\mathcal{O} \left(TnKN\right)$, gdje je $T$ broj iteracija algoritma do konvergencije, $n$ broj značajki (dimenzija) točaka, a $N$ broj točaka. Korak algoritma u kojem se točke pridružuju najbližem centroidu je složenosti $\mathcal{O} \left(nKN\right)$ jer je potrebno za svaku od $N$ točaka ispitati koji od $K$ trenutnih centroida je najbliži, dakle mora ispitati udaljenost od svakog centroida, a računanje udaljenosti je složenosti $\mathcal{O} \left(n\right)$. Korak algoritma u kojem se računaju centroidi je složenosti $\mathcal{O} \left(nN\right)$ jer iako se iterira po grupama, efektivno se iterira po svim ulaznim točkama i obavljaju se operacije zbrajanja i dijeljenja sa nekim brojem (koje su također složenosti $\mathcal{O} \left(n\right)$).\\
 Takva složenost je prihvatljiva i algoritam uz dobar odabir početnih centroida i dobar odabir parametra $K$ proizvodi dobre rezultate. Zbog povoljne složenosti, algoritam je učinkovit i za velike količine podatka (veliki $N$), a broj grupa i značajka ionako su najčešće\footnote{Kod velikog broja značajki tradicionalni algoritmi grupiranja, ali i postupci obrade podataka općenito, nisu učinkoviti. Tada se radi o problemu prokletstva visoke dimenzionalnosti \engl{curse of dimensionality}} puno manji od $N$.
 
-Što se tiče kvalitete grupiranja, postoje slučajevi u kojima algoritam neće ispravno razdvojiti grupe čak i ako odaberemo optimalan $K$ i uvijek se dobro odaberu početni centroidi. Implicitna pretpostavka algoritma, zbog prirode računanja centroida i pridruživanja točaka najbližem centroidu, jest konveksan oblik grupe. Ukratko, skup u nekom prostoru je konveksan ako je segment između bilo koje dvije točke iz skupa također u skupu, u cjelosti. Na slici \ref{fig:convexset} su prikazana dva skupa, plavi je konveksan, a zeleni nije jer postoje dvije točke između kojih segment nije u cjelosti u skupu.
+Što se tiče kvalitete grupiranja, postoje slučajevi u kojima algoritam neće ispravno razdvojiti grupe čak i uz odabir optimalnog $K$ i kvalitetan odabir početnih centroida. Implicitna pretpostavka algoritma, zbog prirode računanja centroida i pridruživanja točaka najbližem centroidu, jest konveksan oblik grupe. Ukratko, skup u nekom prostoru je konveksan ako je segment između bilo koje dvije točke iz skupa također u skupu, u cjelosti. Na slici \ref{fig:convexset} su prikazana dva skupa, plavi je konveksan, a zeleni nije jer postoje dvije točke između kojih segment nije u cjelosti u skupu.
 \begin{figure}[H]
     \centering
     \includegraphics[scale=0.4]{img/convex_nonconvex.png}
     \caption{Konveksan i nekonvenksan skup}
     \label{fig:convexset}
 \end{figure}
-Algoritam K-sredina neće dobro razdvojiti grupe koje nisu konveksnog oblika. Razlog tomu je mogućnost da je centroid takve grupe izvan oblika grupe, pa ako se blizu tog centroida pojavljuje neka druga grupa, algoritam K-sredina ih neće moći dobro razdvojiti.\\
+Algoritam K-sredina neće dobro razdvojiti grupe koje nisu konveksnog oblika. Razlog tomu je mogućnost da centroid takve grupe se nalazi izvan oblika grupe, pa ako se blizu tog centroida pojavljuje neka druga grupa, algoritam K-sredina ih neće dobro razdvojiti.\\
 Postoji mogućnost da grupiranje neće biti kvalitetno čak i ako su sve prirodne grupe konveksne. Takvi slučajevi su primjerice bliske grupe nejednako velikih oblika, ili grupe koje su ‘‘nakošenog’’ oblika. Demonstracija takvih neoptimalnih grupiranja dana je u poglavlju \ref{chap:results}.
 
 \subsection{Odabir početnih $K$ centroida}
@@ -297,7 +297,7 @@ Neka je na raspolaganju neki skup podataka sa dvjema realnim značajkama. Grafi�
     \caption{Ovisnost kriterijske funkcije o broju grupa}
     \label{fig:elbowgraph}
 \end{figure}
-Porast broja grupa do 4 bilježi strmi pad iznosa kriterijske funkcije, a daljnim porastom se ne dobiva značajan pad iznosa kriterijske funkcije. Graf kod broja grupa 4 ima oblik koljena, otkud dolazi naziv metode koljena. Navedeno razmatranje je jaka naznaka da se radi o optimalnom broju grupa $K = 4$. Broj grupa manji od toga naglo povećava iznos kriterijske funkcije, a broj grupa veći od toga ne rezultira značajnim smanjenjima kriterijske funkcije. Zaista, vizualnom metodom je jasno da se u navedenom primjeru radi o 4 prirodne grupe.
+Porast broja grupa do 4 bilježi strmi pad iznosa kriterijske funkcije, a daljnim porastom se ne dobiva značajan pad iznosa kriterijske funkcije. Graf kod broja grupa 4 ima oblik koljena, otkud dolazi naziv metode koljena. Navedeno razmatranje je jaka naznaka da se radi o optimalnom broju grupa $K = 4$. Broj grupa manji od toga naglo povećava iznos kriterijske funkcije, a broj grupa veći od toga ne rezultira značajnim smanjenjima kriterijske funkcije. Zaista, vizualnim promatranjem na slici \ref{fig:elbowdata} je jasno da se u navedenom primjeru radi o 4 prirodne grupe.
 
 
 \section{Model Gaussove mješavine}
@@ -493,7 +493,7 @@ Nijanse boja točaka označuju u kojoj mjeri točka pripada pojedinim grupama. N
 \subsection{Svojstva i složenost algoritma}
 Algoritam maksimizacije očekivanja nastoji maksimizirati log-izglednost opisanu formulom \ref{loglikelihood}, ali u tome neće uvijek uspjeti. Pronaći će lokalni maksimum log-izglednosti, ali to ne mora biti globalni maksimum. Rezultat uvelike ovisi o kvalitetnoj inicijalizaciji parametara $\boldsymbol{\theta}$. Slučajna inicijalizacija je moguća, ali najčešće se parametri inicijaliziraju tako da se najprije nad skupom primjera provede algoritam K-sredina koji će kao rezultat dati $K$ čvrstih grupa. Lokacije $\boldsymbol{\mu}_k$ svake komponente se inicijaliziraju centroidima dobivenih grupa, a koeficijenti mješavine $\pi_k$ se računaju kao udjeli broja primjera u grupi $k$ u odnosu na ukupan broj primjera $N$. Kovarijacijske matrice $\boldsymbol{\Sigma}_k$ se mogu inicijalizirati procjenama kovarijanci iz uzorka: primjera iz grupe $k$.
 
-Što se tiče vremenske složenosti, algoritam je učinkovit jer je linearan sa brojem primjera i brojem komponenata. Računanje Gaussove gustoće, uz prethodno izračunatu determinantu i inverz kovarijacijske matrice\footnote{Takozvana matrica preciznosti ili samo preciznost.}, je $\mathcal{O} \left(n^2\right)$. Prema tome, E-korak je vremenske složenosti $\mathcal{O} \left(N K n^2\right)$ i prostorne složenosti $\mathcal{O} \left(N K\right)$. Što se tiče M-koraka, za svaku komponentu, računanje nove lokacije je $\mathcal{O} \left(N n\right)$, računanje nove kovarijacijske matrice je $\mathcal{O} \left(N n^2\right)$, a računanje novog koeficijenta mješavine je $\mathcal{O} \left(N\right)$. U opisu algoritma nije eksplicitno navedeno, ali potrebno je i računati inverz i determinantu nove kovarijacijske matrice jer su potrebni za kasnije računanje gustoće, što je u općenitom slučaju $\mathcal{O} \left(n^3\right)$. Dakle, M-korak je složenosti $\mathcal{O} \left(K \left(N n^2 + n^3\right)\right)$. Računanje log-izglednosti je vremenske složenosti $\mathcal{O} \left(N K n^2\right)$. Najzahtjevniji od svih tih koraka je M-korak, stoga je uz $T$ iteracija vremenska složenost $\mathcal{O} \left(T K \left(N n^2 + n^3\right)\right)$.
+Što se tiče vremenske složenosti, algoritam je učinkovit jer je linearan sa brojem primjera i brojem komponenata. Računanje Gaussove gustoće, uz prethodno izračunatu determinantu i inverz kovarijacijske matrice\footnote{Takozvana matrica preciznosti ili samo preciznost.}, je $\mathcal{O} \left(n^2\right)$. Prema tome, E-korak je vremenske složenosti $\mathcal{O} \left(N K n^2\right)$ i prostorne složenosti $\mathcal{O} \left(N K\right)$. Što se tiče M-koraka, za svaku komponentu, računanje nove lokacije je $\mathcal{O} \left(N n\right)$, računanje nove kovarijacijske matrice je $\mathcal{O} \left(N n^2\right)$, a računanje novog koeficijenta mješavine je $\mathcal{O} \left(N\right)$. U opisu algoritma nije eksplicitno navedeno, ali potrebno je i računati inverz i determinantu nove kovarijacijske matrice jer su potrebni za kasnije računanje gustoće, što je u općenitom slučaju $\mathcal{O} \left(n^3\right)$. Dakle, M-korak je složenosti $\mathcal{O} \left(K \left(N n^2 + n^3\right)\right)$. Računanje log-izglednosti je vremenske složenosti $\mathcal{O} \left(N K n^2\right)$. Najzahtjevniji od svih tih koraka je M-korak, stoga je uz $T$ iteracija vremenska složenost algoritma $\mathcal{O} \left(T K \left(N n^2 + n^3\right)\right)$.
 
 Složenost se može poboljšati ako se uvedu ograničenja na oblik kovarijacijske matrice, što pojednostavljuje model Gaussove mješavine i operacije poput matričnog množenja, invertiranja i računanje determinante postaju jednostavnije. Tako primjerice kovarijacijske matrice mogu biti
 \begin{enumerate}
@@ -503,7 +503,7 @@ Složenost se može poboljšati ako se uvedu ograničenja na oblik kovarijacijsk
 \end{enumerate}
 Algoritam je učinkovit i na velikim skupovima primjera zbog toga što je složenost u svakom slučaju linearan sa brojem primjera.
 
-Zbog prirode generativnog modela podataka, kao i kod algoritma K-sredina, postoji implicitna pretpostavka o konveksnom obliku grupa. EM algoritam najčešće neće moći kvalitetno razdvojiti dvije grupe koje su relativno blizu, a barem jedna od njih ima nekonveksan oblik. Za razliku od algoritma K-sredina, EM algoritam će ispravno razdvojiti konveksne nejednako velike ili ukošene grupe, jer se svi takvi oblici mogu ispravno modelirati različitim oblicima kovarijacijske matrice.
+Zbog prirode generativnog modela podataka, kao i kod algoritma K-sredina, postoji implicitna pretpostavka o konveksnom obliku grupa. EM algoritam najčešće neće moći kvalitetno razdvojiti dvije grupe koje su relativno blizu, a barem jedna od njih ima nekonveksan oblik. Za razliku od algoritma K-sredina, EM algoritam će ispravno razdvojiti konveksne nejednako velike ili ukošene grupe, jer se svi takvi oblici mogu ispravno modelirati različitim oblicima kovarijacijske matrice. Kako svaka komponenta Gaussove mješavine predstavlja razdiobu normalnog slučajnog vektora, grupiranje ovim algoritmom je moguće samo ako su sve značajke realni brojevi, dakle model i algoritam nisu primjenjivi nad podacima koji nisu realni brojevi.
 
 \subsection{Odabir broja komponenata $K$}
 Odabir optimalnog broja komponenata je nužan uvjet kvalitetnog grupiranja, isto kao što je to bio slučaj kod algoritma K-sredina. Zbog toga što je model Gaussove mješavine statistički model, prikladno je koristiti \textbf{Akaikeov informacijski kriterij} \engl{Akaike information criterion, AIC} za određivanje optimalnog broja komponenata. Akaikeov informacijski kriterij se računa izrazom
@@ -624,7 +624,7 @@ Na donjoj liniji se nalaze oznake svake točke, a na lijevoj liniji se nalazi mj
 \end{figure}
 
 \subsection{Svojstva i složenost algoritma}
-Opisani algoritam daje dobre rezultate, no najveći nedostatak je vremenska i prostorna složenost. Pretpostavimo da se algoritam zaustavlja nakon što je preostalo $K$ grupa. To znači da algoritam u glavnoj petlji radi $N-K$ koraka. Korak u kojem se odlučuje koje dvije grupe spojiti mora proći kroz sve kombinacije grupa, što je vremenske složenosti $\mathcal{O} \left(N^2\right)$. Prema tome, vremenska složenost algoritma je $\mathcal{O} \left(N^2 \left(N-K\right)\right)$, a kako je u praksi $N$ puno veći od $K$, onda je vremenska složenost $\mathcal{O} \left(N^3\right)$. Iz tog razloga algoritam nije dobar izbor za velike skupove podataka. Informacija o udaljenosti između točaka se jako često koristi tijekom izvršenja algoritma, stoga implementacije u pravilu najprije konstruiraju tzv.\ \textbf{matricu udaljenosti} \engl{distance matrix}. Matrica udaljenosti je simetrična matrica dimenzija $N \times N$ i sadrži izračunatu udaljenost između svih parova točaka. Računanje udaljenosti je tada vremenski brzo, ali problem je u prostornoj složenosti: $\mathcal{O} \left(N^2\right)$ (jer je u najmanju ruku potrebno pohraniti $\binom{N}{2}$ brojeva), i to za velike skupove podataka već predstavlja veliki problem. Umjesto matrice udaljenosti, analogno postoji matrica sličnosti i matrica udaljenosti.
+Opisani algoritam daje dobre rezultate, no najveći nedostatak je vremenska i prostorna složenost. Neka se algoritam zaustavlja nakon što je preostalo $K$ grupa. To znači da algoritam u glavnoj petlji radi $N-K$ koraka. Korak u kojem se odlučuje koje dvije grupe spojiti mora proći kroz sve kombinacije grupa, što je vremenske složenosti $\mathcal{O} \left(N^2\right)$. Prema tome, vremenska složenost algoritma je $\mathcal{O} \left(N^2 \left(N-K\right)\right)$, a kako je u praksi $N$ puno veći od $K$, onda je vremenska složenost $\mathcal{O} \left(N^3\right)$. Iz tog razloga algoritam nije dobar izbor za velike skupove podataka. Informacija o udaljenosti između točaka se jako često koristi tijekom izvršenja algoritma, stoga implementacije u pravilu najprije konstruiraju tzv.\ \textbf{matricu udaljenosti} \engl{distance matrix}. Matrica udaljenosti je simetrična matrica dimenzija $N \times N$ i sadrži izračunatu udaljenost između svih parova točaka. Računanje udaljenosti je tada vremenski brzo, ali problem je u prostornoj složenosti: $\mathcal{O} \left(N^2\right)$ (jer je u najmanju ruku potrebno pohraniti $\binom{N}{2}$ brojeva), i to za velike skupove podataka već predstavlja veliki problem. Umjesto matrice udaljenosti, analogno postoji matrica sličnosti i matrica udaljenosti.
 
 Standardni ‘‘naivni’’ algoritam je vremenske složenosti $\mathcal{O} \left(N^3\right)$, no postoje bolje implementacije složenosti $\mathcal{O} \left(N^2 \log N\right)$. Specijalno, ako se koriste jednostruka ili potpuna povezanost, postoje algoritmi složenosti $\mathcal{O} \left(N^2\right)$ poznati kao SLINK i CLINK.
 
@@ -659,7 +659,7 @@ Kod takvog modela grupom se smatraju jezgrene točke i okoline oko njih. Ako se 
 Na slici \ref{fig:densitycluster} vizualiziran je primjer grupe kod takvog modela.
 \begin{figure}[H]
     \centering
-    \includegraphics[scale=0.8]{img/densitycluster.png}
+    \includegraphics[scale=0.6]{img/densitycluster.png}
     \caption{Primjer grupe kod modela gustoća točaka}
     \label{fig:densitycluster}
 \end{figure} Okoline točaka polumjera $\varepsilon$ vizualizirane su kružnicama oko točaka. U ovom primjeru $m = 4$. Crvene točke su jezgrene, žute su granične, a plava točka N je šum. Sve crvene točke oko sebe imaju 4 ili više točaka u svojoj okolini, što ih čini jezgrenima. Granične točke B i C imaju samo dvije točke u svojoj okolini, no nalaze se u barem jednoj okolini jezgrene točke, dok to nije slučaj sa točkom N. Dakle postoji jedna grupa koju čine sve crvene i žute točke, te postoji jedna točka šuma.
@@ -667,12 +667,13 @@ Na slici \ref{fig:densitycluster} vizualiziran je primjer grupe kod takvog model
 \subsection{Opis algoritma}
 Cilj algoritma DBSCAN jest pronaći jezgrene točke i ‘‘proširivati’’ ih sve dok se ne nađu granične točke. Algoritam započinje tako da uzme proizvoljnu točku iz ulaznog skupa i provjerava koliko točaka ima u svojoj okolini. Ako nema dovoljno, onda se na trenutak točka svrstava kao šum, ako ima, onda je pronađena jezgrena točka i započinje se nova grupa. Točke iz okoline su također u toj grupi, pa ako je neka od tih točaka opet jezgrena, onda je i njihova okolina dio grupe i na taj način se gradi grupa do graničnih točaka. Tada se uzima nova neobrađena točka i postupak se ponavlja.
 
-Rezultat grupiranja u kontekstu algoritma DBSCAN su oznake svake točke: točke sa istim oznakama su u istoj grupi. Jedina iznimka su točke šuma: za njih mora postojati posebna oznaka ali to ne znači da čine jednu grupu, nego se oni smatraju nesvrstanima. Stoga će ulazni skup podataka nakon završetka algoritma biti skup uređenih parova
+Rezultat grupiranja u kontekstu algoritma DBSCAN su oznake svake točke: točke sa istim oznakama su u istoj grupi. Jedina iznimka su točke šuma: za njih mora postojati posebna oznaka ali to ne znači da čine jednu grupu, nego se oni smatraju nesvrstanima. Stoga će skup podataka nakon završetka algoritma biti skup uređenih parova
 \[\mathcal{D} = \left\{
     \left( \mathbf{x}^{(i)}, y^{(i)}  \right)
 \right\}_{i=1}^{N}\]
-gdje $y^{(i)}$ predstavlja oznaku točke $\mathbf{x}^{(i)}$. Prije izvršena algoritma, s obzirom da se radi o nenazdiranom strojnom učenju, oznake nisu poznate, odnosno nisu definirane. DBSCAN će tijekom izvršavanja dodjeljivati oznake svakoj točki koju obradi, najjednostavnije u obliku cijelih brojeva počevši od 0. Oznaka šuma bit će posebna oznaka. Neka je $\operatorname{L} \left(\mathbf{x}\right)$ oznaka grupe za točku $\mathbf{x}$, dakle za svaki $\mathbf{x}^{(i)} \in \mathcal{D}$ vrijedi
+gdje $y^{(i)}$ predstavlja oznaku točke $\mathbf{x}^{(i)}$. Prije izvršena algoritma, s obzirom da se radi o nenazdiranom strojnom učenju, oznake nisu poznate, odnosno nisu definirane. DBSCAN će tijekom izvršavanja dodjeljivati oznake svakoj točki koju obradi, najjednostavnije u obliku cijelih brojeva. Oznaka šuma bit će posebna oznaka. Neka je $\operatorname{L} \left(\mathbf{x}\right)$ oznaka grupe za točku $\mathbf{x}$, dakle za svaki $\mathbf{x}^{(i)} \in \mathcal{D}$ vrijedi
 \[\operatorname{L} \left(\mathbf{x}^{(i)}\right) = y^{(i)}\]
+U nastavku je opisan algoritam DBSCAN koji dodjeljuje oznake svakoj ulaznoj točki iz $\mathcal{D}$.
 
 \begin{croatianalgorithm}[H]
 \caption{DBSCAN}
@@ -689,42 +690,54 @@ gdje $y^{(i)}$ predstavlja oznaku točke $\mathbf{x}^{(i)}$. Prije izvršena alg
 \STATE
 
 \STATE{$k \gets 0$}
-\FORALL{$\mathbf{x}^{(i)} \in \mathcal{D}$}
-    \STATE{\textbf{vrati se na} početak petlje ako je oznaka $\operatorname{L} \left(\mathbf{x}^{(i)}\right)$ definirana}
-    \STATE{$\mathcal{R} \gets \mathcal{R} \left(\mathcal{D}, d, \mathbf{x}^{(i)}, \varepsilon\right)$}
-    \IF{$\left\vert \mathcal{R} \right\vert < m$}
+\FORALL{$\mathbf{x}^{(i)} \in \mathcal{D}$ \quad (1)}
+    \STATE{\textbf{vrati se na} početak petlje (1) ako je oznaka $\operatorname{L} \left(\mathbf{x}^{(i)}\right)$ definirana}
+    \STATE{$\mathcal{S} \gets \mathcal{R} \left(\mathcal{D}, d, \mathbf{x}^{(i)}, \varepsilon\right)$}
+    \IF{$\left\vert \mathcal{S} \right\vert < m$}
         \STATE{$\operatorname{L} \left(\mathbf{x}^{(i)}\right) \gets \text{šum}$}
-        \STATE{\textbf{vrati se na} početak petlje}
+        \STATE{\textbf{vrati se na} početak petlje (1)}
     \ENDIF
     \STATE
     \STATE{$k \gets k + 1$}
     \STATE{$\operatorname{L} \left(\mathbf{x}^{(i)}\right) \gets k$}
-    \STATE{$\mathcal{R} \gets \mathcal{R} \setminus
+    \STATE{$\mathcal{S} \gets \mathcal{S} \setminus
     \left\{\mathbf{x}^{(i)}\right\}$}
-    \STATE{\textbf{stvori} red elemenata $\mathcal{Q} \gets \mathcal{R}$}
-    \WHILE{dok red $\mathcal{Q}$ nije prazan}
+    \STATE{\textbf{stvori} red elemenata $\mathcal{Q} \gets \mathcal{S}$}
+    \WHILE{dok red $\mathcal{Q}$ nije prazan \quad (2)}
         \STATE{\textbf{ukloni} prvi element $\mathbf{q}$ iz reda $\mathcal{Q}$}
+        \STATE{\textbf{ako} 
+        $\operatorname{L}\left(\mathbf{q}\right) = \text{šum}$
+        \textbf{onda} $\operatorname{L} \left(\mathbf{q}\right) \gets k$} \COMMENT{Granična točka}
+        \STATE{\textbf{vrati se na} početak petlje (2) ako je oznaka $\operatorname{L} \left(\mathbf{q}\right)$ definirana}
+        \COMMENT {Granična točka druge grupe}
+        \STATE{$\operatorname{L} \left(\mathbf{q}\right) \gets k$}
+        \COMMENT{Jezgrena točka}
+        \STATE{$\widehat{\mathcal{S}} \gets \mathcal{R} \left(\mathcal{D}, d, \mathbf{q}, \varepsilon\right)$}
+        \IF{$\left\vert
+        \widehat{\mathcal{S}}
+        \right\vert \geq m$}
+            \STATE{\textbf{stavi} sve elemente iz $\widehat{\mathcal{S}}$ na kraj reda $\mathcal{Q}$}
+        \ENDIF
     \ENDWHILE
 \ENDFOR
 
-\STATE{$\Gamma \gets \emptyset$}
-\FORALL{$i \in \left\{1, \dots, N\right\}$}
-    \STATE{$\mathcal{C}_i \gets \left\{ \mathbf{x}^{(i)} \right\}$}
-    \STATE{$\Gamma \gets \Gamma \cup \left\{ \mathcal{C}_i \right\}$}
-\ENDFOR
-\WHILE{}
-\STATE{\textbf{prekini} ako je zadan $K$ i vrijedi $\vert \Gamma \vert \leq K$}
-\STATE{$\left(\mathcal{C}_i, \mathcal{C}_j\right) \gets 
-        \argmin_{\left(\mathcal{C}_a, \mathcal{C}_b\right) \in \Gamma \times \Gamma}
-        D \left(\mathcal{C}_a, \mathcal{C}_b\right)
-$}
-\STATE{\textbf{prekini} ako je zadan $\epsilon$ i vrijedi $D \left(\mathcal{C}_i, \mathcal{C}_j\right) > \epsilon$}
-\STATE{$\mathcal{C}_i \gets \mathcal{C}_i \cup \mathcal{C}_j$}
-\STATE{$\Gamma \gets \Gamma \setminus \left\{\mathcal{C}_j\right\}$}
-\ENDWHILE
-\RETURN{$\Gamma$}
 \end{algorithmic}
 \end{croatianalgorithm}
+Na slici \ref{fig:dbscanexample} je prikazan primjer grupiranja dvodimenzijskih podataka algoritmom DBSCAN.
+\begin{figure}[H]
+    \centering
+    \includegraphics[scale=0.6]{img/dbscanexample.png}
+    \caption{Primjer grupiranja algoritmom DBSCAN}
+    \label{fig:dbscanexample}
+\end{figure}
+Točke koje se nalaze unutar područja svijetlije nijanse su granične točke, a točke unutar područja tamnije nijanse su jezgrene točke. Sive točke su šum.
+
+\subsection{Svojstva i složenost algoritma}
+Najveća prednost modela gustoće točaka i algoritma DBSCAN jest mogućnost razdvajanja grupa nekonveksnih oblika, što nije slučaj kod algoritma K-sredina i EM algoritma. To je omogućeno samim modelom gustoće točaka jer grupe se grade prema tome koliko gusto su raspoređene u prostoru, a ne koliko su udaljene od centroida.
+
+Nije potrebno unaprijed odrediti broj grupa koje algoritam treba proizvesti, što nije lako odrediti općenito. S druge strane, potrebno je specificirati dobre parametre $m$ i $\varepsilon$, što može biti izazovno ukoliko se ne poznaje priroda i domena podataka. Ukoliko se odaberu premali $m$ i preveliki $\varepsilon$, algoritam će spajati rijetka područja što može rezultirati spajanjem više prirodnih grupa u jednu zajedno sa šumom. S druge strane, ako se odaberu preveliki $m$ i premali $\varepsilon$, algoritam će veliki dio točaka označiti kao šum. Odabir ispravnih parametara $m$ i $\varepsilon$ postaje još izazovnije ukoliko grupe variraju u gustoći.
+
+Vremenska složenost algoritma DBSCAN ovisi na koji način je izvedeno traženje okoline točke $\mathbf{x}$ polumjera $\varepsilon$: $\mathcal{R} \left(\mathcal{D}, d, \mathbf{x}, \varepsilon\right)$. Naivan pristup je linearna pretraga svakog elementa iz $\mathcal{D}$ i računanje udaljenosti do $\mathbf{x}$. Takav pristup je vremenske složenosti $\mathcal{O} \left(N n\right)$. Najčešće u implementacijama se za spremanje ulaznog skupa podataka $\mathcal{D}$ koriste strukture podataka osmišljene za spremanje prostornih podataka\footnote{Primjerice K-D stablo, R-stablo. Ako se ulazni podaci spreme u neku bazu podataka, ta baza onda može stvoriti jednu od takvih struktura kao indeks.}. U tom slučaju se traženje $\mathcal{R} \left(\mathcal{D}, d, \mathbf{x}, \varepsilon\right)$ ubrzava i vremenske je složenosti $\mathcal{O} \left(\log{N}\right)$. Traženje okoline se obavlja za svaku točku, dakle vremenska složenost algoritma DBSCAN je $\mathcal{O} \left(N^2\right)$ kod naivnog pristupa, a $\mathcal{O} \left(N \log{N}\right)$ ako se koristi brza pretraga okoline, što je prihvatljivo za velike skupove podataka. Što se tiče prostorne složenosti, ono je $\mathcal{O} \left(N\right)$ jer je potrebna struktura podataka koja omogućava spremanje ‘‘neobrađenih’’ susjednih točaka i njihovo uklanjanje nakon obrade. Ako se koristi prethodno pripremljena matrica udaljenosti, tada se radi o prostornoj složenosti $\mathcal{O} \left(N^2\right)$, ali se zauzvrat ubrzava računanje udaljenosti.
 
 \chapter{Postupci vrednovanja algoritama grupiranja}
 \label{evaluation}

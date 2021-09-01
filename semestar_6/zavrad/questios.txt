@@ -21,6 +21,11 @@ konkretne skupove podataka i konkretne mjere vrednovanja u tom dijelu?
 
 7. Složenost EM algoritma?
 
+8. K-means određivanje broja grupa K; GMM/EM određivanje broja komponenata K, organizirati u sklopu poglavlja
+koja se bave tim algoritmima ili u sklopu unutarnje provjere grupa?
+
+9. Treba li pisati konkretan kod u radu? Mislio sam ne jer ionako je 99% svega toga preuzeto sa scikit-learn stranice.
+
 REMINDER: UPISATI DIPLOMSKI LMAO, ROK DO 3.9.
 
 
