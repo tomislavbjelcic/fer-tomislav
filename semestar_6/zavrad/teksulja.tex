@@ -158,7 +158,9 @@ Na slici \ref{fig:hard_vs_soft_clustering} vizualno je prikazana razlika između
 
 \chapter{Algoritmi grupiranja}
 \label{clusteringalgos}
-U daljnjim potpoglavljima opisan je podskup algoritama grupiranja implementiranih u Pythonovoj programskoj knjižnici \textbf{Scikit-learn}, unutar modula za grupiranje \texttt{sklearn.cluster}. Svako potpoglavlje sadrži najprije opis modela grupiranja kojeg taj algoritam koristi, a zatim opis samog algoritma.
+U daljnjim potpoglavljima opisan je podskup algoritama grupiranja implementiranih u Pythonovoj programskoj knjižnici \textbf{Scikit-learn}, unutar modula za grupiranje \texttt{sklearn.cluster}. Svako potpoglavlje sadrži najprije opis modela grupiranja kojeg taj algoritam koristi, a zatim opis samog algoritma te svojstva i složenost. Za neke algoritme i modele je dodatno opisano na koji način odrediti optimalne parametre algoritma.
+
+
 \section{Algoritam K-sredina} \label{kmeans}
 Algoritam \textbf{K-sredina} \engl{K-means clustering} je jednostavan, učinkovit i najpopularniji algoritam particijskog čvrstog grupiranja koji ulazni skup točaka $\mathcal{D}$ particionira u $K$ grupa. $K$ je broj grupa koje je potrebno proizvesti i on se zadaje unaprijed kao parametar algoritma. U poglavlju \ref{subsection:odabirK} su opisane neke metode određivanja optimalnog broja grupa $K$.
 
@@ -219,7 +221,7 @@ Potrebno je napomenuti da je algoritam kao početne centroide odabrao već posto
 
 \subsection{Svojstva i složenost algoritma}
 \label{kmsvojstva}
-Kao što je spomenuto na početku poglavlja \ref{kmeans}, cilj algoritma K-sredina jest minimizirati kriterijsku funkciju. Postavlja se pitanje, hoće li algoritam u tome uvijek i uspjeti? Odgovor je: neće. Algoritam će pronaći lokalni optimum, ali ne garantira da će to biti i globalni optimum. Velik utjecaj na konačni rezultat ima upravo prvi korak algoritma: inicijalizacija početnih $K$ centroida. Kako bi se osigurao što bolji rezultat, odnosno što manji iznos kriterijske funkcije, jako je važno na pametan način odabrati početne centroide. Jednako tako je važno odabrati ispravan broj grupa: parametar $K$.
+Kao što je spomenuto na početku poglavlja \ref{kmeans}, cilj algoritma K-sredina jest minimizirati kriterijsku funkciju. Postavlja se pitanje, hoće li algoritam u tome uvijek i uspjeti? Odgovor je: neće. Algoritam će pronaći lokalni optimum, ali ne garantira da će to biti i globalni optimum. Velik utjecaj na konačni rezultat ima upravo prvi korak algoritma: inicijalizacija početnih $K$ centroida. Kako bi se osigurao što bolji rezultat, odnosno što manji iznos kriterijske funkcije, jako je važno na pametan način odabrati početne centroide. Jednako tako je važno odabrati ispravan broj grupa: parametar $K$. Dodatno, algoritam se može pokrenuti više puta sa različitim izborima početnih centroida i tada se prati koji prolaz algoritma i koje grupiranje je dalo najmanji iznos kriterijske funkcije. Time se pomaže spriječiti problem ‘‘zaglavljivanja’’ u lokalnom optimumu.
 
 Vremenska složenost algoritma K-sredina je $\mathcal{O} \left(TnKN\right)$, gdje je $T$ broj iteracija algoritma do konvergencije, $n$ broj značajki (dimenzija) točaka, a $N$ broj točaka. Korak algoritma u kojem se točke pridružuju najbližem centroidu je složenosti $\mathcal{O} \left(nKN\right)$ jer je potrebno za svaku od $N$ točaka ispitati koji od $K$ trenutnih centroida je najbliži, dakle mora ispitati udaljenost od svakog centroida, a računanje udaljenosti je složenosti $\mathcal{O} \left(n\right)$. Korak algoritma u kojem se računaju centroidi je složenosti $\mathcal{O} \left(nN\right)$ jer iako se iterira po grupama, efektivno se iterira po svim ulaznim točkama i obavljaju se operacije zbrajanja i dijeljenja sa nekim brojem (koje su također složenosti $\mathcal{O} \left(n\right)$).\\
 Takva složenost je prihvatljiva i algoritam uz dobar odabir početnih centroida i dobar odabir parametra $K$ proizvodi dobre rezultate. Zbog povoljne složenosti, algoritam je učinkovit i za velike količine podatka (veliki $N$), a broj grupa i značajka ionako su najčešće\footnote{Kod velikog broja značajki tradicionalni algoritmi grupiranja, ali i postupci obrade podataka općenito, nisu učinkoviti. Tada se radi o problemu prokletstva visoke dimenzionalnosti \engl{curse of dimensionality}} puno manji od $N$.
@@ -760,6 +762,7 @@ Ono mjeri koliko dobro su grupirane međusobno grupe $\mathcal{C}_i$ i $\mathcal
 Davies-Bouldin indeks $DBI$ se tada definira kao
 \[DBI = \frac{1}{K} \sum_{k=1}^{K} R_k\]
 
+Nedostatak vrednovanja Davies-Bouldin indeksom je činjenica da se veći iznosi postižu ako su grupe konveksnog oblika, odnosno iznosi su veći kod grupiranja sa centroidnim modelima (algoritam K-sredina, EM algoritam i model Gaussovih mješavina) nego kod modela kojeg koristi primjerice DBSCAN. Uz to, Davies-Bouldin indeks se može računati samo nad grupiranjima kod kojih je moguće računati centroide i može se koristiti Euklidova udaljenost.
 \subsection{Vrijednost siluete}
 \label{subsec:silhouette}
 Vrijednost siluete \engl{silhouette score} mjeri koliko je svaka točka iz $\mathcal{D}$ slična svojoj grupi u odnosu na ostale grupe, dakle svakoj točki se pridružuje vrijednost siluete. Metoda koja se zasniva na ovoj mjeri se naziva \textbf{metoda siluete}. Za svaku točku $\mathbf{x}^{(i)}$ iz ulaznog skupa točaka $\mathcal{D} = \left\{\mathbf{x}^{(i)}\right\}_{i=1}^{N}$ neka $\mathcal{C} \left(i\right)$ označava grupu kojoj pripada ta točka. Također je na raspolaganju grupiranje koje je generirao promatrani algoritam, odnosno skup od $K$ grupa $\Gamma = \left\{\mathcal{C}_k\right\}_{k=1}^{K}$.
@@ -782,6 +785,11 @@ s (i) = \begin{cases}
 \]
 Jasno je vidljivo iz ovakve definicije vrijednosti siluete da ona može samo poprimiti vrijednosti između -1 i 1, odnosno $-1 \leq s (i) \leq 1$. Kako $a (i)$ mjeri koliko je točka $\mathbf{x}^{(i)}$ blizu ostalim točkama iz svoje grupe, manja vrijedost $a(i)$ znači veću sličnost $\mathbf{x}^{(i)}$ sa ostalim točkama iz svoje grupe. S druge strane, $b(i)$ mjeri koliko je $\mathbf{x}^{(i)}$ blizu točkama iz najbliže susjedne grupe, stoga veća vrijednost $b (i)$ znači veću ‘‘razdvojenost’’, odnosno veću različitost od ostalih grupa. Prema tome, kada je $a(i)$ puno manji od $b(i)$, vrijednost siluete $s (i)$ će biti blizu 1, što označava dobro grupiranje konkretno za promatranu točku. Analogno, kada je $b (i)$ puno veći od $a (i)$, to znači da je točka bliža nekoj drugoj grupi nego vlastitoj. Tada će $s(i)$ biti blizu -1 i to označava loše grupiranje. Vrijednost siluete blizu 0 znači da se $a(i)$ i $b(i)$ malo razlikuju, što znači da je točka $\mathbf{x}^{(i)}$ na granici dvije grupe.
 
+Osim što se može računati vrijednost siluete za svaku točku $\mathbf{x}^{(i)}$ iz ulaznog skupa točaka $\mathcal{D}$, može se računati vrijednost siluete za cijelo grupiranje kao aritmetička sredina silueta svih točaka:
+\[s = \sum_{i=1}^{N} \frac{s (i)}{N}\]
+
+Kao i kod Davies-Bouldin indeksa, vrijednosti siluete su veće kod točaka grupa konveksnog oblika, što ga ne čini dobrim izborom unutarnog vrednovanja ako se grupiranje radi modelom koji ne pretpostavlja konveksan oblik grupa (primjerice model gustoće točaka kod algoritma DBSCAN).
+
 \subsubsection{Metoda siluete}
 Metoda siluete, odnosno analiza siluete, se zasniva na računanju vrijednosti siluete svake točke iz ulaznog skupa. Metoda siluete se može iskoristiti kako bi se odredio optimalan broj grupa kod algoritma K-sredina. U nastavku je primjer analize siluete nad istim ulaznim podacima kao na slici \ref{fig:elbowdata} gdje je bila demonstrirana metoda koljena.
 
@@ -803,19 +811,60 @@ Randov indeks mjeri preciznost grupiranja tako da promatra sve parove ulaznih pr
 Parovi primjera su dobro grupirani ako situacija odgovara referentnom grupiranju, dakle promatraju se primjeri koji su istinito pozitivni i istinito negativni.
 Randov indeks $R$ se tada definira kao:
 \[R = \frac{TP + TN}{TP + TN + FP + FN} = \frac{TP + TN}{\binom{N}{2}}\]
-Jasno je da su u nazivniku pokriveni svi mogući parovi ulaznih primjera, dakle broj takvih parova mora biti $\binom{N}{2}$.
+Jasno je da su u nazivniku pokriveni svi mogući parovi ulaznih primjera, dakle broj takvih parova mora biti $\binom{N}{2}$. Moguće vrijednosti su $R \in \left[0, 1\right]$
 Grupiranje koje je identično referentnom grupiranju ima $R = 1$.
 
 Primjerice, neka su ulazni primjeri skup od 5 prirodnih brojeva od 1 do 5. Neka su ulazni podaci grupirani na sljedeći način:
 \[\left\{ \left\{1, 2, 4\right\}, \left\{3, 5\right\} \right\}\]
-U programskim implementacijama obično se grupiranje specificira nizom oznakama. Za ovaj primjer bi onda u pitanju bio niz $\left\{0, 0, 1, 0, 1\right\}$ Kod oznaka je samo bitno da primjeri iste grupe imaju istu oznaku, kakva je oznaka nije bitno. Oznake su mogle biti primjerice  $\left\{7, 7, 4, 7, 4\right\}$. Neka je referentno grupiranje
+Neka je referentno grupiranje
 \[\left\{\left\{1,2\right\}, \left\{3,4\right\}, \left\{5\right\}\right\}\]
-odnosno u terminima oznaka bi se specificiralo nešto poput $\left\{0, 0, 1, 1, 2\right\}$.
 Za ovaj primjer je $TP = 1$ jer samo par 12 se nalazi u istim grupama u oba grupiranja, a $TN = 5$ i radi se o parovima 13, 15, 23, 25, 45. Prema tome $R = \frac{1 + 5}{\binom{5}{2}} = \frac{6}{10} = 0.6$.
+
+Nedostatak vrednovanja Randovim indeksom jest činjenica da jednako nagrađuje istinito pozitivne i istinito negativne parove primjera. U slučaju da se brojevi grupa razlikuju između dobivenog i referentnog grupiranja, to rezultira velikim brojem istinito negativnih primjerima. Postoji mogućnost da Randov indeks slučajnog grupiranja bude broj puno veći od 0, kao i da Randov indeks relativno lošeg grupiranja bude broj blizu 1. Taj problem rješava \textbf{prilagođeni Randov indeks} \engl{adjusted Rand index} koji uzima u obzir očekivani Randov indeks za slučajna grupiranja. Prilagođeni Randov indeks slučajnim grupiranjima pridjeljuje vrijednosti bliže nuli, a lošim grupiranjima može pridijeliti negativnu vrijednost. Prilagođeni Randov indeks je češće korištena mjera vanjskog vrednovanja u odnosu na neprilagođeni. Način na koji se računa prilagođeni Randov indeks i matematičke formulacije iza njega nećemo navoditi.
+
+\subsection{Uzajamna informacija}
+\textbf{Uzajamna informacija} \engl{mutual information} je mjera iz teorije informacije koja mjeri kako se mijenja nesigurnost predviđanja jedne slučajne varijable ukoliko znamo realizacije druge slučajne varijable. U kontekstu grupiranja radi se o oznakama grupa, (multi)skupovima koji u sebi sadrže oznake za svaki ulazni podatak.
+
+Neka je $X$ diskretna slučajna varijabla koja može poprimiti vrijednosti $x_1, \dots, x_n$ sa vjerojatnostima $P \left(x_i\right) = P \left(X = x_i\right)$. \textbf{Entropija} slučajne varijable $X$ se definira kao
+\[\operatorname{H} \left(X\right) = \sum_{i=1}^{n} P \left(x_i\right) \log{P \left(x_i\right)}\]
+gdje izbor baze logaritma može varirati između primjena, no najčešće se uzima baza 2. Kod grupiranja, skup oznaka grupa se mogu smatrati kao realizacijama neke slučajne varijable. Neka skup $U$ sadrži ukupno $N$ oznaka ($\vert U \vert = N$) od kojih je $n$ različitih oznaka $u_1, \dots, u_n$, te neka je $U_i$ podskup (konceptualno radi se o grupi sa tom oznakom) od $U$ koji sadrži samo oznake $u_i$. Entropija takvog grupiranja $\operatorname{H} \left(U\right)$ je tada
+\[\operatorname{H} \left(U\right) = 
+- \sum_{i=1}^{n} P \left(u_i\right) \log{P \left(u_i\right)}
+= - \sum_{i=1}^{n} \frac{\left\vert U_i \right\vert}{N}
+\log{\frac{\left\vert U_i \right\vert}{N}}\]
+Primjerice, entropija skupa $U = \left\{0, 0, 0, 1, 1, 2, 2, 2, 2, 2, 2\right\}$ (ovdje je $N = 11$ i $n = 3$ jer su prisutne 3 različite vrijednosti) je
+\[\operatorname{H} \left(U\right) = - \left(\frac{3}{11} \log{\frac{3}{11}}
++ \frac{2}{11} \log{\frac{2}{11}}
++ \frac{6}{11} \log{\frac{6}{11}}\right) = 1.435
+\]
+te bi to odgovaralo entropiji grupiranja
+$\left\{\left\{a, b, c\right\}, \left\{d, e\right\}, \left\{f, g, h, i, j, k\right\}\right\}$ gdje mala slova predstavljaju svaki ulazni podatak.
+
+Uzajamna informacija za dva grupiranja (dva skupa oznaka) $U$ i $V$, gdje $U$ ima $n$ različitih oznaka, a $V$ ima $m$ različitih oznaka, se definira kao
+\[\operatorname{MI} \left(U, V\right) = \sum_{i=1}^{n} \sum_{j=1}^{m} 
+P \left(u_i, v_j\right) \log{\frac{P \left(u_i, v_j\right)}{P \left(u_i\right) P \left(v_j\right)}}
+= \sum_{i=1}^{n} \sum_{j=1}^{m} 
+\frac{\left\vert U_i \cap V_j \right\vert}{N} \log{\frac{N \left\vert U_i \cap V_j \right\vert}{\left\vert U_i \right\vert  \left\vert V_j \right\vert}}
+\]
+Što su grupiranja sličnija, to će uzajamna informacija biti veća.
+
+Osim uzajamne informacije, koristi se i \textbf{normalizirana uzajamna informacija} koja se definira kao
+\[\operatorname{NMI} \left(U, V\right) = \frac{\operatorname{MI} \left(U, V\right)}
+{\frac{\operatorname{H} (U) + \operatorname{H} (V)}{2}}\]
+i moguće vrijednosti su između 0 i 1. Obje mjere imaju isti problem kao i neprilagođeni Randov indeks: slučajna grupiranja imaju iznose koje su znatno veće od 0. Na isti način se uvodi i najčešće koristi \textbf{prilagođena uzajamna informacija} \engl{adjusted mutual information}.
 
 \chapter{Programsko ostvarenje i rezultati}
 \label{chap:results}
-Programsko ostvarenje i rezultati.
+
+\section{Programska knjižnica Scikit-learn}
+Scikit-learn je besplatna programska knjižnica otvorenog koda za programski jezik Python namijenjena za strojno učenje. Za potrebe ovog završnog rada posebno je zanimljiv modul za grupiranje \texttt{sklearn.cluster} gdje je implementirana većina\footnote{Osim EM algoritma Gaussovih mješavina koja je dio \texttt{sklearn.mixture} modula.} algoritama grupiranja. Mjere vrednovanja su implementirane u \texttt{sklearn.metrics}.
+
+Svaki algoritam grupiranja je modeliran razredom, a u konstruktoru takvog razreda specificiraju se parametri i postavke algoritma. Primjerice, algoritam K-sredina je modeliran razredom \texttt{sklearn.cluster.KMeans} i u konstruktoru se može specificirati: broj grupa, maksimalan broj iteracija, strategiju inicijalizacije početnih centroida, kolika promjena kriterijske funkcije između iteracija se smatra konvergencijom, koliko puta ponoviti algoritam, žele li se prethodno izračunati udaljenosti između svih parova točaka, itd. Na sličan načim možemo podešavati i ostale algoritme grupiranja, a kod onih čiji model to dopušta može se specificirati i proizvoljna mjera udaljenosti.
+
+Pokretanje algoritma nad stvorenim objektom postiže se pozivom metode \texttt{fit} ili neke srodne metode (primjerice metoda \texttt{fit\_predict}). Kao obavezan argument se prima matrica\footnote{Za modeliranje i manipulaciju matrica koristi se programska knjižnica NumPy} dimenzija $N \times n$, gdje svaki redak te matrice predstavlja jedan ulazni $n$-dimenzionalni podatak. Metoda \texttt{fit} ne obavlja nužno grupiranje, već ‘‘namješta’’ model iz ulaznih podataka. U kontekstu strojnog učenja, radi se o treniranju modela. U slučaju algoritma K-sredina, računaju se završni centroidi. Kod EM algoritma Gaussovih mješavina, računaju se parametri $\boldsymbol{\theta}$. Kod hijerarhijskog aglomerativnog grupiranja, gradi se ‘‘presiječeno’’ (dakle ne potpuno) stablo hijerarhije, a algoritam DBSCAN traži jezgrene točke i usput obavlja grupiranje. Metoda \texttt{fit\_predict} uz treniranje obavlja i grupiranje ulaznog skupa točaka. Pozivatelju se vraća polje duljine $N$ koje sadrži cjelobrojne oznake grupa počevši od 0 za svaki ulazni podatak (oznaka na indeksu $i$ se oznaka grupe za ulazni podatak u $i$-tom retku). Algoritam DBSCAN šum označuje sa -1. Ako postoji za konkretan razred, može se koristiti i metoda \texttt{predict} koja dodjeljuje oznake grupa podataka koji nisu nužno ulazni podaci nad kojima je treniran model. Kako se radi o nenadziranom strojnom učenju, možemo i nove neviđene podatke klasificirati na temelju starih (onih koje smo koristili za treniranje modela). Od opisanih algoritma u poglavlju \ref{clusteringalgos}, tu mogućnost nude algoritam K-sredina i EM algoritam Gaussovih mješavina. Kod algoritma K-sredina, svaki podatak predan kao argument metode \texttt{predict} se svrstava u onu grupu čiji centroid je najbliži, a kod Gaussovih mješavina se svrstava u onu komponentu sa najvećom odgovornošću. Posebno za model Gaussovih mješavina, postoji i metoda \texttt{predict\_proba} koja vraća odgovornosti za svaki ulazni podatak i svaku komponentu u obliku matrice $N \times K$. Naglasak ovog rada je usporedba metoda grupiranja postojećih podataka, a ne klasifikacija novih neviđenih primjera, stoga je korištena samo metoda \texttt{fit\_predict}.
+
+\section{Skupovi podataka}
+Korišteni skupovi podataka.
 
 \chapter{Zaključak}
 \label{chap:conclusion}
