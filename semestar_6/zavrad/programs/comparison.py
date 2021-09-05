@@ -113,37 +113,22 @@ for i_dataset, (dataset, algo_params) in enumerate(datasets):
     # ============
     # Create cluster objects
     # ============
-    ms = cluster.MeanShift(bandwidth=bandwidth, bin_seeding=True)
-    two_means = cluster.MiniBatchKMeans(n_clusters=params['n_clusters'])
+    kmeans = cluster.KMeans(n_clusters=params['n_clusters'])
     ward = cluster.AgglomerativeClustering(
         n_clusters=params['n_clusters'], linkage='ward',
         connectivity=connectivity)
-    spectral = cluster.SpectralClustering(
-        n_clusters=params['n_clusters'], eigen_solver='arpack',
-        affinity="nearest_neighbors")
     dbscan = cluster.DBSCAN(eps=params['eps'])
-    optics = cluster.OPTICS(min_samples=params['min_samples'],
-                            xi=params['xi'],
-                            min_cluster_size=params['min_cluster_size'])
-    affinity_propagation = cluster.AffinityPropagation(
-        damping=params['damping'], preference=params['preference'])
     average_linkage = cluster.AgglomerativeClustering(
-        linkage="average", affinity="cityblock",
+        linkage="average",
         n_clusters=params['n_clusters'], connectivity=connectivity)
-    birch = cluster.Birch(n_clusters=params['n_clusters'])
     gmm = mixture.GaussianMixture(
         n_components=params['n_clusters'], covariance_type='full')
 
     clustering_algorithms = (
-        ('MiniBatch\nKMeans', two_means),
-        ('Affinity\nPropagation', affinity_propagation),
-        ('MeanShift', ms),
-        ('Spectral\nClustering', spectral),
+        ('KMeans', kmeans),
         ('Ward', ward),
         ('Agglomerative\nClustering', average_linkage),
         ('DBSCAN', dbscan),
-        ('OPTICS', optics),
-        ('BIRCH', birch),
         ('Gaussian\nMixture', gmm)
     )
 
@@ -163,31 +148,33 @@ for i_dataset, (dataset, algo_params) in enumerate(datasets):
                 message="Graph is not fully connected, spectral embedding" +
                 " may not work as expected.",
                 category=UserWarning)
-            algorithm.fit(X)
+            y_pred = algorithm.fit_predict(X)
 
         t1 = time.time()
-        if hasattr(algorithm, 'labels_'):
-            y_pred = algorithm.labels_.astype(int)
-        else:
-            y_pred = algorithm.predict(X)
+        timems = round((t1-t0) * 1000)
+        
+        print("{} executed.".format(name))
 
         plt.subplot(len(datasets), len(clustering_algorithms), plot_num)
         if i_dataset == 0:
             plt.title(name, size=18)
 
-        colors = np.array(list(islice(cycle(['#377eb8', '#ff7f00', '#4daf4a',
-                                             '#f781bf', '#a65628', '#984ea3',
-                                             '#999999', '#e41a1c', '#dede00']),
+        colors = np.array(list(islice(cycle([
+                                            '#999999', '#e41a1c', '#dede00',
+                                            '#f781bf', '#a65628', '#984ea3',
+                                            '#377eb8', '#ff7f00', '#4daf4a'
+                                            ]),
                                       int(max(y_pred) + 1))))
+        
         # add black color for outliers (if any)
         colors = np.append(colors, ["#000000"])
-        plt.scatter(X[:, 0], X[:, 1], s=10, color=colors[y_pred])
+        plt.scatter(X[:, 0], X[:, 1], s=0.75, color=colors[y_pred])
 
         plt.xlim(-2.5, 2.5)
         plt.ylim(-2.5, 2.5)
         plt.xticks(())
         plt.yticks(())
-        plt.text(.99, .01, ('%.2fs' % (t1 - t0)).lstrip('0'),
+        plt.text(.99, .01, "{}ms".format(timems),
                  transform=plt.gca().transAxes, size=15,
                  horizontalalignment='right')
         plot_num += 1
