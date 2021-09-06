@@ -753,7 +753,7 @@ Davies-Bouldin indeks promatra sve parove grupa i bilježi koliko su grupe udalj
 \[S_i = \frac{1}{\left\vert \mathcal{C}_i \right\vert}
 \sum_{\mathbf{x} \in \mathcal{C}_i} \Vert \mathbf{x} - \boldsymbol{\mu}_i  \Vert^2
 \]
-$S_i$ je mjera raspršenja unutar grupe $\mathcal{C}_i$. Naravno, kako bi se mogao prema ovakvoj definiciji računati $S_i$, mora se moći izračunati centroid, a to je moguće jedino ako podaci dolaze iz nekog vektorskog prostora. Ranije smo spomenuli da se najčešće radi o realnom koordinatnom prostoru pa se koristi Euklidova udaljenost i Euklidova norma. Neka je $M_{ij}$ udaljenost centroida grupa $\mathcal{C}_i$ i $\mathcal{C}_j$:
+$S_i$ je mjera raspršenja unutar grupe $\mathcal{C}_i$. Naravno, kako bi se mogao prema ovakvoj definiciji računati $S_i$, mora se moći izračunati centroid, a to je moguće jedino ako podaci dolaze iz nekog vektorskog prostora. Ranije je spomenuto da se najčešće radi o realnom koordinatnom prostoru pa se koristi Euklidova udaljenost i Euklidova norma. Neka je $M_{ij}$ udaljenost centroida grupa $\mathcal{C}_i$ i $\mathcal{C}_j$:
 \[M_{ij} = \Vert \boldsymbol{\mu}_i - \boldsymbol{\mu}_j \Vert\]
 $M_{ij}$ mjeri koliko dobro su razdvojene grupe u smislu koliko su im udaljeni centroidi. Neka je $R_{ij}$ definiran kao
 \[R_{ij} = \frac{S_i + S_j}{M_{ij}}\]
@@ -864,8 +864,40 @@ Svaki algoritam grupiranja je modeliran razredom, a u konstruktoru takvog razred
 Pokretanje algoritma nad stvorenim objektom postiže se pozivom metode \texttt{fit} ili neke srodne metode (primjerice metoda \texttt{fit\_predict}). Kao obavezan argument se prima matrica\footnote{Za modeliranje i manipulaciju matrica koristi se programska knjižnica NumPy} dimenzija $N \times n$, gdje svaki redak te matrice predstavlja jedan ulazni $n$-dimenzionalni podatak. Metoda \texttt{fit} ne obavlja nužno grupiranje, već ‘‘namješta’’ model iz ulaznih podataka. U kontekstu strojnog učenja, radi se o treniranju modela. U slučaju algoritma K-sredina, računaju se završni centroidi. Kod EM algoritma Gaussovih mješavina, računaju se parametri $\boldsymbol{\theta}$. Kod hijerarhijskog aglomerativnog grupiranja, gradi se ‘‘presiječeno’’ (dakle ne potpuno) stablo hijerarhije, a algoritam DBSCAN traži jezgrene točke i usput obavlja grupiranje. Metoda \texttt{fit\_predict} uz treniranje obavlja i grupiranje ulaznog skupa točaka. Pozivatelju se vraća polje duljine $N$ koje sadrži cjelobrojne oznake čvrstih grupa počevši od 0 za svaki ulazni podatak (oznaka na indeksu $i$ se oznaka grupe za ulazni podatak u $i$-tom retku). Algoritam DBSCAN šum označuje sa -1. Ako postoji za konkretan razred, može se koristiti i metoda \texttt{predict} koja dodjeljuje oznake grupa podataka koji nisu nužno ulazni podaci nad kojima je treniran model. Kako se radi o nenadziranom strojnom učenju, mogu se i novi neviđeni podaci klasificirati na temelju starih (korištenih za treniranje modela). Od opisanih algoritma u poglavlju \ref{clusteringalgos}, tu mogućnost nude algoritam K-sredina i EM algoritam Gaussovih mješavina. Kod algoritma K-sredina, svaki podatak predan kao argument metode \texttt{predict} se svrstava u onu grupu čiji centroid je najbliži, a kod Gaussovih mješavina se svrstava u onu komponentu sa najvećom odgovornošću. Posebno za model Gaussovih mješavina, postoji i metoda \texttt{predict\_proba} koja vraća odgovornosti (meko grupiranje) za svaki ulazni podatak i svaku komponentu u obliku matrice $N \times K$. Naglasak ovog rada je usporedba metoda grupiranja postojećih podataka, a ne klasifikacija novih neviđenih primjera, stoga je korištena samo metoda \texttt{fit\_predict}.
 
 \section{Skupovi podataka}
-Za potrebe usporedbe algoritama grupiranja korišteno je 6 različitih skupova podataka. Radi se o umjetno stvorenim podacima koji služe za demonstraciju i usporedbu različitih algoritama grupiranja. Kako bi svi opisani algoritmi i modeli grupiranja bili primjenjivi, značajke svakog podatka su realni brojevi, a njihova dimenzija je 2 kako bi se lakše vizualno prikazali. Svaki skup ima 1500 ulaznih točaka kako trajanje izvršenja algoritama ne bi bilo predugo, a s druge strane sasvim dovoljno za demonstraciju. Prema tome
+Za potrebe usporedbe algoritama grupiranja korišteno je 6 različitih skupova podataka. Radi se o umjetno stvorenim podacima koji služe za demonstraciju i usporedbu različitih algoritama grupiranja. Kako bi svi opisani algoritmi i modeli grupiranja bili primjenjivi, značajke svakog podatka su realni brojevi, a njihova dimenzija je 2 kako bi se lakše vizualno prikazali. Svaki skup ima 1500 ulaznih točaka kako trajanje izvršenja algoritama ne bi bilo predugo, a s druge strane to je sasvim dovoljno za demonstraciju. Prema tome
 \[N = 1500, \qquad n = 2, \qquad \mathcal{V} \subseteq \mathbb{R}^2\]
+
+Na slici \ref{fig:datasets} prikazane su točke svakog korištenog skupa podataka u realnom koordinatnom prostoru. Kako su podaci umjetno stvoreni, oznake referentnih grupa su unaprijed poznate kako bi se algoritmi mogli vrednovati mjerama vanjskog vrednovanja. Referentno grupiranje je prikazano bojanjem točaka. Praktični skupovi podataka nisu ovako jednostavni, niti su unaprijed poznate oznake grupa.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[scale=0.73]{img/datasets.png}
+    \caption{Korišteni skupovi podataka}
+    \label{fig:datasets}
+\end{figure}
+
+Skupovi podataka (1) i (2) su primjeri sa grupama nekonveksnih oblika. Podaci iz skupova (3), (4), (5) su uzorkovani iz dvodimenzionalnih normalnih razdioba te se grupiraju prema tome iz koje od tri razdiobe su uzorkovane, a točke skupa (6) su uzorkovane iz dvodimenzionalne jednolike distribucije na nekom području.
+
+\section{Rezultati}
+
+Nad spomenutim skupovima podataka pokrenuto je 7 algoritama grupiranja: K-sredina, DBSCAN, EM algoritam Gaussovih mješavina (bez ograničenja kovarijacijske matrice) i Hijerarhijsko aglomerativno grupiranje sa svakim od 4 opisana kriterija spajanja. Za svaki algoritam i skup podataka specificirani su optimalni parametri, osim za skup (6). U slučaju algoritama kod kojih se može specificirati broj grupa (ili broj komponenata kod Gaussovih mješavina), uvijek je odabran onaj broj grupa koji odgovara prirodnom grupiranja. U slučaju algoritma DBSCAN, parametri $m$ i $\varepsilon$ su odabrani tako da daju najbolje moguće rezultate za taj model. Što se tiče skupa (6), odabrani su parametri identični kao za skup (5). U svim algoritmima korištena je Euklidova udaljenost.
+
+Rezultati grupiranja prikazani su na slikama \ref{fig:resultspart1} i \ref{fig:resultspart2}. Vrijeme u milisekundama potrebno za izvršenje nekog algoritma nad nekim skupom podataka je zapisan u gornjem desnom kutu. Kod algoritma DBSCAN, točke šuma su obojane crnom bojom.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[scale=0.51]{img/results_part1.png}
+    \caption{Rezultati grupiranja}
+    \label{fig:resultspart1}
+\end{figure}
+\begin{figure}[H]
+    \centering
+    \includegraphics[scale=0.68]{img/results_part2.png}
+    \caption{Rezultati grupiranja}
+    \label{fig:resultspart2}
+\end{figure}
+
+Uz grupiranje, izračunate su mjere unutarnjeg i vanjskog vrednovanja za svako grupiranje i prikazane su tablicom %TODO: NAPRAVI TABLICU%.
 
 \chapter{Zaključak}
 \label{chap:conclusion}
@@ -889,4 +921,3 @@ Abstract.
 \end{abstract}
 
 \end{document}
-

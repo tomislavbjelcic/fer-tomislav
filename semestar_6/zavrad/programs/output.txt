@@ -1,0 +1,171 @@
+
+=========================================================
+Comparing different clustering algorithms on toy datasets
+=========================================================
+
+This example shows characteristics of different
+clustering algorithms on datasets that are "interesting"
+but still in 2D. With the exception of the last dataset,
+the parameters of each of these dataset-algorithm pairs
+has been tuned to produce good clustering results. Some
+algorithms are more sensitive to parameter values than
+others.
+
+The last dataset is an example of a 'null' situation for
+clustering: the data is homogeneous, and there is no good
+clustering. For this example, the null dataset uses the
+same parameters as the dataset in the row above it, which
+represents a mismatch in the parameter values and the
+data structure.
+
+While these examples give some intuition about the
+algorithms, this intuition might not apply to very high
+dimensional data.
+
+Dataset: Noisy Circles; K-Means executed.
+DBI: 1.1845976969420957	AvgSilhouette: 0.3536592645389055	
+Rand: 0.49967000222370467	ARI: -0.0006604218833208721	MI: 3.555660909204672e-06	NMI: 5.1297869883715885e-06	AMI: -0.00047648435852711577	
+
+Dataset: Noisy Circles; HAC - Ward executed.
+DBI: 1.1966639391536507	AvgSilhouette: 0.3229951398943203	
+Rand: 0.500096953524572	ARI: 0.0002409213625818089	MI: 0.0004632513494702284	NMI: 0.0006861433073990412	AMI: 0.0001919776199059814	
+
+Dataset: Noisy Circles; HAC - Average Linkage executed.
+DBI: 1.1864200930993762	AvgSilhouette: 0.349204167382769	
+Rand: 0.4996806760062264	ARI: -0.0006322342064562806	MI: 1.4369849170581261e-05	NMI: 2.080850809835953e-05	AMI: -0.00046259406334812897	
+
+Dataset: Noisy Circles; HAC - Single Linkage executed.
+DBI: 989.7939551676102	AvgSilhouette: 0.11397803765999538	
+Rand: 1.0	ARI: 1.0	MI: 0.6931471805599454	NMI: 1.0	AMI: 1.0	
+
+Dataset: Noisy Circles; HAC - Complete Linkage executed.
+DBI: 1.1946653245366494	AvgSilhouette: 0.330422624290279	
+Rand: 0.5018901489882144	ARI: 0.0038164756337051124	MI: 0.0023540076355403894	NMI: 0.0034655939715026937	AMI: 0.0029757895251865327	
+
+Dataset: Noisy Circles; DBSCAN executed.
+DBI: 989.7939551676102	AvgSilhouette: 0.11397803765999538	
+Rand: 1.0	ARI: 1.0	MI: 0.6931471805599454	NMI: 1.0	AMI: 1.0	
+
+Dataset: Noisy Circles; Gaussian Mixture executed.
+DBI: 1.1889368647470224	AvgSilhouette: 0.3520261909545675	
+Rand: 0.4996984656437625	ARI: -0.0006034712692775959	MI: 3.200238960465729e-05	NMI: 4.6170754555702134e-05	AMI: -0.0004354298270294207	
+
+Dataset: Noisy Moons; K-Means executed.
+DBI: 0.80425444846199	AvgSilhouette: 0.4997929474627826	
+Rand: 0.7429655325772737	ARI: 0.4859309101941669	MI: 0.2682341202457348	NMI: 0.3870100623021952	AMI: 0.3867148162006517	
+
+Dataset: Noisy Moons; HAC - Ward executed.
+DBI: 0.8388078875076594	AvgSilhouette: 0.4554688619448854	
+Rand: 0.7796050700466978	ARI: 0.5592286293358629	MI: 0.37878941773826524	NMI: 0.5594301114962545	AMI: 0.5592128765714697	
+
+Dataset: Noisy Moons; HAC - Average Linkage executed.
+DBI: 0.870536687102136	AvgSilhouette: 0.4561066292340493	
+Rand: 0.8651376473204359	ARI: 0.7302789776655884	MI: 0.4752847272774579	NMI: 0.6909734929803205	AMI: 0.6908235107296793	
+
+Dataset: Noisy Moons; HAC - Single Linkage executed.
+DBI: 1.0230868386830778	AvgSilhouette: 0.3891199513969138	
+Rand: 1.0	ARI: 1.0	MI: 0.6931471805599454	NMI: 1.0	AMI: 1.0	
+
+Dataset: Noisy Moons; HAC - Complete Linkage executed.
+DBI: 0.8142234003642493	AvgSilhouette: 0.49437915967769835	
+Rand: 0.7999208361129642	ARI: 0.5998414946152304	MI: 0.3410939321541423	NMI: 0.49209483992631775	AMI: 0.49185022672440304	
+
+Dataset: Noisy Moons; DBSCAN executed.
+DBI: 1.0230868386830778	AvgSilhouette: 0.3891199513969138	
+Rand: 1.0	ARI: 1.0	MI: 0.6931471805599454	NMI: 1.0	AMI: 1.0	
+
+Dataset: Noisy Moons; Gaussian Mixture executed.
+DBI: 0.8043022148439296	AvgSilhouette: 0.499733101501827	
+Rand: 0.7504656437625083	ARI: 0.5009312792331205	MI: 0.27776288375591335	NMI: 0.40081992361553825	AMI: 0.40053128440827185	
+
+Dataset: Varied Blobs; K-Means executed.
+DBI: 0.6346084343875108	AvgSilhouette: 0.6261628445457234	
+Rand: 0.9148837002446075	ARI: 0.8094200991927445	MI: 0.8711732432251069	NMI: 0.7971458106367381	AMI: 0.7968975641049345	
+
+Dataset: Varied Blobs; HAC - Ward executed.
+DBI: 0.655783260268311	AvgSilhouette: 0.6038038481805383	
+Rand: 0.9824994440738269	ARI: 0.9606027285833386	MI: 1.030888164590145	NMI: 0.9384698294655054	AMI: 0.9383949196865436	
+
+Dataset: Varied Blobs; HAC - Average Linkage executed.
+DBI: 0.7571911136685648	AvgSilhouette: 0.511909018351753	
+Rand: 0.7744238381142984	ARI: 0.551121842586853	MI: 0.6247136718081118	NMI: 0.6669794909600679	AMI: 0.6665010518298189	
+
+Dataset: Varied Blobs; HAC - Single Linkage executed.
+DBI: 0.6589781832496562	AvgSilhouette: 0.1299553706565232	
+Rand: 0.33467822993106516	ARI: 1.4269788030111522e-05	MI: 0.002936769274950051	NMI: 0.005249250794935558	AMI: 0.0022203586380014403	
+
+Dataset: Varied Blobs; HAC - Complete Linkage executed.
+DBI: 0.8439693067193282	AvgSilhouette: 0.5423591599278188	
+Rand: 0.7749317322659551	ARI: 0.5377970123439701	MI: 0.6178627557398231	NMI: 0.6274207753932644	AMI: 0.6269135642104249	
+
+Dataset: Varied Blobs; DBSCAN executed.
+DBI: 2.2217598302092694	AvgSilhouette: 0.5319819282130047	
+Rand: 0.7738474538581276	ARI: 0.5501749954549379	MI: 0.6233029344368973	NMI: 0.6641847294307548	AMI: 0.6637034651753749	
+
+Dataset: Varied Blobs; Gaussian Mixture executed.
+DBI: 0.6615374077282977	AvgSilhouette: 0.5962836020366891	
+Rand: 0.9850736046253058	ARI: 0.966393588375995	MI: 1.0350625030266705	NMI: 0.942165372436752	AMI: 0.9420949696825045	
+
+Dataset: Anisotropic Blobs; K-Means executed.
+DBI: 0.6997514855156508	AvgSilhouette: 0.5100099289871952	
+Rand: 0.8260449188347787	ARI: 0.6083805913264235	MI: 0.6791781294827137	NMI: 0.6182735440113698	AMI: 0.6178088246746414	
+
+Dataset: Anisotropic Blobs; HAC - Ward executed.
+DBI: 0.6871395699195854	AvgSilhouette: 0.47991732004551363	
+Rand: 0.8566217478318879	ARI: 0.6852370697525962	MI: 0.8029604523173489	NMI: 0.748784501536842	AMI: 0.7484711223566342	
+
+Dataset: Anisotropic Blobs; HAC - Average Linkage executed.
+DBI: 0.509835596560254	AvgSilhouette: 0.49011849540149294	
+Rand: 0.765987991994663	ARI: 0.5436733287327721	MI: 0.5777919631401022	NMI: 0.6522729807715494	AMI: 0.6516982111681091	
+
+Dataset: Anisotropic Blobs; HAC - Single Linkage executed.
+DBI: 0.3936572206201303	AvgSilhouette: 0.21607483589487167	
+Rand: 0.33377896375361354	ARI: -8.888900740756543e-07	MI: 0.001465261323788318	NMI: 0.0026408344787190213	AMI: -8.036783395585584e-07	
+
+Dataset: Anisotropic Blobs; HAC - Complete Linkage executed.
+DBI: 0.6772319518753855	AvgSilhouette: 0.31311827996606556	
+Rand: 0.6044803202134756	ARI: 0.21165674928722392	MI: 0.35070650086154553	NMI: 0.3593701484298097	AMI: 0.3584910170956737	
+
+Dataset: Anisotropic Blobs; DBSCAN executed.
+DBI: 3.7976653456856964	AvgSilhouette: 0.39662579771679096	
+Rand: 0.988962419390705	ARI: 0.9749445606497402	MI: 1.0853632319025843	NMI: 0.9550710197697597	AMI: 0.9549590963145561	
+
+Dataset: Anisotropic Blobs; Gaussian Mixture executed.
+DBI: 0.8502869068153395	AvgSilhouette: 0.4723603971771301	
+Rand: 1.0	ARI: 1.0	MI: 1.09861228866811	NMI: 1.0	AMI: 1.0	
+
+Dataset: Blobs; K-Means executed.
+DBI: 0.27029945878306816	AvgSilhouette: 0.8104321767519068	
+Rand: 1.0	ARI: 1.0	MI: 1.09861228866811	NMI: 1.0	AMI: 1.0	
+
+Dataset: Blobs; HAC - Ward executed.
+DBI: 0.27029945878306816	AvgSilhouette: 0.8104321767519068	
+Rand: 1.0	ARI: 1.0	MI: 1.09861228866811	NMI: 1.0	AMI: 1.0	
+
+Dataset: Blobs; HAC - Average Linkage executed.
+DBI: 0.27029945878306816	AvgSilhouette: 0.8104321767519068	
+Rand: 1.0	ARI: 1.0	MI: 1.09861228866811	NMI: 1.0	AMI: 1.0	
+
+Dataset: Blobs; HAC - Single Linkage executed.
+DBI: 0.27029945878306816	AvgSilhouette: 0.8104321767519068	
+Rand: 1.0	ARI: 1.0	MI: 1.09861228866811	NMI: 1.0	AMI: 1.0	
+
+Dataset: Blobs; HAC - Complete Linkage executed.
+DBI: 0.27029945878306816	AvgSilhouette: 0.8104321767519068	
+Rand: 1.0	ARI: 1.0	MI: 1.09861228866811	NMI: 1.0	AMI: 1.0	
+
+Dataset: Blobs; DBSCAN executed.
+DBI: 0.27029945878306816	AvgSilhouette: 0.8104321767519068	
+Rand: 1.0	ARI: 1.0	MI: 1.09861228866811	NMI: 1.0	AMI: 1.0	
+
+Dataset: Blobs; Gaussian Mixture executed.
+DBI: 0.27029945878306816	AvgSilhouette: 0.8104321767519068	
+Rand: 1.0	ARI: 1.0	MI: 1.09861228866811	NMI: 1.0	AMI: 1.0	
+
+Dataset: No Structure; K-Means executed.
+Dataset: No Structure; HAC - Ward executed.
+Dataset: No Structure; HAC - Average Linkage executed.
+Dataset: No Structure; HAC - Single Linkage executed.
+Dataset: No Structure; HAC - Complete Linkage executed.
+Dataset: No Structure; DBSCAN executed.
+Dataset: No Structure; Gaussian Mixture executed.

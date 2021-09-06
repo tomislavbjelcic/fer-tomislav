@@ -31,11 +31,12 @@ import numpy as np
 import matplotlib.pyplot as plt
 
 from sklearn import cluster, datasets, mixture
-from sklearn.neighbors import kneighbors_graph
+from sklearn import metrics
 from sklearn.preprocessing import StandardScaler
 from itertools import cycle, islice
 
 np.random.seed(0)
+custom_colors = ["red", "blue", "green", "#f3aa16", "#ed1aed"]
 
 # ============
 # Generate datasets. We choose the size big enough to see the scalability
@@ -46,7 +47,7 @@ noisy_circles = datasets.make_circles(n_samples=n_samples, factor=.5,
                                       noise=.05)
 noisy_moons = datasets.make_moons(n_samples=n_samples, noise=.05)
 blobs = datasets.make_blobs(n_samples=n_samples, random_state=8)
-no_structure = np.random.rand(n_samples, 2), None
+no_structure = np.random.rand(n_samples, 2), [0]*n_samples
 
 # Anisotropicly distributed data
 random_state = 170
@@ -82,16 +83,29 @@ default_base = {'quantile': .3,
 datasets = [
     (noisy_circles, {'damping': .77, 'preference': -240,
                      'quantile': .2, 'n_clusters': 2,
-                     'min_samples': 20, 'xi': 0.25}),
-    (noisy_moons, {'damping': .75, 'preference': -220, 'n_clusters': 2}),
+                     'min_samples': 20, 'xi': 0.25}, "Noisy Circles"),
+    (noisy_moons, {'damping': .75, 'preference': -220, 'n_clusters': 2}, "Noisy Moons"),
     (varied, {'eps': .18, 'n_neighbors': 2,
-              'min_samples': 5, 'xi': 0.035, 'min_cluster_size': .2}),
+              'min_samples': 5, 'xi': 0.035, 'min_cluster_size': .2}, "Varied Blobs"),
     (aniso, {'eps': .15, 'n_neighbors': 2,
-             'min_samples': 20, 'xi': 0.1, 'min_cluster_size': .2}),
-    (blobs, {}),
-    (no_structure, {})]
+             'min_samples': 20, 'xi': 0.1, 'min_cluster_size': .2}, "Anisotropic Blobs"),
+    (blobs, {}, "Blobs"),
+    (no_structure, {}, "No Structure")]
 
-for i_dataset, (dataset, algo_params) in enumerate(datasets):
+internal_eval_metrics = [
+    (metrics.davies_bouldin_score, "DBI"),
+    (metrics.silhouette_score, "AvgSilhouette")
+]
+
+external_eval_metrics = [
+    (metrics.rand_score, "Rand"),
+    (metrics.adjusted_rand_score, "ARI"),
+    (metrics.mutual_info_score, "MI"),
+    (metrics.normalized_mutual_info_score, "NMI"),
+    (metrics.adjusted_mutual_info_score, "AMI")
+]
+
+for i_dataset, (dataset, algo_params, dataset_name) in enumerate(datasets):
     # update parameters with dataset-specific values
     params = default_base.copy()
     params.update(algo_params)
@@ -101,35 +115,33 @@ for i_dataset, (dataset, algo_params) in enumerate(datasets):
     # normalize dataset for easier parameter selection
     X = StandardScaler().fit_transform(X)
 
-    # estimate bandwidth for mean shift
-    bandwidth = cluster.estimate_bandwidth(X, quantile=params['quantile'])
-
-    # connectivity matrix for structured Ward
-    connectivity = kneighbors_graph(
-        X, n_neighbors=params['n_neighbors'], include_self=False)
-    # make connectivity symmetric
-    connectivity = 0.5 * (connectivity + connectivity.T)
-
     # ============
     # Create cluster objects
     # ============
     kmeans = cluster.KMeans(n_clusters=params['n_clusters'])
     ward = cluster.AgglomerativeClustering(
-        n_clusters=params['n_clusters'], linkage='ward',
-        connectivity=connectivity)
+        n_clusters=params['n_clusters'], linkage='ward')
     dbscan = cluster.DBSCAN(eps=params['eps'])
     average_linkage = cluster.AgglomerativeClustering(
         linkage="average",
-        n_clusters=params['n_clusters'], connectivity=connectivity)
+        n_clusters=params['n_clusters'])
     gmm = mixture.GaussianMixture(
         n_components=params['n_clusters'], covariance_type='full')
+    single_linkage = cluster.AgglomerativeClustering(
+        n_clusters=params['n_clusters'], linkage='single'
+    )
+    complete_linkage = cluster.AgglomerativeClustering(
+        n_clusters=params['n_clusters'], linkage='complete'
+    )
 
     clustering_algorithms = (
-        ('KMeans', kmeans),
-        ('Ward', ward),
-        ('Agglomerative\nClustering', average_linkage),
+        ('K-Means', kmeans),
+        ('HAC - Ward', ward),
+        ('HAC - Average Linkage', average_linkage),
+        ('HAC - Single Linkage', single_linkage),
+        ('HAC - Complete Linkage', complete_linkage),
         ('DBSCAN', dbscan),
-        ('Gaussian\nMixture', gmm)
+        ('Gaussian Mixture', gmm)
     )
 
     for name, algorithm in clustering_algorithms:
@@ -153,30 +165,39 @@ for i_dataset, (dataset, algo_params) in enumerate(datasets):
         t1 = time.time()
         timems = round((t1-t0) * 1000)
         
-        print("{} executed.".format(name))
+        print("Dataset: {}; {} executed.".format(dataset_name,name))
+
+        if dataset_name != "No Structure":
+            for metric, metric_name in internal_eval_metrics:
+                score = metric(X, y_pred)
+                print("{}: {}".format(metric_name, score), end="\t")
+            print()
+            for metric, metric_name in external_eval_metrics:
+                score = metric(y, y_pred)
+                print("{}: {}".format(metric_name, score), end="\t")
+            print("\n")
 
         plt.subplot(len(datasets), len(clustering_algorithms), plot_num)
         if i_dataset == 0:
-            plt.title(name, size=18)
+            plt.title(name, size=13)
 
-        colors = np.array(list(islice(cycle([
-                                            '#999999', '#e41a1c', '#dede00',
-                                            '#f781bf', '#a65628', '#984ea3',
-                                            '#377eb8', '#ff7f00', '#4daf4a'
-                                            ]),
+        colors = np.array(list(islice(cycle(custom_colors),
                                       int(max(y_pred) + 1))))
         
         # add black color for outliers (if any)
         colors = np.append(colors, ["#000000"])
-        plt.scatter(X[:, 0], X[:, 1], s=0.75, color=colors[y_pred])
-
-        plt.xlim(-2.5, 2.5)
-        plt.ylim(-2.5, 2.5)
+        plt.scatter(X[:, 0], X[:, 1], s=3, c=colors[y_pred])
+        '''
+        L = 2.5
+        plt.xlim(-L, L)
+        plt.ylim(-L, L)
+        '''
         plt.xticks(())
         plt.yticks(())
-        plt.text(.99, .01, "{}ms".format(timems),
+        plt.text(.99, .88, "{}ms".format(timems),
                  transform=plt.gca().transAxes, size=15,
                  horizontalalignment='right')
+        
         plot_num += 1
 
 plt.show()
