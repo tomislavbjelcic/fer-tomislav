@@ -899,17 +899,39 @@ Rezultati grupiranja prikazani su na slikama \ref{fig:resultspart1} i \ref{fig:r
 
 Uz grupiranje, izračunate su mjere unutarnjeg i vanjskog vrednovanja za svako grupiranje i prikazane su tablicom %TODO: NAPRAVI TABLICU%.
 
+\section{Usporedba rezultata i učinkovitosti grupiranja}
+
+Algoritam K-sredina uspješno je razdvojio samo skup (5), a ostale nije jer nisu bile ispunjenje sve pretpostavke o oblicima grupa. Grupe skupova (1) i (2) su nekonveksnog oblika, a grupe skupova (3) i (4) su ili nejednakih veličina ili su ukošene, što predstavlja problem za model centroida. Neke točke iako pripadaju u stvarnosti jednoj grupi, zbog toga što su udaljenošću bliže ostalim grupama, algoritam K-sredina ih je svrstao u te krive grupe.
+
+Kriterij spajanja velikim dijelom utječe na rezultate kod hijerarhijskih aglomerativnih grupiranja. Jednostruka povezanost je u potpunosti ispravno razdvojila nekonveksne grupe skupova (1) i (2), ali je skroz pogrešno grupirala skupove (3) i (4) jer kod tih skupova postoje međusobno vrlo bliske točke između prirodnih grupa, a kako jednostruka povezanost gleda najmanju udaljenost između parova točaka, onda ih je spojila u jednu grupu. Taj efekt jednostruke povezanosti se onda proširio po gotovo cijelom skupu i u konačnici ostale dvije grupe se sastoje od jedne ili dvije točke. Wardova povezanost uspjela je većim dijelom razdvojiti grupe skupa (3) jer Wardova metoda prati promjenu varijance prije i nakon spajanja grupa, a kako grupe skupa (3) nisu ukošene i uzorkovane su iz normalnih razdioba, praćenje varijance je upravo ono što je potrebno napraviti za takve podatke. Osim slučaja sa Wardovom metodom i skupa (3), kriteriji spajanja nisu uspjeli pravilno razdvojiti grupe skupova (osim (5)) jer nisu idealnog oblika poput grupa skupa (5).
+
+Algoritam DBSCAN je u potpunosti uspio razdvojiti grupe nekonveksnih oblika skupova (1) i (2) jer to omogućava model gustočaka, a gusta područja nisu blizu jedna drugoj u kojem slučaju bi se mogla svrstati u jedno gusto područje: jednu grupu. Taj problem je vidljiv kod grupiranja skupa (3), gdje je desna prirodna grupa spojena sa srednjom jer gusta područja nisu dovoljno odvojena da bi model gustoće točaka shvatio da se radi o dvije grupe. Grupiranje skupa (4) algoritmom DBSCAN je veoma dobro unatoč tome što su prepoznate 4 grupe, a ne prirodne 3. Također nema puno točaka šuma (svega dvadesetak) u odnosu na grupiranje skupa (3) gdje ih ima nezanemarivo mnogo.
+
+EM algoritam Gaussovih mješavina postiže najbolje rezultate na skupovima (3) i (4) u odnosu na ostale algoritme. Razlog tome jest činjenica da podaci tih skupova odgovaraju generativnom modelu Gaussovih mješavina: točke su uzorkovane iz tri Gaussove distribucije. To je najviše izraženo kod skupa (4) gdje je Gaussova mješavina i EM algoritam savršeno grupirao cijeli skup, što je moguće zbog toga što nije bilo ograničenja na kovarijacijske matrice pa su uzeti u obzir i ukošeni oblici grupa. Grupiranja skupa (1) i (2) nisu dobra zbog neposredne pretpostavke o konveksnim oblicima grupa kod Gaussovih mješavina.
+
+Svi algoritmi su savršeno grupirali skup (5) jer su grupe relativno kompaktne, dobro odvojene i konveksne, što je idealan slučaj grupa. Rezultati grupiranja skupa (6) su zanimljivi prikazuju kako se formiraju oblici grupa tijekom izvršenja algoritama i njihove konačne oblike.
+
+Iznosi mjera za vanjsko vrednovanje su očekivani: što grupiranje više sliči prirodnom grupiranju to su iznosi mjera veći. S druge strane, mjere unutarnjih vrednovanja ne oslikavaju najbolje kvalitetu grupiranja u većini slučajeva. Primjerice, srednja vrijednost siluete za grupiranje skupa (1) hijerarhijskim aglomerativnim grupiranjem sa jednostrukom povezanošću je niska unatoč tomu što je grupiranje savršeno obavljeno. Osim toga, srednja vrijednost siluete je niža od grupiranja koja nisu uspjela razdvojiti nekonveksne grupe. Razlog tomu je činjenica da unutarnje mjere pridjeljuju veće iznose grupiranjima sa grupama konveksnih oblika, neovisno o tome je li takvo grupiranje ispravno ili nije.
+
+\subsection{Usporedba učinkovitosti algoritama}
+
+Iz dobivenih vremena grupiranja vidljiv je nedostatak hijerarhijskog aglomerativnog grupiranja, a to je velika vremenska složenost što je uzrokovalo relativno velika vremena izvođenja. Iznimka je jednostruka povezanost. Algoritmi DBSCAN i EM algoritam Gaussovih mješavina grupiranje su obavile relativno brzo, što je očekivano jer u odnosu na broj podataka $N$ složenost je manja od kvadratne. Možda neočekivan rezultat su vremena izvođenja algoritma K-sredina, ali postoje razlozi za to. Od svih opisanih algoritama, općenito najučinkoviti je algoritam K-sredina jer je linearan po svim parametrima. Kod ovih skupova podataka to nije došlo do izražaja jer skupovi nisu jako veliki ($N = 1500$), a kada bi bili nekoliko redova veličine veći vidjelo bi se kako je algoritam K-sredina brži od ostalih. Uz to je algoritam K-sredina odradio puno iteracija zbog problematičnih oblika grupa, zbog čega je vrijeme bilo malo više nego kod algoritama DBSCAN i EM algoritma.
+
 \chapter{Zaključak}
 \label{chap:conclusion}
-Zaključak.
+Problem grupiranja može biti vrlo izazovan ako ne znamo puno o podacima. Izbor algoritma grupiranja ovisi o nekoliko stvari koje je potrebno uzeti u obzir: veličina skupa podataka, prostor podataka odnosno priroda značajki i postoji li znanje o kojem modelu podataka bi moglo biti riječ. Osim odabira algoritma, odabir parametara također može biti izazovno.
+
+Za jako velike skupove podataka i realne značajke algoritam K-sredina i Gaussove mješavine su općenito dobar izbor. Ako skup podataka nije pretjerano velik, vrijedi pokušati pokrenuti hijerarhijsko aglomerativno grupiranje s obzirom da nisu ograničeni na realne značajke (osim Wardove metode). Ako postoji sumnja da su podaci nepravilnih oblika, DBSCAN je dobar izbor.
+
+U svakom slučaju, potrebno je postupcima vrednovanja uvjeriti se u ispravnost grupiranja odabranim algoritmom. Unutarnja vrednovanja mogu biti od koristi, ali potreban je oprez s obzirom da mogu navesti na krive zaključke.
 
 \bibliography{literatura}
 \bibliographystyle{fer}
 
 \begin{sazetak}
-Sažetak na hrvatskom jeziku.
+Grupiranje je postupak particioniranja skupa podatka na podskupove sa međusobno sličnim podacima. Grupiranje se zasniva na mjeri udaljenosti između podataka. Grupiranja se dijele na particijska i hijerarhijska, a hijerarhijska na aglomerativna i divizijska. Uz to, dijele se i na čvrsta i meka grupiranja. Algoritam K-srednjih vrijednosti je najpoznatiji, najučinkovitiji algoritam grupiranja, zasniva na modelu centroida i zahtjeva poznavanje broja grupa. Hijerarhijsko aglomerativno grupiranje zasniva se na kriteriju spajanja, gradi hijerarhiju grupa spajanjem i nije učinkovit kao K-sredina ali je primjenjiv na svim vrstama podataka. DBSCAN se zasniva na modelu gustoće točaka koje prepoznaje i grupira gusto raspoređene podatke. DBSCAN je brz i poznaje koncept šuma. EM algoritam Gaussovih mješavina se zasniva na modelu miješanih Gaussovih gustoća.  
 
-\kljucnerijeci{Ključne riječi, odvojene zarezima.}
+\kljucnerijeci{Grupiranje, nenadzirano strojno učenje, mjera udaljenosti, Euklidova udaljenost, K-sredina, centroid, K-means++, metoda koljena, miješana gustoća, GMM, MLE, EM algoritam, AIC, hijerarhijsko aglomerativno grupiranje, kriterij spajanja, Ward, model gustoće točaka, DBSCAN, šum, Davies-Bouldin indeks, vrijednost siluete, Randov indeks, uzajamna informacija, Scikit-Learn, Python}
 \end{sazetak}
 %‘‘slični’’
 % TODO: Navedite naslov na engleskom jeziku.
@@ -917,7 +939,8 @@ Sažetak na hrvatskom jeziku.
 \begin{abstract}
 Abstract.
 
-\keywords{Keywords.}
+\keywords{Clustering, unsupervised machine learning, distance measure, Euclidean distance, K-means, centroid, K-means++, elbow method, mixture model, GMM, MLE, EM algorithm, AIC, hierarchical agglomerative clustering, linkage criterion, Ward, density model, DBSCAN, noise, Davies-Bouldin index, silhouette, Rand index, mutual information, Scikit-Learn, Python}
 \end{abstract}
 
 \end{document}
+
