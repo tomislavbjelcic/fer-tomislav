@@ -50,7 +50,7 @@ X, y = make_blobs(n_samples=500,
                   shuffle=True,
                   random_state=1)  # For reproducibility
 
-range_n_clusters = [6]
+range_n_clusters = [2, 3, 4, 5, 6]
 
 for n_clusters in range_n_clusters:
     # Create a subplot with 1 row and 2 columns
@@ -129,8 +129,6 @@ for n_clusters in range_n_clusters:
                     s=50, edgecolor='k')
 
     ax2.set_title("The visualization of the clustered data.")
-    ax2.set_xlabel("Feature space for the 1st feature")
-    ax2.set_ylabel("Feature space for the 2nd feature")
 
     plt.suptitle(("Silhouette analysis for KMeans clustering on sample data "
                   "with n_clusters = %d" % n_clusters),
