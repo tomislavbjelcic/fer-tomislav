@@ -13,8 +13,8 @@ stds = np.array([[1.6, 2], [2, 2], [1.2, 1.6]])
 X, y = make_blobs(n_samples=n_samples, centers=centers, cluster_std=stds, random_state=random_state)
 
 plt.scatter(X[:, 0], X[:, 1])
-plt.xlabel("Masa / kg")
-plt.ylabel("Visina / cm")
+plt.xlabel("Masa [kg]")
+plt.ylabel("Visina [cm]")
 #plt.title("Podaci o psima u skloništu za životinje")
 
 plt.show()

@@ -37,7 +37,7 @@ datasets = [
     (noisy_moons, "Polumjeseci"),
     (varied, "Neukošene grupe različitih veličina"),
     (aniso, "Ukošene grupe"),
-    (blobs, "Dobro odvojene, kompaktne i sferične grupe"),
+    (blobs, "Dobro odvojene i kompaktne grupe"),
     (no_structure, "Jednoliko raspoređeni podaci")
 ]
 num = len(datasets)
