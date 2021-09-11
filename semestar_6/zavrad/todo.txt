@@ -1,7 +1,0 @@
-- TABLICA ZA MJERE VREDNOVANJA $$DONE$$
-- ZAKLJUČAK $$DONE$$
-- KLJUČNE RIJEČI ENG/HRV $DONE$
-- SAŽETAK ENG/HRV #treba na engleskom#
-- METODA SILUETE $$DONE$$
-- LITERATURA $$DONE (pretty much)$$
-
