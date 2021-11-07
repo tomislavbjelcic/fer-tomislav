@@ -1,9 +1,11 @@
 package kik.lab1.util;
 
+import java.util.Objects;
+
 public class ByteUtils {
 	
 	
-	//private static final String HEX_REGEX = "(\\p{XDigit})*";
+	private static final String HEX_REGEX = "(\\p{XDigit})*";
 	
 	private static final int INT_MASK = 0x00_00_00_ff;
 	
@@ -55,7 +57,7 @@ public class ByteUtils {
 		return sb.toString();
 	}
 
-	/*
+	
 	private static void checkHexString(String hex) {
 		int len = hex.length();
 		if (len%2 != 0)
@@ -65,6 +67,45 @@ public class ByteUtils {
 		if (!match)
 			throw new IllegalArgumentException("Invalid hex: " + hex);
 	}
-	*/
+	
+	/**
+	 * Pretvara hex zapis {@code hex} u niz bajtova ako je hex zapis ispravan.<br>
+	 * Ispravan hex zapis se sastoji isključivo od znakova koje predstavljaju heksadekadske znamenke 
+	 * i duljina zapisa je paran broj.
+	 * 
+	 * @param hex
+	 * @return niz bajtova hex zapisa {@code hex}.
+	 * @throws NullPointerException ako je predani hex zapis {@code null}.
+	 * @throws IllegalArgumentException ako je predan neispravan hex zapis.
+	 */
+	public static byte[] hexToByte(String hex) {
+		Objects.requireNonNull(hex);
+		checkHexString(hex);
+		
+		int count = hex.length() / 2;
+		byte[] output = new byte[count];
+		for (int i=0; i<count; i++) {
+			int off = i*2;
+			char firstDigitChar = hex.charAt(off);
+			char secondDigitChar = hex.charAt(off+1);
+			
+			int firstDigit = hexDigitValue(firstDigitChar);
+			int secondDigit = hexDigitValue(secondDigitChar);
+			
+			int val = firstDigit * 16 + secondDigit;
+			output[i] = (byte) val;
+		}
+		return output;
+	}
+	
+	private static int hexDigitValue(char digit) {
+		boolean isDigit = Character.isDigit(digit);
+		if (isDigit)
+			return (int) (digit - '0');
+		char lowercase = Character.toLowerCase(digit);
+		return (int) (lowercase - 'a' + 10);
+	}
+
+
 	
 }
