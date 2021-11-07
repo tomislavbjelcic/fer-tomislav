@@ -21,6 +21,8 @@
 #define SJEDNI 51L
 #define SJEO 52L
 #define USTANI 53L
+#define USTAO 54L
+#define DUMMY 88L
 
 uid_t UID;
 int MSGQ_ID_POS[POSJETITELJA];
@@ -56,6 +58,11 @@ typedef struct ustani_msg_t {
     long mtype;
     char mtext[1];
 } ustani_msg_t;
+
+typedef struct ustao_msg_ack {
+    long mtype;
+    char mtext[1];
+} ustao_msg_ack;
 
 
 
@@ -130,7 +137,7 @@ typedef struct dummy_msg {
 
 void posjetitelj(int i) {
     dummy_msg dummy;
-    msgrcv(MSGQ_ID_VRT, &dummy, 1, 0, 0);
+    msgrcv(MSGQ_ID_VRT, &dummy, 1, DUMMY, 0);
     printf("Početak izvršavanja procesa posjetitelja broj %d\n", i);
     srand(time(NULL) + i*5);
     
@@ -138,7 +145,9 @@ void posjetitelj(int i) {
     znacka_msg_t znbuf;
     sjedni_msg_t sjbuf;
     sjeo_msg_ack sjeo;
+    ustao_msg_ack ustao;
     sjeo.mtype = SJEO;
+    ustao.mtype = USTAO;
     ustani_msg_t usbuf;
     for (int rides=0; rides<VOZNJI; rides++) {
         t.tv_sec = 0;
@@ -204,6 +213,7 @@ void posjetitelj(int i) {
         msgsnd(MSGQ_ID_VRT, &sjeo, 1, 0);
         msgrcv(MSGQ_ID_VRT, &usbuf, 1, USTANI, 0);
         printf("Sišao posjetitelj %d\n", i);
+        msgsnd(MSGQ_ID_VRT, &ustao, 1, 0);
 
     }
 
@@ -239,6 +249,7 @@ int main(void) {
 		}
 	}
     dummy_msg dummy;
+    dummy.mtype = DUMMY;
     for (int k=0; k<POSJETITELJA; k++)
         msgsnd(MSGQ_ID_VRT, &dummy, 1, 0);
     //VRTULJAK
@@ -246,6 +257,7 @@ int main(void) {
     sjedni_msg_t sj;
     ustani_msg_t us;
     sjeo_msg_ack sjeo;
+    ustao_msg_ack ustao;
     sj.mtype = SJEDNI;
     us.mtype = USTANI;
     int active = POSJETITELJA;
@@ -289,6 +301,9 @@ int main(void) {
 
         for (int m=0; m<MAX_MJESTA; m++) {
             msgsnd(MSGQ_ID_VRT, &us, 1, 0);
+        }
+        for (int m=0; m<MAX_MJESTA; m++) {
+            msgrcv(MSGQ_ID_VRT, &ustao, 1, USTAO, 0);
         }
     }
     
