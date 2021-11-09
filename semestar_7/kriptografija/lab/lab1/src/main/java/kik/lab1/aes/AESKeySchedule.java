@@ -23,6 +23,7 @@ public class AESKeySchedule {
 	private int R;
 	private int keySizeBits;
 	private int[] words;
+	private byte[][] roundKeys;
 	
 	public AESKeySchedule(int keySizeBits) {
 		
@@ -55,21 +56,30 @@ public class AESKeySchedule {
 				words[i] = words[i-N] ^ words[i-1];
 			}
 		}
+		this.roundKeys = genAsRoundKeys(this.words);
 	}
 	
 	public int[] getWords() {
 		return words;
 	}
 	
-	public static void main(String[] args) {
-		String kh = "603deb1015ca71be2b73aef0857d77811f352c073b6108d72d9810a30914dff4";
-		byte[] keyBytes = ByteUtils.hexToByte(kh);
-		AESKeySchedule schedule = new AESKeySchedule(256);
-		schedule.generate(keyBytes);
-		int[] words = schedule.getWords();
-		for (int i=0; i<words.length; i++)
-			System.out.println("" + i + ". " + ByteUtils.intToHex(words[i]));
-		
+	public byte[][] getAsRoundKeys() {
+		return roundKeys;
+	}
+	
+	private static byte[][] genAsRoundKeys(int[] words) {
+		int rows = words.length/4;
+		byte[][] rk = new byte[rows][16];
+		for (int i=0; i<rows; i++) {
+			for (int j=0; j<4; j++) {
+				int word = words[4*i+j];
+				for (int wb=0; wb<4; wb++) {
+					byte b = (byte) (word >>> (24-8*wb));
+					rk[i][4*j+wb] = b;
+				}
+			}
+		}
+		return rk;
 	}
 	
 }

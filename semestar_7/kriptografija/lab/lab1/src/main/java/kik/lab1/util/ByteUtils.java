@@ -105,6 +105,16 @@ public class ByteUtils {
 		char lowercase = Character.toLowerCase(digit);
 		return (int) (lowercase - 'a' + 10);
 	}
+	
+	public static void arrayXor(byte[] a, byte[] b, byte[] dest) {
+		if (a.length != b.length)
+			throw new IllegalArgumentException("Array size mismatch.");
+		if (a.length != dest.length)
+			throw new IllegalArgumentException("Array size mismatch.");
+		for (int i=0; i<a.length; i++) {
+			dest[i] = (byte)(a[i] ^ b[i]);
+		}
+	}
 
 
 	
