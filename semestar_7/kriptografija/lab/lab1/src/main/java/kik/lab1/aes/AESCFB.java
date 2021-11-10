@@ -25,21 +25,21 @@ public class AESCFB {
 		byte[] paddedPlaintext = SimplePadding.pad(plaintext);
 		byte[] ciphertext = new byte[paddedPlaintext.length];
 		byte[] bufpl = new byte[BLOCK_SIZE_BYTES];
-		byte[] bufciph = new byte[BLOCK_SIZE_BYTES];
-		byte[] ofbin = Arrays.copyOf(iv, IV_SIZE_BYTES);
-		byte[] ofbout = new byte[BLOCK_SIZE_BYTES];
+		//byte[] bufciph = new byte[BLOCK_SIZE_BYTES];
+		byte[] aesin = Arrays.copyOf(iv, IV_SIZE_BYTES);
+		byte[] aesout = new byte[BLOCK_SIZE_BYTES];
 		
 		int blockCount = ciphertext.length / BLOCK_SIZE_BYTES;
 		for (int i=0; i<blockCount; i++) {
 			System.arraycopy(paddedPlaintext, i*BLOCK_SIZE_BYTES, bufpl, 0, BLOCK_SIZE_BYTES);
-			AESAlgorithm.encrypt(ofbin, ofbout, sched);
-			ByteUtils.arrayXor(ofbout, bufpl, bufciph);
+			AESAlgorithm.encrypt(aesin, aesout, sched);
+			ByteUtils.arrayXor(aesout, bufpl);
 			
-			System.arraycopy(bufciph, 0, ciphertext, i*BLOCK_SIZE_BYTES, BLOCK_SIZE_BYTES);
+			System.arraycopy(aesout, 0, ciphertext, i*BLOCK_SIZE_BYTES, BLOCK_SIZE_BYTES);
 			
-			var tmp = ofbout;
-			ofbout = ofbin;
-			ofbin = tmp;
+			var tmp = aesout;
+			aesout = aesin;
+			aesin = tmp;
 		}
 		
 		return ciphertext;
@@ -49,23 +49,23 @@ public class AESCFB {
 		if (ciphertext.length % BLOCK_SIZE_BYTES != 0)
 			throw new IllegalArgumentException("Ciphertext length " + 
 					ciphertext.length + " not divisible by " + BLOCK_SIZE_BYTES);
-		byte[] bufpl = new byte[BLOCK_SIZE_BYTES];
+		//byte[] bufpl = new byte[BLOCK_SIZE_BYTES];
 		byte[] bufciph = new byte[BLOCK_SIZE_BYTES];
 		byte[] plaintextpadded = new byte[ciphertext.length];
-		byte[] ofbin = Arrays.copyOf(iv, IV_SIZE_BYTES);
-		byte[] ofbout = new byte[BLOCK_SIZE_BYTES];
+		byte[] aesin = Arrays.copyOf(iv, IV_SIZE_BYTES);
+		byte[] aesout = new byte[BLOCK_SIZE_BYTES];
 		
 		int blockCount = ciphertext.length / BLOCK_SIZE_BYTES;
 		for (int i=0; i<blockCount; i++) {
 			System.arraycopy(ciphertext, i*BLOCK_SIZE_BYTES, bufciph, 0, BLOCK_SIZE_BYTES);
-			AESAlgorithm.encrypt(ofbin, ofbout, sched);
-			ByteUtils.arrayXor(ofbout, bufciph, bufpl);
+			AESAlgorithm.encrypt(aesin, aesout, sched);
+			ByteUtils.arrayXor(aesout, bufciph);
 			
-			System.arraycopy(bufpl, 0, plaintextpadded, i*BLOCK_SIZE_BYTES, BLOCK_SIZE_BYTES);
+			System.arraycopy(aesout, 0, plaintextpadded, i*BLOCK_SIZE_BYTES, BLOCK_SIZE_BYTES);
 			
-			var tmp = ofbout;
-			ofbout = ofbin;
-			ofbin = tmp;
+			var tmp = aesin;
+			aesin = bufciph;
+			bufciph = tmp;
 		}
 		
 		return SimplePadding.unpad(plaintextpadded);

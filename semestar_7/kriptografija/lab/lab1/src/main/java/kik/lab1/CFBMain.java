@@ -4,19 +4,20 @@ import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.security.SecureRandom;
 import java.util.Scanner;
 
-import kik.lab1.aes.AESECB;
+import kik.lab1.aes.AESCFB;
 import kik.lab1.util.ByteUtils;
 
-public class ECBMain {
+public class CFBMain {
 	
 	public static void main(String[] args) {
 		
 		@SuppressWarnings("resource")
 		Scanner sc = new Scanner(System.in);
 		
-		System.out.println("Demonstracijski program algoritma AES u ECB načinu rada.\n");
+		System.out.println("Demonstracijski program algoritma AES u CFB načinu rada.\n");
 		System.out.print("Čitati iz datoteke? (y/n) >");
 		String in = sc.nextLine().strip().toLowerCase();
 		byte[] plaintext = null;
@@ -49,6 +50,16 @@ public class ECBMain {
 		String hkey = sc.nextLine();
 		keyBytes = ByteUtils.hexToByte(removeWhitespaces(hkey));
 		
+		byte[] iv = null;
+		System.out.print("Inicijalizacijski vektor (za slučajno generiranje unesite \"R\")>");
+		String ivhex = sc.nextLine().strip().toLowerCase();
+		if (ivhex.equals("r")) {
+			iv = new byte[AESCFB.IV_SIZE_BYTES];
+			SecureRandom rng = new SecureRandom();
+			rng.nextBytes(iv);
+		} else
+			iv = ByteUtils.hexToByte(removeWhitespaces(ivhex));
+		
 		System.out.print("Kriptirati ili dekriptirati? (Unos \"E\" za kriptiranje) >");
 		String e_or_d = sc.nextLine().strip().toLowerCase();
 		boolean e = e_or_d.equals("e");
@@ -57,7 +68,7 @@ public class ECBMain {
 		
 		byte[] ciphertext = null;
 		try {
-			AESECB cipher = new AESECB(keyBytes);
+			AESCFB cipher = new AESCFB(iv, keyBytes);
 			if (e)
 				ciphertext = cipher.encrypt(plaintext);
 			else
@@ -69,8 +80,10 @@ public class ECBMain {
 		
 		System.out.println("\n");
 		System.out.println(_in + " tekst: " + ByteUtils.byteToHex(plaintext));
+		System.out.println("Inicijalizacijski vektor: " + ByteUtils.byteToHex(iv));
 		System.out.println("Ključ: " + ByteUtils.byteToHex(keyBytes));
 		System.out.println(_out + " tekst: " + ByteUtils.byteToHex(ciphertext));
+		
 		
 		
 		
@@ -88,3 +101,4 @@ public class ECBMain {
 		return sb.toString();
 	}
 }
+
