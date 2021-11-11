@@ -128,8 +128,19 @@ void spavaj(timespec *tim, int lowms, int upms) {
     nanosleep(tim, tim);
 }
 
-void log_msg(int f, msg_t *msg, int current_clock) {
+void log_msg_rcv(int f, const msg_t *msg, int current_clock) {
     
+    cout << "Filozof " << f << ": od filozofa " << msg->m.i << 
+                    " primio poruku " << ss[msg->mtype] << msg->m << "\t\t\t" <<
+                    "(C" << f << " = " << current_clock << ") *" << nl;
+                    
+}
+
+void log_msg_snd(int f, int to, const msg_t *msg, int current_clock) {
+    
+    cout << "Filozof " << f << ": filozofu " << to << 
+                    " poslao poruku " << ss[msg->mtype] << msg->m << "\t\t\t" <<
+                    "(C" << f << " = " << current_clock << ')' << nl;
 }
 
 void filozof(int f) {
@@ -159,14 +170,13 @@ void filozof(int f) {
         msg_t odg;
         while (msgrcv(msgq[f], &msgbuf, siz, 0, IPC_NOWAIT) != -1) {
             update_clock(clock, msgbuf.m.t);
-            cout << "Filozof " << f << ": od " << msgbuf.m.i << 
-                    " primio poruku " << ss[msgbuf.mtype] << msgbuf.m << "" << nl;
+            log_msg_rcv(f, &msgbuf, clock);
             
             odg.mtype = ODG;
             odg.m.i = f;
             odg.m.t = msgbuf.m.t;
             msgsnd(msgq[msgbuf.m.i], &odg, siz, 0);
-            cout << "Filozof " << f << ": poslao poruku " << ss[odg.mtype] << odg.m << nl;
+            log_msg_snd(f, msgbuf.m.i, &odg, clock);
         }
 
         //generiraj zahtjev za ulazak u KO
@@ -178,7 +188,7 @@ void filozof(int f) {
         shuffle(others.begin(), others.end(), rng); //simulacija kome prvome slati
         for (int &o : others) {
             msgsnd(msgq[o], &zahmsg, siz, 0);
-            cout << "Filozof " << f << ": poslao poruku " << ss[zahmsg.mtype] << zahmsg.m << nl;
+            log_msg_snd(f, o, &zahmsg, clock);
         } //poslan zahtjev, sad cekaj sta dodje na redu poruka
 
         int others_answers = 0;
@@ -187,8 +197,9 @@ void filozof(int f) {
         });
         while(others_answers < 2) {
             msgrcv(msgq[f], &msgbuf, siz, 0, 0);
-            cout << "Filozof " << f << ": primio poruku " << ss[msgbuf.mtype] << msgbuf.m << nl;
             update_clock(clock, msgbuf.m.t);
+            log_msg_rcv(f, &msgbuf, clock);
+            
             if (msgbuf.mtype == ZAH) {
                 if (msgbuf.m < zahmsg.m) {
                     // primljen zahtjev je poslan prije
@@ -197,7 +208,7 @@ void filozof(int f) {
                     odg.m.i = f;
                     odg.m.t = msgbuf.m.t;
                     msgsnd(msgq[msgbuf.m.i], &odg, siz, 0);
-                    cout << "Filozof " << f << ": poslao poruku " << ss[odg.mtype] << odg.m << nl;
+                    log_msg_snd(f, msgbuf.m.i, &odg, clock);
                     unanswered[msgbuf.m.i] = -2;
 
                 } else {
@@ -211,7 +222,7 @@ void filozof(int f) {
         }
 
         // kriticni odsjecak
-        cout << "Filozof " << f << " uzima štapiće " << leftfork << rightfork << " i jede" << nl;
+        cout << "Filozof " << f << " uzima  štapiće " << leftfork << rightfork << " i jede" << nl;
         bool both_available = common->forks[leftfork] && common->forks[rightfork];
         if (!both_available) {
             cout << "Filozof " << f << " nema dostupna oba štapića! Greška!" << nl;
@@ -232,7 +243,7 @@ void filozof(int f) {
                 odg.m.i = f;
                 odg.m.t = pair.second;
                 msgsnd(msgq[pair.first], &odg, siz, 0);
-                cout << "Filozof " << f << ": poslao poruku " << ss[odg.mtype] << odg.m << nl;
+                log_msg_snd(f, pair.first, &odg, clock);
             }
         }
 
