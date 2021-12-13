@@ -1,14 +1,15 @@
 package kik.lab2.format;
 
 import java.io.BufferedReader;
+import java.io.BufferedWriter;
 import java.io.IOException;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.HashSet;
-import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -36,6 +37,7 @@ public class CryptoData {
 	public static final String ENVELOPE_CRYPT_KEY = "envelope crypt key";
 	
 	private static final Set<String> FIELDS = new HashSet<>();
+	private static final List<String> FIELDS_LIST = new ArrayList<>(16);
 	
 	static {
 		registerFields(DESCRIPTION, FILE_NAME, METHOD, KEY_LENGTH, SECRET_KEY, 
@@ -45,18 +47,13 @@ public class CryptoData {
 	
 	public static void registerFields(String... fields) {
 		for (String f : fields) {
-			FIELDS.add(f.toLowerCase());
+			FIELDS.add(f);
+			FIELDS_LIST.add(f);
 		}
 	}
 	
-	private Map<String, List<String>> data = new LinkedHashMap<>();
-	
-	public Map<String, List<String>> getData() {
-		return data;
-	}
-	
-	public static CryptoData fromFile(Path file) {
-		CryptoData cd = new CryptoData();
+	public static Map<String, List<String>> fromFile(Path file) {
+		Map<String, List<String>> data = new HashMap<>();
 		try (BufferedReader br = Files.newBufferedReader(file, CS)) {
 			int state = 0;	// 0=nije doslo do pocetka, 1=citaju se kriptografski podaci, 2=doslo je do kraja
 			boolean readingField = false;
@@ -97,7 +94,7 @@ public class CryptoData {
 							throw new RuntimeException("Nepoznato polje: " + field);
 						readingField = true;
 						values = new ArrayList<>();
-						cd.data.put(field, values);
+						data.put(field, values);
 						continue;
 					}
 					
@@ -123,15 +120,36 @@ public class CryptoData {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-		return cd;
+		return data;
 	}
 	
-	public static void main(String[] args) {
-		Path file = Path.of("in.txt");
-		CryptoData cryptoData = fromFile(file);
-		var dataMap = cryptoData.getData();
-		for (var e : dataMap.entrySet()) {
-			System.out.println(e);
+	public static void writeToFile(Map<String, List<String>> data, Path file) {
+		try (BufferedWriter bw = Files.newBufferedWriter(file, CS)) {
+			bw.write(BEGIN);
+			bw.newLine();
+			
+			for (String f : FIELDS_LIST) {
+				List<String> values = data.get(f);
+				if (values == null)
+					continue;
+				
+				bw.write(f);
+				bw.write(SEP);
+				bw.newLine();
+				
+				for (String v : values) {
+					bw.write(PREF);
+					bw.write(v);
+					bw.newLine();
+				}
+				bw.newLine();
+			}
+			
+			bw.write(END);
+			bw.newLine();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
 		}
 	}
 	
