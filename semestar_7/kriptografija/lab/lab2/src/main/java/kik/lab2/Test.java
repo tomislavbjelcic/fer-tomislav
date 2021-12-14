@@ -5,6 +5,7 @@ import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
 import java.security.SecureRandom;
 import java.security.spec.AlgorithmParameterSpec;
+import java.util.Arrays;
 
 import javax.crypto.BadPaddingException;
 import javax.crypto.Cipher;
@@ -36,7 +37,7 @@ public class Test {
 		//String h = Hex.toHexString(null);
 		Cipher cipher = null;
 		try {
-			cipher = Cipher.getInstance("DESede/CTR/PKCS5Padding");
+			cipher = Cipher.getInstance("DESede/CTR/NoPadding");
 		} catch (NoSuchAlgorithmException | NoSuchPaddingException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -65,6 +66,7 @@ public class Test {
 		byte[] randomdata = new byte[50];
 		rng.nextBytes(randomdata);
 		
+		System.out.println(cipher.getParameters());
 		
 		try {
 			byte[] ciphertext = cipher.doFinal(randomdata);
