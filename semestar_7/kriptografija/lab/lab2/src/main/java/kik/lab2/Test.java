@@ -5,7 +5,6 @@ import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
 import java.security.SecureRandom;
 import java.security.spec.AlgorithmParameterSpec;
-import java.util.Arrays;
 
 import javax.crypto.BadPaddingException;
 import javax.crypto.Cipher;
@@ -37,7 +36,7 @@ public class Test {
 		//String h = Hex.toHexString(null);
 		Cipher cipher = null;
 		try {
-			cipher = Cipher.getInstance("DESede/CTR/NoPadding");
+			cipher = Cipher.getInstance("AES/CFB/NoPadding");
 		} catch (NoSuchAlgorithmException | NoSuchPaddingException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -45,15 +44,20 @@ public class Test {
 		
 		KeyGenerator keygen = null;
 		try {
-			keygen = KeyGenerator.getInstance("DESede");
+			keygen = KeyGenerator.getInstance("AES");
 		} catch (NoSuchAlgorithmException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
+		keygen.init(256);
 		SecretKey symkey = keygen.generateKey();
+		System.out.println(symkey.getFormat());
+		byte[] symkeyenc = symkey.getEncoded();
+		System.out.println("Keylen: " + symkeyenc.length);
 		
 		SecureRandom rng = new SecureRandom();
-		byte[] ivb = new byte[8];
+		int blocksize = cipher.getBlockSize();
+		byte[] ivb = new byte[blocksize];
 		rng.nextBytes(ivb);
 		AlgorithmParameterSpec ivspec = new IvParameterSpec(ivb);
 		try {

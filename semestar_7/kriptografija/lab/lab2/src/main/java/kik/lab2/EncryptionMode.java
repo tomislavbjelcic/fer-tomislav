@@ -1,10 +1,5 @@
 package kik.lab2;
 
-import java.security.spec.AlgorithmParameterSpec;
-
-import javax.crypto.spec.GCMParameterSpec;
-import javax.crypto.spec.IvParameterSpec;
-
 public enum EncryptionMode {
 	
 	ECB(true, false),
@@ -23,19 +18,12 @@ public enum EncryptionMode {
 		this.requiresIv = requiresIv;
 	}
 	
-	public String getDefaultPadding() {
-		return requiresPadding ? "PKCS5Padding" : "NoPadding";
+	public boolean requiresPadding() {
+		return requiresPadding;
 	}
 	
-	public AlgorithmParameterSpec getAlgorithmParameterSpec(byte[] iv) {
-		if (!requiresIv)
-			return null;
-		
-		return this==GCM ? new GCMParameterSpec(128, iv) : new IvParameterSpec(iv);
-	}
-	
-	public static void main(String[] args) {
-		System.out.println(GCM.toString());
+	public boolean requiresIv() {
+		return requiresIv;
 	}
 	
 }

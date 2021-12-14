@@ -1,4 +1,4 @@
-package kik.lab2.format;
+package kik.lab2;
 
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
@@ -21,6 +21,8 @@ public class CryptoData {
 	private static final Charset CS = StandardCharsets.US_ASCII;
 	private static final String SEP = ":";
 	private static final String PREF = "    ";
+	
+	public static final int UNIT_SIZE = 60;
 	
 	public static final String DESCRIPTION = "description";
 	public static final String FILE_NAME = "file name";
