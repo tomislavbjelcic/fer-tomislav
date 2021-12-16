@@ -10,10 +10,8 @@ public abstract class SymmetricKeyExtractor implements KeyExtractor {
 	
 	@Override
 	public Key extract(Map<String, List<String>> data) {
-		// TODO Auto-generated method stub
+		
 		return null;
 	}
-	
-	protected abstract List<Integer> getKeySizes();
 	
 }

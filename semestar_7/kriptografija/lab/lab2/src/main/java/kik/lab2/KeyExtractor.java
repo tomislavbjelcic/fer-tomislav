@@ -8,4 +8,7 @@ public interface KeyExtractor {
 	
 	Key extract(Map<String, List<String>> data);
 	
+	int getKeySize();
+	String getAlgorithm();
+	
 }
