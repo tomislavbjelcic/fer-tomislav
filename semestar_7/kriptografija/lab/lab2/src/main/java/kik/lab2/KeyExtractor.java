@@ -6,6 +6,7 @@ import java.util.Map;
 
 public interface KeyExtractor {
 	
+	
 	Key extract(Map<String, List<String>> data);
 	
 	int getKeySize();

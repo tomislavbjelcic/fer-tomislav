@@ -7,6 +7,10 @@ import org.bouncycastle.jce.provider.BouncyCastleProvider;
 
 public class AddBcProv {
 	
+	/**
+	 * Registrira dodatnog vanjskog providera, za slučaj da već dostupni provideri 
+	 * ne mogu ponuditi neke kriptografske algoritme.
+	 */
 	public static void add() {
 		Provider prov = new BouncyCastleProvider();
 		String provName = prov.getName();

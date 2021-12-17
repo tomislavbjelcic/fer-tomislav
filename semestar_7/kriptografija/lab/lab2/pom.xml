@@ -9,7 +9,7 @@
 	<version>1.0</version>
 	<packaging>jar</packaging>
 
-	<name>KIK: druga laboratorijska vježba</name>
+	<name>KIK: druga laboratorijska vjezba</name>
      
 	<properties>
 		<maven.compiler.source>11</maven.compiler.source>

@@ -1,7 +1,6 @@
 package kik.lab2;
 
-import static kik.lab2.CryptoData.METHOD;
-import static kik.lab2.CryptoData.SIG;
+import static kik.lab2.CryptoData.*;
 
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -17,12 +16,13 @@ public class CheckSig {
 	public static void main(String[] args) throws Exception {
 		AddBcProv.add();
 		
-		Path filepath = Path.of(args[0]);
-		Path sigpath = Path.of(args[1]);
-		Path pubkeypath = Path.of(args[2]);
+		//Path filepath = Path.of(args[0]);
+		Path sigpath = Path.of(args[0]);
+		Path pubkeypath = Path.of(args[1]);
 		
 		Map<String, List<String>> pubkeydata = CryptoData.fromFile(pubkeypath);
 		Map<String, List<String>> sigdata = CryptoData.fromFile(sigpath);
+		Path filepath = Path.of(sigdata.get(FILE_NAME).get(0));
 		List<String> methods = sigdata.get(METHOD);
 		if (methods.size() != 2) {
 			System.out.println("Signature doesn't specify exactly 2 methods.");

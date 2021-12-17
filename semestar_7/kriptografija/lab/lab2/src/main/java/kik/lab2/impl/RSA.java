@@ -36,8 +36,7 @@ public class RSA implements EncryptionAlgorithm {
 
 	@Override
 	public void extractData(Map<String, List<String>> data) {
-		// TODO Auto-generated method stub
-		
+		//prazno
 	}
 	
 	
