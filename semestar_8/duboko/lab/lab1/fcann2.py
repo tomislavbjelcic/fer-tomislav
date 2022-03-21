@@ -1,6 +1,7 @@
 from scipy.special import softmax
+import matplotlib.pyplot as plt
 import numpy as np
-from data import *
+import data
 
 class FCANN2:
     def __init__(self, hldim=5, param_niter=1000, param_delta=0.05) -> None:
@@ -11,7 +12,7 @@ class FCANN2:
 
 
     def fcann2_train(self, X, y):
-        Yoh = class_to_onehot(y)
+        Yoh = data.class_to_onehot(y)
         D = X.shape[1]
         N = Yoh.shape[0]
         C = Yoh.shape[1]
@@ -30,7 +31,7 @@ class FCANN2:
             S1 = np.dot(X, np.matrix.transpose(self.W1)) + self.b1
             H1 = relu(S1)
             S2 = np.dot(H1, np.matrix.transpose(self.W2)) + self.b2
-            probs = softmax(S2)
+            probs = softmax(S2, axis=-1)
 
             #izracunaj gradijente
             Gs2 = probs - Yoh
@@ -55,7 +56,7 @@ class FCANN2:
         S1 = np.dot(X, np.matrix.transpose(self.W1)) + self.b1
         H1 = relu(S1)
         S2 = np.dot(H1, np.matrix.transpose(self.W2)) + self.b2
-        return softmax(S2)
+        return softmax(S2, axis=-1)
 
 
 
@@ -68,20 +69,23 @@ if __name__ == "__main__":
     np.random.seed(100)
   
     # get data
-    X,Y_ = sample_gmm_2d(ncomponents=6, nclasses=2, nsamples=10)
-    # X,Y_ = sample_gauss_2d(2, 100)
+    X,Y_ = data.sample_gmm_2d(ncomponents=6, nclasses=2, nsamples=10)
 
     # get the class predictions
     model = FCANN2()
     model.fcann2_train(X, Y_)
-    Y = np.argmax(model.fcann2_classify(X), axis=-1)  
+    Y_probs = model.fcann2_classify(X)
+    Y = np.argmax(Y_probs, axis=-1)
+
 
     # graph the decision surface
     rect=(np.min(X, axis=0), np.max(X, axis=0))
-    graph_surface(model.fcann2_classify, rect, offset=0)
+    #classifier = lambda X: np.argmax(model.fcann2_classify(X), axis=-1)
+    classifier = lambda X: model.fcann2_classify(X)[:,1]
+    data.graph_surface(classifier, rect, offset=0.5)
     
     # graph the data points
-    graph_data(X, Y_, Y, special=[])
+    data.graph_data(X, Y_, Y, special=[])
 
     plt.show()
     

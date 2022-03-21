@@ -105,7 +105,7 @@ def graph_data(X,Y_, Y, special=[]):
               s=sizes[bad], marker='s', edgecolors='black')
 
 def class_to_onehot(Y):
-  Yoh=np.zeros((len(Y),max(Y)+1))
+  Yoh=np.zeros((len(Y),max(Y)+1), dtype=np.int8)
   Yoh[range(len(Y)),Y] = 1
   return Yoh
 
@@ -204,7 +204,7 @@ if __name__=="__main__":
   #np.random.seed(100)
   
   # get data
-  X,Y_ = sample_gmm_2d(ncomponents=6, nclasses=5, nsamples=10)
+  X,Y_ = sample_gmm_2d(ncomponents=4, nclasses=2, nsamples=30)
   # X,Y_ = sample_gauss_2d(2, 100)
 
   # get the class predictions
