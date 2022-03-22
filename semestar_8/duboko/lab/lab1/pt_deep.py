@@ -54,7 +54,12 @@ class PTDeep(nn.Module):
 
     
     def count_params(self):
-        return None
+        params = []
+        total_param_count = 0
+        for name, param in ptlr.named_parameters():
+            params.append((name, param.shape))
+            total_param_count += param.numel()
+        return {"params":params, "total_param_count":total_param_count}
 
 
 def train(model : PTDeep, X, Yoh_, param_niter, param_delta, param_lambda=0.001):
@@ -104,8 +109,8 @@ def eval(model, X):
 
 if __name__ == "__main__":
     # inicijaliziraj generatore slučajnih brojeva
-    #np.random.seed(43)
-    #torch.manual_seed(43) sheeeeesh
+    np.random.seed(43)
+    torch.manual_seed(43)
 
     # instanciraj podatke X i labele Yoh_
     X,Y_ = data.sample_gmm_2d(ncomponents=6, nclasses=2, nsamples=10)
@@ -121,11 +126,12 @@ if __name__ == "__main__":
 
     # nauči parametre (X i Yoh_ moraju biti tipa torch.Tensor):
     train_params = {
-        "param_niter":1000, 
+        "param_niter":10000, 
         "param_delta":0.1, 
         "param_lambda":1e-4
     }
     train(ptlr, X_tensor, Yoh_tensor, **train_params)
+    
 
     # dohvati vjerojatnosti na skupu za učenje
     probs = eval(ptlr, X)
