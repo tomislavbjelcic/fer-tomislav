@@ -11,7 +11,7 @@ DATA_DIR = Path(__file__).parent / 'datasets' / 'MNIST'
 SAVE_DIR = Path(__file__).parent / 'out'
 
 config = {}
-config['max_epochs'] = 8
+config['max_epochs'] = 1
 config['batch_size'] = 50
 config['save_dir'] = SAVE_DIR
 config['weight_decay'] = 1e-3
@@ -26,8 +26,9 @@ np.random.seed(int(time.time() * 1e6) % 2**31)
 ds_train, ds_test = MNIST(DATA_DIR, train=True, download=True), MNIST(DATA_DIR, train=False)
 train_x = ds_train.data.reshape([-1, 1, 28, 28]).numpy().astype(np.float) / 255
 train_y = ds_train.targets.numpy()
-train_x, valid_x = train_x[:55000], train_x[55000:]
-train_y, valid_y = train_y[:55000], train_y[55000:]
+N = 55000
+train_x, valid_x = train_x[:N], train_x[N:]
+train_y, valid_y = train_y[:N], train_y[N:]
 test_x = ds_test.data.reshape([-1, 1, 28, 28]).numpy().astype(np.float) / 255
 test_y = ds_test.targets.numpy()
 train_mean = train_x.mean()
