@@ -10,20 +10,22 @@ def main():
     L_multiple = dev.get_info(cl.device_info.PREFERRED_WORK_GROUP_SIZE_MULTIPLE)
     
     # podesi parametre
-    N = 2**26
-    G = 2**13
+    N = 10**10 #int(input("N = "))
+    if N < 1:
+        return
+    G = 2**12
     L = L_multiple * 1
     print(f"N = {N}\nG = {G}\nL = {L}")
     
 
     # ucitaj program
     src = None
-    with open("primes.cl", "r") as f:
+    with open("calc_pi.cl", "r") as f:
         src = f.read()
     
 
     # pripremi podatke
-    data = np.arange(start=1, stop=N+1, dtype=np.int32)
+    # nema ih...
     
 
     # stvori red
@@ -31,21 +33,24 @@ def main():
 
 
     # pripremi memoriju naprave
-    dev_data = cl.Buffer(context=ctx, flags=cl.mem_flags.READ_ONLY | cl.mem_flags.COPY_HOST_PTR, hostbuf=data)
-    dev_count = cl.Buffer(context=ctx, flags=cl.mem_flags.READ_WRITE, size=4)
+    dev_results = cl.Buffer(context=ctx, flags=cl.mem_flags.READ_WRITE, size=G * np.dtype(np.double).itemsize)
 
 
     # prevedi i izvrsi program
     prog = cl.Program(ctx, src).build()
     start_time = time.time()
-    evt = prog.count_primes(queue, (G, ), (L, ), dev_data, dev_count, np.int32(N//G))
+    evt = prog.calc_pi(queue, (G, ), (L, ), dev_results, np.int64(N))
     evt.wait()
     duration = time.time() - start_time
 
     # dohvati rezultate
-    count = np.empty(1, dtype=np.int32)
-    cl.enqueue_copy(queue, count, dev_count)
-    print(f"Dovrseno u {duration} sekundi.\nProstih brojeva: {count[0]}")
+    results = np.empty(G, dtype=np.double)
+    cl.enqueue_copy(queue, results, dev_results)
+    res = np.sum(results)
+    print(f"pi = {res}")
+    print(f"Odstupanje od numpy.pi: {np.absolute(res-np.pi)}")
+    print(f"Dovrseno u {duration} sekundi.")
+
 
 
 if __name__ == '__main__':
